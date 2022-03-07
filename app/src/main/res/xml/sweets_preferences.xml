@@ -1,0 +1,23 @@
+<PreferenceScreen
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    >
+    <PreferenceCategory
+        app:title="Sweets"
+        app:summary="Select the item you would like"
+        app:allowDividerBelow="true"
+        >
+        <CheckBoxPreference
+            app:key="candy"
+            app:title="Candy"
+            app:useSimpleSummaryProvider="true"
+            app:allowDividerBelow="true"
+            />
+        <CheckBoxPreference
+            app:key="chocolate"
+            app:title="Chocolate"
+            app:useSimpleSummaryProvider="true"
+            app:allowDividerBelow="true"
+            />
+    </PreferenceCategory>
+</PreferenceScreen>

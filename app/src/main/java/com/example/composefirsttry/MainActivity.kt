@@ -1,5 +1,6 @@
 package com.example.composefirsttry
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -8,6 +9,7 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.composefirsttry.preferencescreens.PreferenceActivity
 import com.example.composefirsttry.ui.theme.ComposeFirstTryTheme
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonArray
@@ -46,9 +48,21 @@ class MainActivity : ComponentActivity() {
     override fun onResume() {
         super.onResume()
 
+        if (true) {
+            callPrefActivity()
+            return
+        }
+
         testingJson()
 
 //        testingEnum()
+    }
+
+    private fun callPrefActivity() {
+        val intent = Intent(this, PreferenceActivity::class.java)
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        this.startActivity(intent)
+        this.finish()
     }
 
     private fun testingJson(){
