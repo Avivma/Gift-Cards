@@ -19,5 +19,10 @@
             app:useSimpleSummaryProvider="true"
             app:allowDividerBelow="true"
             />
+
+<!--        <com.example.composefirsttry.preferencescreens.widget.MyPreferenceCheckBox-->
+<!--            android:layout="@layout/preference_item"-->
+<!--            app:key="chocolate"-->
+<!--            />-->
     </PreferenceCategory>
 </PreferenceScreen>

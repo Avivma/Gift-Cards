@@ -16,10 +16,8 @@ import com.example.composefirsttry.preferencescreens.widget.TriCheckBox
 
 class PrefViewModel (application: Application) : AndroidViewModel(application) {
     private val sp: SharedPreferences = application.getSharedPreferences(SHARD_PREF_NAME, Context.MODE_PRIVATE)
-    private var _intentionsLiveData: MutableLiveData<PrefEvents>? = MutableLiveData()
-    val intentionsLiveData: LiveData<PrefEvents>? = _intentionsLiveData
 
-    fun init() {
+    fun init(): ArrayList<ParentPrefItem> {
 //        L.i("PrefViewModel - init")
         val prefItems: ArrayList<ParentPrefItem> = arrayListOf()
         ParentCategoryEnum.values().toCollection(ArrayList()).forEach { category ->
@@ -27,7 +25,7 @@ class PrefViewModel (application: Application) : AndroidViewModel(application) {
             prefItems.add(ParentPrefItem(category, state))
         }
 
-        _intentionsLiveData?.postValue(PrefEvents.LandingScreen(prefItems))
+        return prefItems
     }
 
     fun updateState(parentItem: ParentPrefItem) {
@@ -43,10 +41,5 @@ class PrefViewModel (application: Application) : AndroidViewModel(application) {
             }
         }
         editor.putInt(parentItem.prefType.text, parentItem.state).commit()
-    }
-
-    fun resetObserver(viewLifecycleOwner: LifecycleOwner) {
-        intentionsLiveData?.removeObservers(viewLifecycleOwner)
-        _intentionsLiveData = null
     }
 }

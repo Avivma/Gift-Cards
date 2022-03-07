@@ -3,38 +3,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/mainPrefFragment">
+    app:startDestination="@id/alternativeMainPrefFragment">
 
     <fragment
         android:id="@+id/FirstFragment"
         android:name="com.example.composefirsttry.preferencescreens.ideexample.FirstFragment"
         android:label="@string/first_fragment_label"
-        tools:layout="@layout/fragment_first">
+        tools:layout="@layout/fragment_first"/>
 
-        <action
-            android:id="@+id/action_FirstFragment_to_SecondFragment"
-            app:destination="@id/SecondFragment" />
-    </fragment>
-    <fragment
-        android:id="@+id/SecondFragment"
-        android:name="com.example.composefirsttry.preferencescreens.ideexample.SecondFragment"
-        android:label="@string/second_fragment_label"
-        tools:layout="@layout/fragment_second">
-
-        <action
-            android:id="@+id/action_SecondFragment_to_FirstFragment"
-            app:destination="@id/FirstFragment" />
-    </fragment>
-
-    <fragment
-        android:id="@+id/mainPrefFragment"
-        android:name="com.example.composefirsttry.preferencescreens.fragments.MainPrefFragment"
-        android:label="MainPreferenceFragment"
-        tools:layout="@layout/main_preference_fragment">
-        <action
-            android:id="@+id/action_mainPreferenceFragment_to_subPreferenceFragment"
-            app:destination="@id/subPrefFragment" />
-    </fragment>
     <fragment
         android:id="@+id/subPrefFragment"
         android:name="com.example.composefirsttry.preferencescreens.fragments.SubPrefFragment"
@@ -42,5 +18,14 @@
         <argument
             android:name="parentItem"
             app:argType="com.example.composefirsttry.preferencescreens.fragments.ParentPrefItem" />
+    </fragment>
+    <fragment
+        android:id="@+id/alternativeMainPrefFragment"
+        android:name="com.example.composefirsttry.preferencescreens.fragments.AlternativeMainPrefFragment"
+        android:label="AlternativeMainPrefFragment"
+        >
+        <action
+            android:id="@+id/action_alternativeMainPrefFragment_to_subPrefFragment"
+            app:destination="@id/subPrefFragment" />
     </fragment>
 </navigation>
