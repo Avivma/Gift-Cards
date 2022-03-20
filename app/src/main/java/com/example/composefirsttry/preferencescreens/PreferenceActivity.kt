@@ -1,11 +1,12 @@
 package com.example.composefirsttry.preferencescreens
 
-import android.content.Context
-import android.content.SharedPreferences
+import android.content.*
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
@@ -38,6 +39,14 @@ class PreferenceActivity : AppCompatActivity() {
         val navController = findNavController(R.id.nav_host_fragment_content_preference)
         appBarConfiguration = AppBarConfiguration(navController.graph)
         setupActionBarWithNavController(navController, appBarConfiguration)
+
+        binding.contentPreferenceLayout.sendLogButton.setOnClickListener { view ->
+            //send logs:
+            L.i("Logs sent (mock)")
+        }
+        binding.contentPreferenceLayout.sendLogCancelButton.setOnClickListener { view ->
+            binding.contentPreferenceLayout.sendLogLayout.visibility = View.GONE
+        }
 
         binding.fab.setOnClickListener { view ->
 //            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
@@ -81,7 +90,37 @@ class PreferenceActivity : AppCompatActivity() {
 
     //(10, candy) : true
 
+    override fun onStart() {
+        super.onStart()
+        registerReceivers()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        unregisterReceivers()
+    }
+
+    private fun registerReceivers() {
+        LocalBroadcastManager.getInstance(this).registerReceiver(sendLogReceiver, IntentFilter(SEND_LOGS_ACTION))
+    }
+
+    private fun unregisterReceivers() {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(sendLogReceiver)
+    }
+
+    private val sendLogReceiver = object : BroadcastReceiver() {
+        override fun onReceive(contxt: Context?, intent: Intent?) {
+            when (intent?.action) {
+                SEND_LOGS_ACTION -> {
+                    binding.contentPreferenceLayout.sendLogLayout.visibility = View.VISIBLE
+                }
+            }
+        }
+    }
+
     companion object {
         const val LOG_TAG = "TESTING"
+
+        const val SEND_LOGS_ACTION = "send_logs_action"
     }
 }

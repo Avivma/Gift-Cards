@@ -1,14 +1,17 @@
 package com.example.composefirsttry.preferencescreens.fragments
 
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.navigation.fragment.navArgs
 import androidx.preference.CheckBoxPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceCategory
 import androidx.preference.PreferenceFragmentCompat
 import com.example.composefirsttry.R
+import com.example.composefirsttry.preferencescreens.PreferenceActivity.Companion.SEND_LOGS_ACTION
 import com.example.composefirsttry.preferencescreens.miscellaneous.CategoryEnum
 import com.example.composefirsttry.preferencescreens.miscellaneous.ParentCategoryEnum
 import com.example.composefirsttry.preferencescreens.miscellaneous.SHARD_PREF_NAME
@@ -54,8 +57,14 @@ class SubPrefFragment : PreferenceFragmentCompat() {
                 0 -> TriCheckBox.UNCHECKED
                 else -> TriCheckBox.INDETERMINATE
             }
+        } else if (preference?.key == "send_logs") {
+            sendLocalBroadcast()
         }
         return true
+    }
+
+    private fun sendLocalBroadcast() {
+        LocalBroadcastManager.getInstance(requireContext()).sendBroadcast(Intent(SEND_LOGS_ACTION))
     }
 
     private fun getCheckedPref(categories: ArrayList<CategoryEnum>): Int = categories.filter { category ->

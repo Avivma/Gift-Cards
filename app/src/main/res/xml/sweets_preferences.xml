@@ -24,5 +24,9 @@
 <!--            android:layout="@layout/preference_item"-->
 <!--            app:key="chocolate"-->
 <!--            />-->
+        <Preference
+            app:key="send_logs"
+            app:title="Send Logs"
+            />
     </PreferenceCategory>
 </PreferenceScreen>
