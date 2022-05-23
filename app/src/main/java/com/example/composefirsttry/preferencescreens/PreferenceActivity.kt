@@ -18,12 +18,19 @@ import com.example.composefirsttry.preferencescreens.miscellaneous.CategoryEnum
 import com.example.composefirsttry.preferencescreens.miscellaneous.ParentCategoryEnum
 import com.example.composefirsttry.preferencescreens.miscellaneous.SHARD_PREF_NAME
 import com.example.composefirsttry.preferencescreens.widget.TriCheckBox
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.lifecycle.lifecycleScope
+import com.example.composefirsttry.amazon.AmazonIapManager
+import kotlinx.coroutines.launch
+
 
 class PreferenceActivity : AppCompatActivity() {
 
     private lateinit var sp: SharedPreferences
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityPreferenceBinding
+    private lateinit var amazonIapManager: AmazonIapManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,6 +47,28 @@ class PreferenceActivity : AppCompatActivity() {
         appBarConfiguration = AppBarConfiguration(navController.graph)
         setupActionBarWithNavController(navController, appBarConfiguration)
 
+
+
+        val installerPackageName = getInstallerPackageName(this.packageName)
+        var purchaseFromAmazonStore = false
+        if (installerPackageName!!.startsWith("com.amazon")) {
+            // Amazon
+            amazonIapManager.init()
+            purchaseFromAmazonStore = true
+        } else if ("com.android.vending" == installerPackageName) {
+            // Google Play
+        }
+
+        binding.contentPreferenceLayout.purchaseButton.setOnClickListener { view ->
+            if (purchaseFromAmazonStore) {
+                this.lifecycleScope.launch {
+                    amazonIapManager.purchase("com.amazon.sample.iap.subscription.mymagazine")
+                }
+            } else {
+                // Google Play
+            }
+        }
+
         binding.contentPreferenceLayout.sendLogButton.setOnClickListener { view ->
             //send logs:
             L.i("Logs sent (mock)")
@@ -53,6 +82,16 @@ class PreferenceActivity : AppCompatActivity() {
 //                .setAction("Action", null).show()
             printAllSettings()
         }
+    }
+
+    fun getInstallerPackageName(packageName: String): String? {
+        kotlin.runCatching {
+            return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R)
+                this.packageManager.getInstallSourceInfo(packageName).installingPackageName
+            else
+                this.packageManager.getInstallerPackageName(packageName)
+        }
+        return null
     }
 
     override fun onSupportNavigateUp(): Boolean {

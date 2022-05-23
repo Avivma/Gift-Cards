@@ -29,7 +29,7 @@ object L {
         Log.e(TAG, message!!)
     }
 
-    fun e(@NonNull message: String?, @NonNull e: Exception?) {
+    fun e(@NonNull message: String?, @NonNull e: Throwable?) {
         Log.e(TAG, message, e)
     }
 }

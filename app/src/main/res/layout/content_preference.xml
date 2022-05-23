@@ -6,6 +6,7 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
     <fragment
+        android:visibility="gone"
         android:id="@+id/nav_host_fragment_content_preference"
         android:name="androidx.navigation.fragment.NavHostFragment"
         android:layout_width="0dp"
@@ -16,6 +17,41 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:navGraph="@navigation/nav_graph" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/purchase_layout"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:background="@color/colorPrimary"
+        >
+        <TextView
+            android:id="@+id/purchase_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_margin="12dp"
+            android:text="Select plan to purchase:"
+            android:textSize="16sp"
+            android:textColor="@color/black"
+            />
+
+        <Button
+            android:id="@+id/purchase_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:background="@color/transparent"
+            android:text="Purchase"
+            android:textAllCaps="false"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:visibility="gone"

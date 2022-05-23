@@ -76,6 +76,9 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
     implementation 'androidx.preference:preference:1.1.0'
 
+    //Amazon
+    implementation 'com.amazon.device:amazon-appstore-sdk:3.0.2'
+
     //Dagger 2
     implementation 'com.google.dagger:dagger:2.25.4'
     kapt 'com.google.dagger:dagger-compiler:2.25.4'
