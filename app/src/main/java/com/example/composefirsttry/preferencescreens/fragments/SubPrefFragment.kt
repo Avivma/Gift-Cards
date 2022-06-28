@@ -8,7 +8,6 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.navigation.fragment.navArgs
 import androidx.preference.CheckBoxPreference
 import androidx.preference.Preference
-import androidx.preference.PreferenceCategory
 import androidx.preference.PreferenceFragmentCompat
 import com.example.composefirsttry.R
 import com.example.composefirsttry.preferencescreens.PreferenceActivity.Companion.SEND_LOGS_ACTION
@@ -16,8 +15,6 @@ import com.example.composefirsttry.preferencescreens.miscellaneous.CategoryEnum
 import com.example.composefirsttry.preferencescreens.miscellaneous.ParentCategoryEnum
 import com.example.composefirsttry.preferencescreens.miscellaneous.SHARD_PREF_NAME
 import com.example.composefirsttry.preferencescreens.widget.TriCheckBox
-import java.util.*
-import kotlin.collections.ArrayList
 
 class SubPrefFragment : PreferenceFragmentCompat() {
     private val args: SubPrefFragmentArgs by navArgs()
@@ -47,7 +44,7 @@ class SubPrefFragment : PreferenceFragmentCompat() {
         setPreferencesFromResource(xmlPreferenceResource, rootKey)
     }
 
-    override fun onPreferenceTreeClick(preference: Preference?): Boolean {
+    override fun onPreferenceTreeClick(preference: Preference): Boolean {
         super.onPreferenceTreeClick(preference)
         if (preference is CheckBoxPreference) {
             checkedPreferences += if (preference.isChecked) 1 else -1
@@ -68,7 +65,7 @@ class SubPrefFragment : PreferenceFragmentCompat() {
     }
 
     private fun getCheckedPref(categories: ArrayList<CategoryEnum>): Int = categories.filter { category ->
-            this.preferenceManager.sharedPreferences.getBoolean(category.text, false)
+            this.preferenceManager.sharedPreferences!!.getBoolean(category.text, false)
         }.count()
 
     override fun onStop() {

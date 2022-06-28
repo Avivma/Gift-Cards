@@ -9,6 +9,7 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.composefirsttry.giftcard.GiftCardMainActivity
 import com.example.composefirsttry.preferencescreens.PreferenceActivity
 import com.example.composefirsttry.ui.theme.ComposeFirstTryTheme
 import com.google.gson.GsonBuilder
@@ -48,8 +49,13 @@ class MainActivity : ComponentActivity() {
     override fun onResume() {
         super.onResume()
 
+//        if (true) {
+//            callPrefActivity()
+//            return
+//        }
+
         if (true) {
-            callPrefActivity()
+            callGiftCardActivity()
             return
         }
 
@@ -60,6 +66,13 @@ class MainActivity : ComponentActivity() {
 
     private fun callPrefActivity() {
         val intent = Intent(this, PreferenceActivity::class.java)
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        this.startActivity(intent)
+        this.finish()
+    }
+
+    private fun callGiftCardActivity() {
+        val intent = Intent(this, GiftCardMainActivity::class.java)
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         this.startActivity(intent)
         this.finish()

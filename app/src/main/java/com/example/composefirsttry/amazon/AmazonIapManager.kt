@@ -29,23 +29,23 @@ class AmazonIapManager @Inject constructor(
             val status = purchaseResponse.requestStatus
             L.i("onPurchaseResponse: requestId ($requestId) userId ($userId) purchaseRequestStatus ($status)")
             when (status) {
-                PurchaseResponse.RequestStatus.SUCCESSFUL -> {
-                    val receipt = purchaseResponse.receipt
-                    L.i("onPurchaseResponse: receipt json: ${receipt.toJSON()}")
-                    handleSubscriptionPurchase(receipt, purchaseResponse.userData)
-                }
-                PurchaseResponse.RequestStatus.ALREADY_PURCHASED ->
-                    L.i("onPurchaseResponse: already purchased, you should verify the subscription purchase on your side and make sure the purchase was granted to customer")
-                PurchaseResponse.RequestStatus.INVALID_SKU -> {
-                    L.i("onPurchaseResponse: invalid SKU!  onProductDataResponse should have disabled buy button already.")
-                    val unavailableSkus: MutableSet<String> = HashSet()
-                    unavailableSkus.add(purchaseResponse.receipt.sku)
-                    iapManager.disablePurchaseForSkus(unavailableSkus)
-                }
-                PurchaseResponse.RequestStatus.FAILED, PurchaseResponse.RequestStatus.NOT_SUPPORTED -> {
-                    L.i("onPurchaseResponse: failed so remove purchase request from local storage")
-                    iapManager.purchaseFailed(purchaseResponse.receipt.sku)
-                }
+//                PurchaseResponse.RequestStatus.SUCCESSFUL -> {
+//                    val receipt = purchaseResponse.receipt
+//                    L.i("onPurchaseResponse: receipt json: ${receipt.toJSON()}")
+//                    handleSubscriptionPurchase(receipt, purchaseResponse.userData)
+//                }
+//                PurchaseResponse.RequestStatus.ALREADY_PURCHASED ->
+//                    L.i("onPurchaseResponse: already purchased, you should verify the subscription purchase on your side and make sure the purchase was granted to customer")
+//                PurchaseResponse.RequestStatus.INVALID_SKU -> {
+//                    L.i("onPurchaseResponse: invalid SKU!  onProductDataResponse should have disabled buy button already.")
+//                    val unavailableSkus: MutableSet<String> = HashSet()
+//                    unavailableSkus.add(purchaseResponse.receipt.sku)
+//                    iapManager.disablePurchaseForSkus(unavailableSkus)
+//                }
+//                PurchaseResponse.RequestStatus.FAILED, PurchaseResponse.RequestStatus.NOT_SUPPORTED -> {
+//                    L.i("onPurchaseResponse: failed so remove purchase request from local storage")
+//                    iapManager.purchaseFailed(purchaseResponse.receipt.sku)
+//                }
             }
         }
     }
@@ -62,14 +62,14 @@ class AmazonIapManager @Inject constructor(
                 if (!verifyReceiptFromYourService(receipt.receiptId, userData)) {
                     // if the purchase cannot be verified,
                     // show relevant error message to the customer.
-                    mainActivity.showMessage("Purchase cannot be verified, please retry later.")
-                    return
+//                    mainActivity.showMessage("Purchase cannot be verified, please retry later.")
+//                    return
                 }
                 grantSubscriptionPurchase(receipt, userData)
             }
             return
         } catch (e: Throwable) {
-            mainActivity.showMessage("Purchase cannot be completed, please retry")
+//            mainActivity.showMessage("Purchase cannot be completed, please retry")
         }
     }
 
@@ -79,26 +79,26 @@ class AmazonIapManager @Inject constructor(
     }
 
     private fun grantSubscriptionPurchase(receipt: Receipt, userData: UserData) {
-        val mySku: MySku = MySku.fromSku(receipt.sku, userIapData.getAmazonMarketplace())
-        // Verify that the SKU is still applicable.
-        if (mySku !== MySku.MY_MAGAZINE_SUBS) {
-            L.i("The SKU [${receipt.sku}] in the receipt is not valid anymore")
-            // if the sku is not applicable anymore, call
-            // PurchasingService.notifyFulfillment with status "UNAVAILABLE"
-            PurchasingService.notifyFulfillment(receipt.receiptId, FulfillmentResult.UNAVAILABLE)
-            return
-        }
-        try {
-            // Set the purchase status to fulfilled for your application
-            PurchasingService.notifyFulfillment(receipt.receiptId, FulfillmentResult.FULFILLED)
-            ///////////////////////////////////
-            // start Cumulus activation process
-            ///////////////////////////////////
-        } catch (e: Throwable) {
-            // If for any reason the app is not able to fulfill the purchase,
-            // add your own error handling code here.
-            L.e("Failed to grant entitlement purchase, with error: ", e)
-        }
+//        val mySku: MySku = MySku.fromSku(receipt.sku, userIapData.getAmazonMarketplace())
+//        // Verify that the SKU is still applicable.
+//        if (mySku !== MySku.MY_MAGAZINE_SUBS) {
+//            L.i("The SKU [${receipt.sku}] in the receipt is not valid anymore")
+//            // if the sku is not applicable anymore, call
+//            // PurchasingService.notifyFulfillment with status "UNAVAILABLE"
+//            PurchasingService.notifyFulfillment(receipt.receiptId, FulfillmentResult.UNAVAILABLE)
+//            return
+//        }
+//        try {
+//            // Set the purchase status to fulfilled for your application
+//            PurchasingService.notifyFulfillment(receipt.receiptId, FulfillmentResult.FULFILLED)
+//            ///////////////////////////////////
+//            // start Cumulus activation process
+//            ///////////////////////////////////
+//        } catch (e: Throwable) {
+//            // If for any reason the app is not able to fulfill the purchase,
+//            // add your own error handling code here.
+//            L.e("Failed to grant entitlement purchase, with error: ", e)
+//        }
     }
 
 }

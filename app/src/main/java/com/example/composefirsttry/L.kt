@@ -21,14 +21,17 @@ object L {
         }.start()
     }
 
+    @JvmStatic
     fun i(@NonNull message: String?) {
         Log.i(TAG, message!!)
     }
 
+    @JvmStatic
     fun e(message: String?) {
         Log.e(TAG, message!!)
     }
 
+    @JvmStatic
     fun e(@NonNull message: String?, @NonNull e: Throwable?) {
         Log.e(TAG, message, e)
     }

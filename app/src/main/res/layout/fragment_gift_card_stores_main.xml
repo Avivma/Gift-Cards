@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <variable
+            name="model"
+            type="com.example.composefirsttry.giftcard.viewmodel.StoresMainViewModel"
+            />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/stores_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:gravity="center"
+            android:text="Stores"
+            android:textSize="32sp"
+            android:textColor="@color/black"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <EditText
+            android:id="@+id/search_store"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="18dp"
+            android:layout_marginEnd="12dp"
+            android:hint="Search store"
+            android:text="@={model.searchTextMutableLiveData}"
+            android:textSize="20sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/search_button"
+            app:layout_constraintTop_toBottomOf="@+id/stores_title" />
+
+        <Button
+            android:id="@+id/search_button"
+            android:layout_width="90dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="@id/search_store"
+            app:layout_constraintStart_toEndOf="@id/search_store"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginEnd="12dp"
+            android:text="Search"
+            android:textAllCaps="false"
+            />
+
+        <androidx.appcompat.widget.AppCompatCheckBox
+            android:id="@+id/max_check_box"
+            android:layout_width="96dp"
+            android:layout_height="36dp"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="8dp"
+            android:background="@color/very_light_grey"
+            android:checked="@{model.maxCardChecked}"
+            android:gravity="center"
+            android:text="Max"
+            android:textSize="12sp"
+            android:textColor="@color/black"
+            app:layout_constraintStart_toStartOf="@id/search_store"
+            app:layout_constraintTop_toBottomOf="@id/search_store"
+            tools:checked="true" />
+
+        <androidx.appcompat.widget.AppCompatCheckBox
+            android:id="@+id/corporate_check_box"
+            android:layout_width="96dp"
+            android:layout_height="36dp"
+            android:layout_marginStart="24sp"
+            android:background="@color/very_light_grey"
+            android:checked="@{model.corporateCardChecked}"
+            android:gravity="center"
+            android:text="Corporate"
+            android:textSize="12sp"
+            android:textColor="@color/black"
+            app:layout_constraintStart_toEndOf="@id/max_check_box"
+            app:layout_constraintTop_toTopOf="@id/max_check_box"
+            tools:checked="true" />
+
+        <androidx.appcompat.widget.AppCompatCheckBox
+            android:id="@+id/hot_check_box"
+            android:layout_width="96dp"
+            android:layout_height="36dp"
+            android:layout_marginStart="24sp"
+            android:background="@color/very_light_grey"
+            android:checked="@{model.hotCardChecked}"
+            android:gravity="center"
+            android:text="Hot"
+            android:textSize="12sp"
+            android:textColor="@color/black"
+            app:layout_constraintStart_toEndOf="@id/corporate_check_box"
+            app:layout_constraintTop_toTopOf="@id/max_check_box"
+            tools:checked="true" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/store_recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_margin="12dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/max_check_box"
+            tools:itemCount="5"
+            tools:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            tools:listitem="@layout/store_row_layout"
+            tools:scrollbars="vertical" />
+
+        <ProgressBar
+            android:id="@+id/progress_circular"
+            android:layout_width="120dp"
+            android:layout_height="0dp"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintTop_toTopOf="@id/store_recycler_view"
+            app:layout_constraintBottom_toBottomOf="@id/store_recycler_view"
+            app:layout_constraintStart_toStartOf="@id/store_recycler_view"
+            app:layout_constraintEnd_toEndOf="@id/store_recycler_view"
+            android:visibility="gone"
+            />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
