@@ -16,7 +16,9 @@
         android:theme="@style/Theme.ComposeFirstTry">
         <activity
             android:name=".giftcard.GiftCardMainActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.ComposeFirstTry.NoActionBar"/>
         <activity
             android:name=".preferencescreens.PreferenceActivity"
             android:exported="false"

@@ -2,8 +2,9 @@ package com.example.composefirsttry.giftcard.network
 
 import com.example.composefirsttry.giftcard.network.sheet.SheetItem
 import com.example.composefirsttry.giftcard.network.sheet.SheetsUsingUrl
+import javax.inject.Inject
 
-class RestGiftCardService {
+class RestGiftCardService @Inject constructor() {
     fun getStores(): List<SheetItem> {
 //        printAllFirebaseDB()
         val sheetItems = SheetsUsingUrl.dataFromWeb()

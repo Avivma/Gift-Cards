@@ -1,6 +1,5 @@
 package com.example.composefirsttry.giftcard.repository
 
-import android.content.Context
 import androidx.annotation.WorkerThread
 import androidx.lifecycle.LiveData
 import com.example.composefirsttry.giftcard.db.GiftCardDatabase
@@ -9,25 +8,22 @@ import com.example.composefirsttry.giftcard.db.entity.StoreEntity
 import com.example.composefirsttry.giftcard.network.RestGiftCardService
 import com.example.composefirsttry.giftcard.network.sheet.SheetItem
 import java.util.*
+import javax.inject.Inject
+import javax.inject.Singleton
 
-object GiftCardRepo {
-    private lateinit var db: GiftCardDatabase
-    private lateinit var giftCardDao: GiftCardDao
-    private lateinit var allStores: LiveData<List<StoreEntity>>
-    private lateinit var restService: RestGiftCardService
+@Singleton
+class GiftCardRepo @Inject constructor(
+    db: GiftCardDatabase,
+    private var restService: RestGiftCardService
+) {
+    private val giftCardDao: GiftCardDao = db.giftCardDao()
+    private val allStores: LiveData<List<StoreEntity>> = giftCardDao.getAll()
 
     fun getAllStoresDb(): LiveData<List<StoreEntity>> = allStores
 
     @WorkerThread
-    fun initializeDB(context: Context) {
-        db = GiftCardDatabase.getDataseClient(context)
-        giftCardDao = db.giftCardDao()
-        allStores = giftCardDao.getAll()
-        restService = RestGiftCardService()
-
-        if ((allStores.value?.size ?: 0) == 0) {
-            fetchFromServer()
-        }
+    fun refresh() {
+        fetchFromServer()
     }
 
     private fun fetchFromServer() {
@@ -55,15 +51,10 @@ object GiftCardRepo {
         return storesDb
     }
 
-//    fun insertData(context: Context, giftCardName: String, firstStoreName: String) {
-//        GlobalScope.launch(Dispatchers.IO) {
-//            db.giftCardDao().insertAll(
-//                giftCards = arrayListOf("zara", "fox").map { store -> StoreEntity(store) })
-//        }
-//    }
-
-    @WorkerThread
-    suspend fun refresh() {
-        fetchFromServer()
-    }
+/*    fun insertData(context: Context, giftCardName: String, firstStoreName: String) {
+        GlobalScope.launch(Dispatchers.IO) {
+            db.giftCardDao().insertAll(
+                giftCards = arrayListOf("zara", "fox").map { store -> StoreEntity(store) })
+        }
+    }*/
 }

@@ -46,8 +46,7 @@ class GiftCardStoresMainFragment : Fragment() {
         viewModel = ViewModelProvider(this, StoresMainViewModelFactory(requireActivity().application, viewLifecycleOwner))
             .get(StoresMainViewModel::class.java)
 
-        adapter = StoresAdapter(viewModel.getStores())
-
+        adapter = StoresAdapter(emptyList())
         binding.storeRecyclerView.adapter = adapter
         binding.storeRecyclerView.layoutManager = LinearLayoutManager(requireActivity())
 
@@ -64,15 +63,18 @@ class GiftCardStoresMainFragment : Fragment() {
         //More info: https://blog.usejournal.com/observe-livedata-from-viewmodel-in-fragment-fd7d14f9f5fb
         viewModel.stateLiveData.removeObservers(viewLifecycleOwner)
         viewModel.stateLiveData.observe(viewLifecycleOwner, Observer { state -> render(state) })
+        viewModel.action(StoresMainIntention.Refresh)
     }
 
     private fun render(state: StoreMainState) {
         when(state) {
             StoreMainState.Waiting -> {
+                L.i("StoreMainState.Waiting")
                 binding.progressCircular.visibility = if (state.progressBarVisible) View.VISIBLE else View.GONE
                 binding.storeRecyclerView.alpha = if (state.storesListFaded) 0.5f else 1f
             }
             is StoreMainState.DisplayData -> {
+                L.i("StoreMainState.DisplayData")
                 binding.progressCircular.visibility = if (state.progressBarVisible) View.VISIBLE else View.GONE
                 binding.storeRecyclerView.alpha = if (state.storesListFaded) 0.5f else 1f
                 adapter.setStores(state.stores)
@@ -86,14 +88,14 @@ class GiftCardStoresMainFragment : Fragment() {
     }
 
     private fun setListeners() {
-        binding.maxCheckBox.setOnCheckedChangeListener { _, isChecked ->
-            viewModel.action(StoresMainIntention.FilterByCard(GiftCard.MAX, isChecked))
+        binding.maxCheckBox.setOnCheckedChangeListener { buttonView, isChecked ->
+            if (buttonView.isPressed) viewModel.action(StoresMainIntention.FilterByCard(GiftCard.MAX, isChecked))
         }
-        binding.corporateCheckBox.setOnCheckedChangeListener { _, isChecked ->
-            viewModel.action(StoresMainIntention.FilterByCard(GiftCard.CORPORATE, isChecked))
+        binding.corporateCheckBox.setOnCheckedChangeListener { buttonView, isChecked ->
+            if (buttonView.isPressed) viewModel.action(StoresMainIntention.FilterByCard(GiftCard.CORPORATE, isChecked))
         }
-        binding.hotCheckBox.setOnCheckedChangeListener { _, isChecked ->
-            viewModel.action(StoresMainIntention.FilterByCard(GiftCard.HOT, isChecked))
+        binding.hotCheckBox.setOnCheckedChangeListener { buttonView, isChecked ->
+            if (buttonView.isPressed) viewModel.action(StoresMainIntention.FilterByCard(GiftCard.HOT, isChecked))
         }
 
         binding.searchButton.setOnClickListener {
