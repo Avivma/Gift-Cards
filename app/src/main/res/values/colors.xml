@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="accent">@color/teal_200</color>
+
     <color name="purple_200">#FFBB86FC</color>
     <color name="purple_500">#FF6200EE</color>
     <color name="purple_700">#FF3700B3</color>
@@ -7,11 +9,18 @@
     <color name="teal_700">#FF018786</color>
     <color name="colorPrimary">#c7c7c7</color>
     <color name="colorSecondary">#575aff</color>
+    <color name="light_accent">#D8A7FF</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="grey">#787878</color>
     <color name="very_light_grey">#e0e0e0</color>
+    <color name="extreme_light_grey">#EFEFEF</color>
     <color name="transparent">@android:color/transparent</color>
+    <color name="top_background">@color/light_accent</color>
     <color name="check_box_color">#575aff</color>
-    <color name="frame_color">#AB9D72</color>
+    <color name="search_frame_color">@color/colorSecondary</color>
+    <color name="select_frame_color">@color/accent</color>
+    <color name="store_cards_frame_color">@color/extreme_light_grey</color>
+    <color name="store_solid_color">@color/extreme_light_grey</color>
+<!--    <color name="frame_color">#AB9D72</color>-->
 </resources>

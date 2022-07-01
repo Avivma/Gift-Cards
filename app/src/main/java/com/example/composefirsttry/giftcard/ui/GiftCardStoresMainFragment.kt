@@ -11,7 +11,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.composefirsttry.L
 import com.example.composefirsttry.MyApplication
 import com.example.composefirsttry.R
@@ -49,15 +49,7 @@ class GiftCardStoresMainFragment : Fragment() {
 
         adapter = StoresAdapter(emptyList())
         binding.storeRecyclerView.adapter = adapter
-        //        binding.storeRecyclerView.layoutManager = GridLayoutManager(requireActivity(), 2)
-
-        val layoutManager = GridLayoutManager(requireActivity(), 2)
-        layoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
-            override fun getSpanSize(position: Int): Int {
-                return 1
-            }
-        }
-        binding.storeRecyclerView.layoutManager = layoutManager
+        binding.storeRecyclerView.layoutManager = LinearLayoutManager(requireActivity())
 
         L.i("Checkboxes state BEFORE attach model: binding.maxCheckBox= ${binding.maxCheckBox.checkBoxFrame.visibility == View.VISIBLE}, binding.corporateCheckBox= ${binding.corporateCheckBox.checkBoxFrame.visibility == View.VISIBLE}, binding.hotCheckBox= ${binding.hotCheckBox.checkBoxFrame.visibility == View.VISIBLE}")
         binding.model = viewModel
@@ -97,9 +89,6 @@ class GiftCardStoresMainFragment : Fragment() {
     }
 
     private fun setListeners() {
-//        binding.maxCheckBox.setOnCheckedChangeListener { buttonView, isChecked ->
-//            if (buttonView.isPressed) viewModel.action(StoresMainIntention.FilterByCard(GiftCard.MAX, isChecked))
-//        }
         binding.maxCheckBox.checkBox.setOnClickListener { view ->
             if (view is CheckedTextView) {
                 view.toggle()
@@ -122,10 +111,6 @@ class GiftCardStoresMainFragment : Fragment() {
                 binding.hotCheckBox.checkBoxFrame.visibility = if (view.isChecked) View.VISIBLE else View.INVISIBLE
                 viewModel.action(StoresMainIntention.FilterByCard(GiftCard.HOT, view.isChecked))
             }
-        }
-
-        binding.searchButton.setOnClickListener {
-            viewModel.action(StoresMainIntention.FilterByPrefix(binding.searchStore.text.toString()))
         }
     }
 

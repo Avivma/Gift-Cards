@@ -4,7 +4,11 @@
 
     <corners android:radius="12dp" />
 
-    <solid android:color="@color/store_solid_color" />
+    <solid android:color="@color/transparent" />
+
+    <stroke
+        android:width="2.5dp"
+        android:color="@color/store_cards_frame_color" />
 
     <padding
         android:left="4dp" android:top="4dp"

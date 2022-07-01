@@ -57,6 +57,11 @@ class StoresMainViewModel(app: Application, private val fragmentViewLifecycleOwn
         storesLiveData.observeFreshly(fragmentViewLifecycleOwner, Observer { ignore ->
             sendFreshData()
         })
+
+        searchTextMutableLiveData.removeObservers(fragmentViewLifecycleOwner)
+        searchTextMutableLiveData.observeFreshly(fragmentViewLifecycleOwner, Observer { textFilter ->
+            action(StoresMainIntention.FilterByPrefix(textFilter))
+        })
     }
 
     private fun sendFreshData() {
@@ -71,7 +76,7 @@ class StoresMainViewModel(app: Application, private val fragmentViewLifecycleOwn
                 is StoresMainIntention.FilterByPrefix -> filterByPrefix(intention.prefix)
                 is StoresMainIntention.FilterByCard -> filterByCard(intention.card, intention.isChecked)
                 StoresMainIntention.Refresh -> {
-                    delay(1500)
+                    delay(1000)
                     giftCardRepo.refresh()
                 }
             }
