@@ -17,10 +17,11 @@
 
         <TextView
             android:id="@+id/store_name"
-            android:layout_width="128dp"
-            android:layout_height="72dp"
+            android:layout_width="144dp"
+            android:layout_height="80dp"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             android:textColor="@color/black"
             android:gravity="center"
             android:textSize="18sp"
@@ -30,23 +31,15 @@
             tools:text="Mega Sport"
             />
 
-        <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/guideline"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toTopOf="@id/store_name"
-            android:orientation="horizontal"
-            app:layout_constraintGuide_percent="0.15"
-            />
-
         <include
             android:id="@+id/card_max"
-            android:layout_width="60dp"
+            android:layout_width="20dp"
             android:layout_height="0dp"
             app:layout_constraintDimensionRatio="1:1"
-            app:layout_constraintTop_toTopOf="@id/guideline"
-            app:layout_constraintStart_toEndOf="@id/store_name"
-            android:layout_marginStart="8dp"
+            app:layout_constraintStart_toStartOf="@id/store_name"
+            app:layout_constraintBottom_toBottomOf="@id/store_name"
+            android:layout_marginStart="4dp"
+            android:layout_marginBottom="2dp"
             layout="@layout/gift_card_small_layout"
             app:cardNameSmallLayout="@{GiftCard.MAX_CARD_NAME}"
             app:cardImageSmallLayout="@{@drawable/max}"
@@ -56,11 +49,11 @@
 
         <include
             android:id="@+id/card_corporate"
-            android:layout_width="60dp"
+            android:layout_width="20dp"
             android:layout_height="0dp"
             app:layout_constraintDimensionRatio="1:1"
             app:layout_constraintStart_toEndOf="@id/card_max"
-            app:layout_constraintTop_toTopOf="@id/guideline"
+            app:layout_constraintBottom_toBottomOf="@id/card_max"
             android:layout_marginStart="8dp"
             layout="@layout/gift_card_small_layout"
             app:cardNameSmallLayout="@{GiftCard.CORPORATE_CARD_NAME}"
@@ -68,15 +61,14 @@
             android:visibility="@{store.corporateCard ? View.VISIBLE : View.GONE, default=invisible}"
             tools:visibility="visible"
             />
-<!--        app:cardName="@{giftCardCorporate.name}"-->
 
         <include
             android:id="@+id/card_hot"
-            android:layout_width="60dp"
+            android:layout_width="20dp"
             android:layout_height="0dp"
             app:layout_constraintDimensionRatio="1:1"
             app:layout_constraintStart_toEndOf="@id/card_corporate"
-            app:layout_constraintTop_toTopOf="@id/guideline"
+            app:layout_constraintBottom_toBottomOf="@id/card_max"
             android:layout_marginStart="8dp"
             layout="@layout/gift_card_small_layout"
             app:cardNameSmallLayout="@{GiftCard.HOT_CARD_NAME}"

@@ -33,6 +33,7 @@
             android:textColor="@color/black"
             android:text="@{cardNameSmallLayout}"
             tools:text="Hot"
+            android:visibility="gone"
             />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable name="cardCheckedLayoutWithFrame" type="java.lang.Boolean"/>
+        <variable name="cardNameLayoutWithFrame" type="java.lang.String"/>
+        <variable name="cardImageLayoutWithFrame" type="android.graphics.drawable.Drawable"/>
+    </data>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        >
+        <FrameLayout
+            android:id="@+id/check_box_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            >
+            <CheckedTextView
+                android:id="@+id/check_box"
+                android:layout_width="72dp"
+                android:layout_height="32dp"
+                android:background="@{cardImageLayoutWithFrame}"
+                android:gravity="center"
+                android:layout_gravity="center"
+                android:textColor="@color/black"
+                android:checked="@{cardCheckedLayoutWithFrame}"
+                android:textSize="12sp"
+                tools:background="@drawable/max"
+                />
+            <View
+                android:id="@+id/check_box_frame"
+                android:layout_width="80dp"
+                android:layout_height="40dp"
+                app:bindChecked="@{cardCheckedLayoutWithFrame}"
+                android:background="@drawable/select_frame"/>
+        </FrameLayout>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textSize="12sp"
+            android:textColor="@color/black"
+            android:text="@{cardNameLayoutWithFrame}"
+            tools:text="Hot"
+            />
+    </LinearLayout>
+</layout>

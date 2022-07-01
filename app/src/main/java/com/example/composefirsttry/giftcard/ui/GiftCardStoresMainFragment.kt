@@ -6,11 +6,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.CheckedTextView
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.GridLayoutManager
 import com.example.composefirsttry.L
 import com.example.composefirsttry.MyApplication
 import com.example.composefirsttry.R
@@ -48,11 +49,19 @@ class GiftCardStoresMainFragment : Fragment() {
 
         adapter = StoresAdapter(emptyList())
         binding.storeRecyclerView.adapter = adapter
-        binding.storeRecyclerView.layoutManager = LinearLayoutManager(requireActivity())
+        //        binding.storeRecyclerView.layoutManager = GridLayoutManager(requireActivity(), 2)
 
-        L.i("Checkboxes state BEFORE attach model: binding.maxCheckBox= ${binding.maxCheckBox.isChecked}, binding.corporateCheckBox= ${binding.corporateCheckBox.isChecked}, binding.hotCheckBox= ${binding.hotCheckBox.isChecked}")
+        val layoutManager = GridLayoutManager(requireActivity(), 2)
+        layoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
+            override fun getSpanSize(position: Int): Int {
+                return 1
+            }
+        }
+        binding.storeRecyclerView.layoutManager = layoutManager
+
+        L.i("Checkboxes state BEFORE attach model: binding.maxCheckBox= ${binding.maxCheckBox.checkBoxFrame.visibility == View.VISIBLE}, binding.corporateCheckBox= ${binding.corporateCheckBox.checkBoxFrame.visibility == View.VISIBLE}, binding.hotCheckBox= ${binding.hotCheckBox.checkBoxFrame.visibility == View.VISIBLE}")
         binding.model = viewModel
-        L.i("Checkboxes state AFTER attach model: binding.maxCheckBox= ${binding.maxCheckBox.isChecked}, binding.corporateCheckBox= ${binding.corporateCheckBox.isChecked}, binding.hotCheckBox= ${binding.hotCheckBox.isChecked}")
+        L.i("Checkboxes state AFTER attach model: binding.maxCheckBox= ${binding.maxCheckBox.checkBoxFrame.visibility == View.VISIBLE}, binding.corporateCheckBox= ${binding.corporateCheckBox.checkBoxFrame.visibility == View.VISIBLE}, binding.hotCheckBox= ${binding.hotCheckBox.checkBoxFrame.visibility == View.VISIBLE}")
 
         return binding.root
     }
@@ -88,14 +97,31 @@ class GiftCardStoresMainFragment : Fragment() {
     }
 
     private fun setListeners() {
-        binding.maxCheckBox.setOnCheckedChangeListener { buttonView, isChecked ->
-            if (buttonView.isPressed) viewModel.action(StoresMainIntention.FilterByCard(GiftCard.MAX, isChecked))
+//        binding.maxCheckBox.setOnCheckedChangeListener { buttonView, isChecked ->
+//            if (buttonView.isPressed) viewModel.action(StoresMainIntention.FilterByCard(GiftCard.MAX, isChecked))
+//        }
+        binding.maxCheckBox.checkBox.setOnClickListener { view ->
+            if (view is CheckedTextView) {
+                view.toggle()
+                binding.maxCheckBox.checkBoxFrame.visibility = if (view.isChecked) View.VISIBLE else View.INVISIBLE
+                viewModel.action(StoresMainIntention.FilterByCard(GiftCard.MAX, view.isChecked))
+            }
         }
-        binding.corporateCheckBox.setOnCheckedChangeListener { buttonView, isChecked ->
-            if (buttonView.isPressed) viewModel.action(StoresMainIntention.FilterByCard(GiftCard.CORPORATE, isChecked))
+
+        binding.corporateCheckBox.checkBox.setOnClickListener { view ->
+            if (view is CheckedTextView) {
+                view.toggle()
+                binding.corporateCheckBox.checkBoxFrame.visibility = if (view.isChecked) View.VISIBLE else View.INVISIBLE
+                viewModel.action(StoresMainIntention.FilterByCard(GiftCard.CORPORATE, view.isChecked))
+            }
         }
-        binding.hotCheckBox.setOnCheckedChangeListener { buttonView, isChecked ->
-            if (buttonView.isPressed) viewModel.action(StoresMainIntention.FilterByCard(GiftCard.HOT, isChecked))
+
+        binding.hotCheckBox.checkBox.setOnClickListener { view ->
+            if (view is CheckedTextView) {
+                view.toggle()
+                binding.hotCheckBox.checkBoxFrame.visibility = if (view.isChecked) View.VISIBLE else View.INVISIBLE
+                viewModel.action(StoresMainIntention.FilterByCard(GiftCard.HOT, view.isChecked))
+            }
         }
 
         binding.searchButton.setOnClickListener {
