@@ -60,7 +60,7 @@
             layout="@layout/gift_card_small_layout"
             app:cardNameSmallLayout="@{GiftCard.MAX_CARD_NAME}"
             app:cardImageSmallLayout="@{@drawable/max}"
-            android:visibility="@{store.maxCard ? View.VISIBLE : View.GONE, default=invisible}"
+            android:visibility="@{store.maxCard &amp;&amp; false ? View.VISIBLE : View.GONE, default=invisible}"
             tools:visibility="visible"
             />
 

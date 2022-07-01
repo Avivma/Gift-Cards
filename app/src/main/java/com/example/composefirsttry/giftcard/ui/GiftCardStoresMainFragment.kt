@@ -21,6 +21,7 @@ import com.example.composefirsttry.giftcard.ui.states.StoreMainState
 import com.example.composefirsttry.giftcard.ui.states.StoresMainIntention
 import com.example.composefirsttry.giftcard.viewmodel.StoresMainViewModel
 import com.example.composefirsttry.giftcard.viewmodel.StoresMainViewModelFactory
+import com.example.composefirsttry.preferencescreens.miscellaneous.bindChecked
 import com.example.composefirsttry.preferencescreens.miscellaneous.getApplication
 import javax.inject.Inject
 
@@ -51,9 +52,9 @@ class GiftCardStoresMainFragment : Fragment() {
         binding.storeRecyclerView.adapter = adapter
         binding.storeRecyclerView.layoutManager = LinearLayoutManager(requireActivity())
 
-        L.i("Checkboxes state BEFORE attach model: binding.maxCheckBox= ${binding.maxCheckBox.checkBoxFrame.visibility == View.VISIBLE}, binding.corporateCheckBox= ${binding.corporateCheckBox.checkBoxFrame.visibility == View.VISIBLE}, binding.hotCheckBox= ${binding.hotCheckBox.checkBoxFrame.visibility == View.VISIBLE}")
+        L.i("Checkboxes state BEFORE attach model: binding.maxCheckBox= ${binding.maxCheckBox.checkBoxCross.visibility == View.VISIBLE}, binding.corporateCheckBox= ${binding.corporateCheckBox.checkBoxCross.visibility == View.VISIBLE}, binding.hotCheckBox= ${binding.hotCheckBox.checkBoxCross.visibility == View.VISIBLE}")
         binding.model = viewModel
-        L.i("Checkboxes state AFTER attach model: binding.maxCheckBox= ${binding.maxCheckBox.checkBoxFrame.visibility == View.VISIBLE}, binding.corporateCheckBox= ${binding.corporateCheckBox.checkBoxFrame.visibility == View.VISIBLE}, binding.hotCheckBox= ${binding.hotCheckBox.checkBoxFrame.visibility == View.VISIBLE}")
+        L.i("Checkboxes state AFTER attach model: binding.maxCheckBox= ${binding.maxCheckBox.checkBoxCross.visibility == View.VISIBLE}, binding.corporateCheckBox= ${binding.corporateCheckBox.checkBoxCross.visibility == View.VISIBLE}, binding.hotCheckBox= ${binding.hotCheckBox.checkBoxCross.visibility == View.VISIBLE}")
 
         return binding.root
     }
@@ -92,7 +93,8 @@ class GiftCardStoresMainFragment : Fragment() {
         binding.maxCheckBox.checkBox.setOnClickListener { view ->
             if (view is CheckedTextView) {
                 view.toggle()
-                binding.maxCheckBox.checkBoxFrame.visibility = if (view.isChecked) View.VISIBLE else View.INVISIBLE
+                bindChecked(binding.maxCheckBox.checkBox, view.isChecked)
+                bindChecked(binding.maxCheckBox.checkBoxCross, view.isChecked)
                 viewModel.action(StoresMainIntention.FilterByCard(GiftCard.MAX, view.isChecked))
             }
         }
@@ -100,7 +102,8 @@ class GiftCardStoresMainFragment : Fragment() {
         binding.corporateCheckBox.checkBox.setOnClickListener { view ->
             if (view is CheckedTextView) {
                 view.toggle()
-                binding.corporateCheckBox.checkBoxFrame.visibility = if (view.isChecked) View.VISIBLE else View.INVISIBLE
+                bindChecked(binding.corporateCheckBox.checkBox, view.isChecked)
+                bindChecked(binding.corporateCheckBox.checkBoxCross, view.isChecked)
                 viewModel.action(StoresMainIntention.FilterByCard(GiftCard.CORPORATE, view.isChecked))
             }
         }
@@ -108,7 +111,8 @@ class GiftCardStoresMainFragment : Fragment() {
         binding.hotCheckBox.checkBox.setOnClickListener { view ->
             if (view is CheckedTextView) {
                 view.toggle()
-                binding.hotCheckBox.checkBoxFrame.visibility = if (view.isChecked) View.VISIBLE else View.INVISIBLE
+                bindChecked(binding.hotCheckBox.checkBox, view.isChecked)
+                bindChecked(binding.hotCheckBox.checkBoxCross, view.isChecked)
                 viewModel.action(StoresMainIntention.FilterByCard(GiftCard.HOT, view.isChecked))
             }
         }

@@ -28,15 +28,19 @@
                 android:layout_gravity="center"
                 android:textColor="@color/black"
                 android:checked="@{cardCheckedLayoutWithFrame}"
+                app:bindChecked="@{cardCheckedLayoutWithFrame}"
                 android:textSize="12sp"
                 tools:background="@drawable/max"
                 />
             <View
-                android:id="@+id/check_box_frame"
+                android:id="@+id/check_box_cross"
                 android:layout_width="76dp"
                 android:layout_height="36dp"
+                android:gravity="center"
                 app:bindChecked="@{cardCheckedLayoutWithFrame}"
-                android:background="@drawable/select_frame"/>
+                android:background="@drawable/ic_cross_off_image"
+                android:visibility="invisible"
+                />
         </FrameLayout>
         <TextView
             android:layout_width="match_parent"
