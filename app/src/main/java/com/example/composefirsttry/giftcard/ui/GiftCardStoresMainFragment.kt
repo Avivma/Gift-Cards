@@ -21,8 +21,8 @@ import com.example.composefirsttry.giftcard.ui.states.StoreMainState
 import com.example.composefirsttry.giftcard.ui.states.StoresMainIntention
 import com.example.composefirsttry.giftcard.viewmodel.StoresMainViewModel
 import com.example.composefirsttry.giftcard.viewmodel.StoresMainViewModelFactory
-import com.example.composefirsttry.preferencescreens.miscellaneous.bindChecked
-import com.example.composefirsttry.preferencescreens.miscellaneous.getApplication
+import com.example.composefirsttry.utils.bindChecked
+import com.example.composefirsttry.utils.getApplication
 import javax.inject.Inject
 
 class GiftCardStoresMainFragment : Fragment() {

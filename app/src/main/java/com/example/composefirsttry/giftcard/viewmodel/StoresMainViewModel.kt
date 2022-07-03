@@ -11,8 +11,8 @@ import com.example.composefirsttry.giftcard.repository.GiftCardRepo
 import com.example.composefirsttry.giftcard.ui.states.StoreMainState
 import com.example.composefirsttry.giftcard.ui.states.StoresMainIntention
 import com.example.composefirsttry.giftcard.utils.DbToModelConverter
-import com.example.composefirsttry.preferencescreens.miscellaneous.observeFreshly
 import com.example.composefirsttry.utils.SPKeys
+import com.example.composefirsttry.utils.observeFreshly
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch

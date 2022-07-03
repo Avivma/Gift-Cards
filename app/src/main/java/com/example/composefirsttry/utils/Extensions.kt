@@ -1,4 +1,4 @@
-package com.example.composefirsttry.preferencescreens.miscellaneous
+package com.example.composefirsttry.utils
 
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner

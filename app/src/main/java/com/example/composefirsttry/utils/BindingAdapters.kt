@@ -1,4 +1,4 @@
-package com.example.composefirsttry.preferencescreens.miscellaneous
+package com.example.composefirsttry.utils
 
 import android.view.View
 import android.widget.CheckedTextView

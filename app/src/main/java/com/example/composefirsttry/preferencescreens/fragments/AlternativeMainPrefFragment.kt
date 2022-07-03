@@ -6,10 +6,11 @@ import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceViewHolder
 import com.example.composefirsttry.R
 import com.example.composefirsttry.preferencescreens.PreferenceActivity
-import com.example.composefirsttry.preferencescreens.miscellaneous.*
+import com.example.composefirsttry.preferencescreens.miscellaneous.SHARD_PREF_NAME
 import com.example.composefirsttry.preferencescreens.widget.MyPreferenceCheckBox
 import com.example.composefirsttry.preferencescreens.widget.TriCheckBox
-import java.util.ArrayList
+import com.example.composefirsttry.utils.requireActivity
+import java.util.*
 
 class AlternativeMainPrefFragment : PreferenceFragmentCompat() {
     private lateinit var viewModel: PrefViewModel
