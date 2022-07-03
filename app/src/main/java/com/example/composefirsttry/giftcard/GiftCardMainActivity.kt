@@ -1,23 +1,18 @@
 package com.example.composefirsttry.giftcard
 
 import android.os.Bundle
-import android.view.MenuItem
-import android.view.View
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavController
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.NavigationUI.setupWithNavController
 import androidx.navigation.ui.navigateUp
-import androidx.navigation.ui.onNavDestinationSelected
 import com.example.composefirsttry.L
-import com.example.composefirsttry.MyApplication
 import com.example.composefirsttry.R
 import com.example.composefirsttry.databinding.ActivityGiftCardMainBinding
 import com.example.composefirsttry.giftcard.repository.GiftCardRepo
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import javax.inject.Inject
 
 
@@ -37,11 +32,18 @@ class GiftCardMainActivity : AppCompatActivity() {
         binding = ActivityGiftCardMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-//        setSupportActionBar(binding.toolbar)
+        val navController: NavController = getNavController()
+        val bottomNavigationView = findViewById<BottomNavigationView>(R.id.activity_main_bottom_navigation_view)
+        setupWithNavController(bottomNavigationView, navController)
 
-//        val navController = findNavController(R.id.nav_host_fragment)
-//        appBarConfiguration = AppBarConfiguration(navController.graph)
-//        setupActionBarWithNavController(navController, appBarConfiguration)
+//        binding.activityMainBottomNavigationView.setOnNavigationItemSelectedListener {
+//        binding.activityMainBottomNavigationView.setOnItemSelectedListener {
+//            when(it.itemId){
+//                R.id.giftCardsMainFragment -> goToMainFragment()
+//                R.id.cardsFragment -> goToCardsFragment()
+//            }
+//            true
+//        }
     }
 
     override fun onSupportNavigateUp(): Boolean {
@@ -49,35 +51,9 @@ class GiftCardMainActivity : AppCompatActivity() {
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
     }
 
-    fun getNavController() = this.findNavController(R.id.nav_host_fragment)
-
-    fun getMyApplication(): MyApplication = application as MyApplication
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val navController = findNavController(R.id.nav_host_fragment)
-        return onOptionsItemSelected(item.itemId)|| item.onNavDestinationSelected(navController) || super.onOptionsItemSelected(item)
-    }
-
-    private fun onOptionsItemSelected(item: Int): Boolean {
-        when(item) {
-            R.id.refresh -> {
-                lifecycleScope.launch {
-                    notifyUserForDataRefreshProcess(true)
-                    withContext(Dispatchers.IO) {
-                        giftCardRepo.refresh()
-                    }
-                    notifyUserForDataRefreshProcess(false)
-                }
-                return true
-            }
-        }
-        return false
-    }
-
-    private fun notifyUserForDataRefreshProcess(startProcess: Boolean) {
-        val progressBarVisibility = if (startProcess) View.VISIBLE else View.GONE
-        binding.progressbar.visibility = progressBarVisibility
-        val toastText = if (startProcess) "Refreshing data..." else "Finish refreshing data"
-        Toast.makeText(this, toastText, Toast.LENGTH_SHORT).show()
+//    fun getNavController(): NavController = this.findNavController(R.id.nav_host_fragment)
+    fun getNavController(): NavController {
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+        return navHostFragment.navController
     }
 }

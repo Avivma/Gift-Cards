@@ -5,7 +5,6 @@
 
     <data>
         <import type="android.view.View" />
-        <import type="com.example.composefirsttry.giftcard.model.GiftCard" />
         <variable name="store" type="com.example.composefirsttry.giftcard.model.Store"/>
 
         <variable name="maxCardChecked" type="java.lang.Boolean"/>

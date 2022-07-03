@@ -45,7 +45,16 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintTop_toBottomOf="@id/toolbar_layout"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/activity_main_bottom_navigation_view"
         app:defaultNavHost="true"
         app:navGraph="@navigation/gift_card_stores_nav_graph" />
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/activity_main_bottom_navigation_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/navigation_menu_background"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:menu="@menu/navigation_menu"/>
+<!--    app:labelVisibilityMode="unlabeled"-->
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -12,10 +12,17 @@ fun <K> Fragment.getApplication() = requireActivity().application as K
 
 
 //try to fix sending last data before observing. Helpful link: https://stackoverflow.com/questions/49832787/livedata-prevent-receive-the-last-value-when-start-observing
-fun <T> LiveData<T>.observeFreshly(owner: LifecycleOwner, observer: Observer<in T>) {
-    // extention fuction to get LiveData's version, will explain in below.
+fun <T> LiveData<T>.observeFreshly(owner: LifecycleOwner, observer: Observer<in T>): Observer<T> {
     val sinceVersion = 0
-    this.observe(owner, FreshObserver<T>(observer, sinceVersion))
+    val freshObserver = FreshObserver<T>(observer, sinceVersion)
+    this.observe(owner, freshObserver)
+    return freshObserver
+}
+fun <T> LiveData<T>.observeForeverFreshly(observer: Observer<in T>): Observer<T> {
+    val sinceVersion = 0
+    val freshObserver = FreshObserver<T>(observer, sinceVersion)
+    this.observeForever(freshObserver)
+    return freshObserver
 }
 
 class FreshObserver<T>(

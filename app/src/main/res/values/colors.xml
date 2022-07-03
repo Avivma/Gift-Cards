@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- OS overrides -->
-    <color name="accent">@color/teal_200</color>
-    <color name="colorPrimary">#c7c7c7</color>
+    <color name="accent">@color/dark_accent</color>
+    <color name="colorPrimary">@color/dark_accent</color>
+    <color name="colorDarkPrimary">@color/very_dark_accent</color>
     <color name="colorSecondary">@color/dark_accent</color>
 
     <!-- Colors -->

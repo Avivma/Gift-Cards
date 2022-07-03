@@ -12,13 +12,12 @@ import com.example.composefirsttry.giftcard.ui.main.states.StoreMainState
 import com.example.composefirsttry.giftcard.ui.main.states.StoresMainIntention
 import com.example.composefirsttry.giftcard.utils.DbToModelConverter
 import com.example.composefirsttry.utils.SPKeys
-import com.example.composefirsttry.utils.observeFreshly
+import com.example.composefirsttry.utils.observeForeverFreshly
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class StoresMainViewModel(app: Application, private val fragmentViewLifecycleOwner: LifecycleOwner) : AndroidViewModel(app) {
+class StoresMainViewModel(app: Application, private val fragmentViewLifecycleOwner: LifecycleOwner /*ignore - just to see that I can*/) : AndroidViewModel(app) {
     @Inject
     lateinit var sp: SharedPreferences
 
@@ -26,6 +25,7 @@ class StoresMainViewModel(app: Application, private val fragmentViewLifecycleOwn
     lateinit var giftCardRepo: GiftCardRepo
 
     val searchTextMutableLiveData: MutableLiveData<String>
+    private lateinit var searchTextMutableLiveDataObserver: Observer<String>
     var maxCardChecked: Boolean
     var corporateCardChecked: Boolean
     var hotCardChecked: Boolean
@@ -33,6 +33,7 @@ class StoresMainViewModel(app: Application, private val fragmentViewLifecycleOwn
 
     private val stateMutableLiveData = MutableLiveData<StoreMainState>()
     val stateLiveData: LiveData<StoreMainState> = stateMutableLiveData
+    private lateinit var storesLiveDataObserver: Observer<List<Store>>
 
     init {
         (app as MyApplication).component.inject(this)
@@ -42,10 +43,10 @@ class StoresMainViewModel(app: Application, private val fragmentViewLifecycleOwn
         corporateCardChecked = sp.getBoolean(SPKeys.GIFT_CARD_CORPORATE_CHECKBOX_STATE, true)
         hotCardChecked = sp.getBoolean(SPKeys.GIFT_CARD_HOT_CHECKBOX_STATE, true)
 
-        initLiveData()
+        initListeners()
     }
 
-    private fun initLiveData() {
+    private fun initListeners() {
         //attach viewModel's stores to db
         storesLiveData = Transformations.map(giftCardRepo.getAllStoresDb()) { storesEntities ->
             storesEntities.map { storeEntity ->
@@ -53,15 +54,19 @@ class StoresMainViewModel(app: Application, private val fragmentViewLifecycleOwn
             }
         }
         //notify when changes happens
-        storesLiveData.removeObservers(fragmentViewLifecycleOwner)
-        storesLiveData.observeFreshly(fragmentViewLifecycleOwner, Observer { ignore ->
+        storesLiveDataObserver = storesLiveData.observeForeverFreshly(Observer { ignore ->
             sendFreshData()
         })
 
-        searchTextMutableLiveData.removeObservers(fragmentViewLifecycleOwner)
-        searchTextMutableLiveData.observeFreshly(fragmentViewLifecycleOwner, Observer { textFilter ->
+        searchTextMutableLiveDataObserver = searchTextMutableLiveData.observeForeverFreshly(Observer { textFilter ->
             action(StoresMainIntention.FilterByPrefix(textFilter))
         })
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        searchTextMutableLiveData.removeObserver(searchTextMutableLiveDataObserver)
+        storesLiveData.removeObserver(storesLiveDataObserver)
     }
 
     private fun sendFreshData() {
@@ -76,9 +81,10 @@ class StoresMainViewModel(app: Application, private val fragmentViewLifecycleOwn
                 is StoresMainIntention.FilterByPrefix -> filterByPrefix(intention.prefix)
                 is StoresMainIntention.FilterByCard -> filterByCard(intention.card, intention.isChecked)
                 StoresMainIntention.Refresh -> {
-                    delay(500)
+//                    delay(500)
                     giftCardRepo.refresh()
                 }
+                else -> L.e("Unfamiliar intention. Intention = ${intention.javaClass.simpleName}")
             }
         }
     }

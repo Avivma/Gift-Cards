@@ -4,14 +4,20 @@ import android.content.SharedPreferences
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.RecyclerView
 import com.example.composefirsttry.R
 import com.example.composefirsttry.databinding.StoreRowLayoutBinding
+import com.example.composefirsttry.giftcard.model.GiftCard
 import com.example.composefirsttry.giftcard.model.Store
+import com.example.composefirsttry.giftcard.ui.main.states.StoresMainIntention
 import com.example.composefirsttry.utils.SPKeys
 
 class StoresAdapter(giftCards: List<Store>, var sp: SharedPreferences): RecyclerView.Adapter<StoresAdapter.StoreRowHolder>() {
     private val stores: MutableList<Store> = ArrayList(giftCards)
+    var cardListener: LiveData<StoresMainIntention> = MutableLiveData()
+    private var mutableCardListener: MutableLiveData<StoresMainIntention> = cardListener as MutableLiveData<StoresMainIntention>
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): StoreRowHolder {
         val binding: StoreRowLayoutBinding = DataBindingUtil.inflate(LayoutInflater.from(parent.context), R.layout.store_row_layout, parent, false)
@@ -53,6 +59,10 @@ class StoresAdapter(giftCards: List<Store>, var sp: SharedPreferences): Recycler
             binding.maxCardChecked = maxCardChecked
             binding.corporateCardChecked = corporateCardChecked
             binding.hotCardChecked = hotCardChecked
+
+            binding.cardMax.cardLayout.setOnClickListener { mutableCardListener.postValue(StoresMainIntention.NavigateToCardsScreen(GiftCard.MAX)) }
+            binding.cardCorporate.cardLayout.setOnClickListener { mutableCardListener.postValue(StoresMainIntention.NavigateToCardsScreen(GiftCard.CORPORATE)) }
+            binding.cardHot.cardLayout.setOnClickListener { mutableCardListener.postValue(StoresMainIntention.NavigateToCardsScreen(GiftCard.HOT)) }
         }
     }
 }

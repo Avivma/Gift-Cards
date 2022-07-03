@@ -7,6 +7,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckedTextView
+import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -16,11 +18,13 @@ import com.example.composefirsttry.L
 import com.example.composefirsttry.MyApplication
 import com.example.composefirsttry.R
 import com.example.composefirsttry.databinding.FragmentGiftCardStoresMainBinding
+import com.example.composefirsttry.giftcard.GiftCardMainActivity
 import com.example.composefirsttry.giftcard.model.GiftCard
 import com.example.composefirsttry.giftcard.ui.main.states.StoreMainState
 import com.example.composefirsttry.giftcard.ui.main.states.StoresMainIntention
 import com.example.composefirsttry.utils.bindChecked
 import com.example.composefirsttry.utils.getApplication
+import com.example.composefirsttry.utils.requireActivity
 import javax.inject.Inject
 
 class GiftCardStoresMainFragment : Fragment() {
@@ -54,15 +58,36 @@ class GiftCardStoresMainFragment : Fragment() {
         binding.model = viewModel
         L.i("Checkboxes state AFTER attach model: binding.maxCheckBox= ${binding.maxCheckBox.checkBoxCross.visibility == View.VISIBLE}, binding.corporateCheckBox= ${binding.corporateCheckBox.checkBoxCross.visibility == View.VISIBLE}, binding.hotCheckBox= ${binding.hotCheckBox.checkBoxCross.visibility == View.VISIBLE}")
 
+        handleOnBackPressed()
         return binding.root
+    }
+
+    private fun handleOnBackPressed() {
+        val callback: OnBackPressedCallback = object : OnBackPressedCallback(true /* enabled by default */) {
+                override fun handleOnBackPressed() {
+                    // Handle the back button event
+                    requireActivity().finish()
+                }
+            }
+        requireActivity().onBackPressedDispatcher.addCallback(this, callback)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         //Important fix: removeObservers and getViewLifecyclerOwner instead of activity to prevent multiple call to onChanged from unremoved observers.
         //More info: https://blog.usejournal.com/observe-livedata-from-viewmodel-in-fragment-fd7d14f9f5fb
+
+        adapter.cardListener.removeObservers(viewLifecycleOwner)
+        adapter.cardListener.observe(viewLifecycleOwner, Observer { navigationIntention ->
+            if (navigationIntention is StoresMainIntention.NavigateToCardsScreen) {
+                val direction = GiftCardStoresMainFragmentDirections.actionGiftCardsMainFragmentToCardsFragment(navigationIntention.card)
+                requireActivity<GiftCardMainActivity>().getNavController().navigate(direction)
+            }
+        })
+
         viewModel.stateLiveData.removeObservers(viewLifecycleOwner)
         viewModel.stateLiveData.observe(viewLifecycleOwner, Observer { state -> render(state) })
+
         viewModel.action(StoresMainIntention.Refresh)
     }
 
@@ -97,6 +122,11 @@ class GiftCardStoresMainFragment : Fragment() {
             }
         }
 
+        binding.maxCheckBox.checkBox.setOnLongClickListener {
+            Toast.makeText(requireContext(), cardToastMessage(GiftCard.MAX), Toast.LENGTH_LONG).show()
+            true
+        }
+
         binding.corporateCheckBox.checkBox.setOnClickListener { view ->
             if (view is CheckedTextView) {
                 view.toggle()
@@ -104,6 +134,11 @@ class GiftCardStoresMainFragment : Fragment() {
                 bindChecked(binding.corporateCheckBox.checkBoxCross, view.isChecked)
                 viewModel.action(StoresMainIntention.FilterByCard(GiftCard.CORPORATE, view.isChecked))
             }
+        }
+
+        binding.corporateCheckBox.checkBox.setOnLongClickListener {
+            Toast.makeText(requireContext(), cardToastMessage(GiftCard.CORPORATE), Toast.LENGTH_LONG).show()
+            true
         }
 
         binding.hotCheckBox.checkBox.setOnClickListener { view ->
@@ -114,7 +149,15 @@ class GiftCardStoresMainFragment : Fragment() {
                 viewModel.action(StoresMainIntention.FilterByCard(GiftCard.HOT, view.isChecked))
             }
         }
+
+        binding.hotCheckBox.checkBox.setOnLongClickListener {
+            Toast.makeText(requireContext(), cardToastMessage(GiftCard.HOT), Toast.LENGTH_LONG).show()
+            true
+        }
     }
+
+    private fun cardToastMessage(giftCard: GiftCard) =
+        "${giftCard.name} card has ${giftCard.discount.toString().removeSuffix(".0")}% discount"
 
 //    fun refresh() {
 //        viewModel.action(StoresMainIntention.Refresh)

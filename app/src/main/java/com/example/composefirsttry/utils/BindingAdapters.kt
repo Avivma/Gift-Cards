@@ -2,6 +2,10 @@ package com.example.composefirsttry.utils
 
 import android.view.View
 import android.widget.CheckedTextView
+import android.widget.ImageView
+import android.widget.TextView
+import androidx.annotation.DrawableRes
+import androidx.core.content.ContextCompat
 import androidx.databinding.BindingAdapter
 import com.example.composefirsttry.preferencescreens.widget.TriCheckBox
 
@@ -19,4 +23,15 @@ fun bindChecked(view: View, checked: Boolean) {
         //show cross off
         view.visibility = if (checked) View.INVISIBLE else View.VISIBLE
     }
+}
+
+
+@BindingAdapter("loadImage")
+fun loadImage(image: ImageView, @DrawableRes imageRes:  Int) {
+    image.setImageDrawable(ContextCompat.getDrawable(image.context, imageRes))
+}
+
+@BindingAdapter("setDiscount")
+fun setDiscount(textView: TextView, discount: Float) {
+    textView.text = "${discount.toString().removeSuffix(".0")}%"
 }

@@ -1,9 +1,55 @@
 package com.example.composefirsttry.giftcard.model
 
-sealed class GiftCard(val name: String, val discount: Float, val imageName: String) {
-    object MAX: GiftCard(MAX_CARD_NAME, 16.5f, "max.bmp")
-    object CORPORATE: GiftCard(CORPORATE_CARD_NAME, 19f, "corporate.bmp")
-    object HOT: GiftCard(HOT_CARD_NAME, 15f, "hot.bmp")
+import androidx.annotation.DrawableRes
+import com.example.composefirsttry.R
+import java.io.Serializable
+
+sealed class GiftCard(
+    val name: String,
+    val discount: Float,
+    @DrawableRes val imageRes: Int,
+    val longName: String,
+    val number: String,
+    val cvv: String,
+    val expirationDate: String,
+    val operator: String,
+    val isOutsideBank: Boolean
+): Serializable {
+    object MAX : GiftCard(
+        MAX_CARD_NAME,
+        16.5f,
+        imageRes = R.drawable.max,
+        "Gift Card MAX executive",
+        "1111-1111-1111-111",
+        "999",
+        "01/26",
+        "MASTERCARD",
+        true
+    )
+
+    object CORPORATE : GiftCard(
+        CORPORATE_CARD_NAME,
+        19f,
+        imageRes = R.drawable.corporate,
+        "GiftCard ישראכרט",
+        "2222-2222-2222-222",
+        "888",
+        "10/25",
+        "ישראכרט",
+        true
+    )
+
+    object HOT : GiftCard(
+        HOT_CARD_NAME,
+        15f,
+        imageRes = R.drawable.hot,
+        "הוט התו החכם",
+        "3333-3333-3333-333",
+        "777",
+        "12/24",
+        "MASTERCARD",
+        true
+    )
 
     companion object {
         const val MAX_CARD_NAME = "Max"
@@ -11,3 +57,14 @@ sealed class GiftCard(val name: String, val discount: Float, val imageName: Stri
         const val HOT_CARD_NAME = "Hot"
     }
 }
+
+
+// card image
+// card name
+// card discount
+// card longName
+// card number
+// card date
+// card cvv
+// card operator (VIZA, MASTERCARD)
+// card isOutsideBank
