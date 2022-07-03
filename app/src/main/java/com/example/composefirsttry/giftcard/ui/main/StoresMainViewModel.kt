@@ -1,4 +1,4 @@
-package com.example.composefirsttry.giftcard.viewmodel
+package com.example.composefirsttry.giftcard.ui.main
 
 import android.app.Application
 import android.content.SharedPreferences
@@ -8,8 +8,8 @@ import com.example.composefirsttry.MyApplication
 import com.example.composefirsttry.giftcard.model.GiftCard
 import com.example.composefirsttry.giftcard.model.Store
 import com.example.composefirsttry.giftcard.repository.GiftCardRepo
-import com.example.composefirsttry.giftcard.ui.states.StoreMainState
-import com.example.composefirsttry.giftcard.ui.states.StoresMainIntention
+import com.example.composefirsttry.giftcard.ui.main.states.StoreMainState
+import com.example.composefirsttry.giftcard.ui.main.states.StoresMainIntention
 import com.example.composefirsttry.giftcard.utils.DbToModelConverter
 import com.example.composefirsttry.utils.SPKeys
 import com.example.composefirsttry.utils.observeFreshly

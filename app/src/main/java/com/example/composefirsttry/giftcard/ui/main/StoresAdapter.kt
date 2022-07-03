@@ -1,4 +1,4 @@
-package com.example.composefirsttry.giftcard.ui
+package com.example.composefirsttry.giftcard.ui.main
 
 import android.content.SharedPreferences
 import android.view.LayoutInflater

@@ -6,7 +6,7 @@
         <import type="com.example.composefirsttry.giftcard.model.GiftCard" />
         <variable
             name="model"
-            type="com.example.composefirsttry.giftcard.viewmodel.StoresMainViewModel"
+            type="com.example.composefirsttry.giftcard.ui.main.StoresMainViewModel"
             />
     </data>
 

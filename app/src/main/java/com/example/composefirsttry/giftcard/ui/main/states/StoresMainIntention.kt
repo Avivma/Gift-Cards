@@ -1,4 +1,4 @@
-package com.example.composefirsttry.giftcard.ui.states
+package com.example.composefirsttry.giftcard.ui.main.states
 
 import com.example.composefirsttry.giftcard.model.GiftCard
 

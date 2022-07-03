@@ -1,8 +1,8 @@
 package com.example.composefirsttry.di
 
 import com.example.composefirsttry.giftcard.GiftCardMainActivity
-import com.example.composefirsttry.giftcard.ui.GiftCardStoresMainFragment
-import com.example.composefirsttry.giftcard.viewmodel.StoresMainViewModel
+import com.example.composefirsttry.giftcard.ui.main.GiftCardStoresMainFragment
+import com.example.composefirsttry.giftcard.ui.main.StoresMainViewModel
 import dagger.Component
 import javax.inject.Singleton
 
