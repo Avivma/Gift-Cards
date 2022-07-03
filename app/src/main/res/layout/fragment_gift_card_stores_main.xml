@@ -12,7 +12,8 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="@color/top_background_color">
 
         <View
             android:layout_width="match_parent"
@@ -20,19 +21,18 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toTopOf="@id/store_recycler_view"
             android:layout_marginBottom="4dp"
-            android:background="@color/top_background"
+            android:background="@drawable/top_background"
             />
 
-        <TextView
+        <ImageView
             android:id="@+id/stores_title"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="60dp"
             android:layout_marginTop="6dp"
             android:gravity="center"
-            android:text="Stores"
-            android:textSize="24sp"
-            android:textColor="@color/black"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            android:src="@drawable/ic_store"
+            />
 
         <EditText
             android:id="@+id/search_store"
@@ -115,7 +115,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/max_check_box"
-            tools:itemCount="5"
+            tools:itemCount="10"
             tools:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             tools:listitem="@layout/store_row_layout"
             tools:scrollbars="vertical" />

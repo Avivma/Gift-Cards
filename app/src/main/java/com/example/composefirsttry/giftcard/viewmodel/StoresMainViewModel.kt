@@ -76,7 +76,7 @@ class StoresMainViewModel(app: Application, private val fragmentViewLifecycleOwn
                 is StoresMainIntention.FilterByPrefix -> filterByPrefix(intention.prefix)
                 is StoresMainIntention.FilterByCard -> filterByCard(intention.card, intention.isChecked)
                 StoresMainIntention.Refresh -> {
-                    delay(1000)
+                    delay(500)
                     giftCardRepo.refresh()
                 }
             }

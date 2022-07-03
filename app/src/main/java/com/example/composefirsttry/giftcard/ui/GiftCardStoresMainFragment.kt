@@ -48,7 +48,7 @@ class GiftCardStoresMainFragment : Fragment() {
         viewModel = ViewModelProvider(this, StoresMainViewModelFactory(requireActivity().application, viewLifecycleOwner))
             .get(StoresMainViewModel::class.java)
 
-        adapter = StoresAdapter(emptyList())
+        adapter = StoresAdapter(emptyList(), sp)
         binding.storeRecyclerView.adapter = adapter
         binding.storeRecyclerView.layoutManager = LinearLayoutManager(requireActivity())
 

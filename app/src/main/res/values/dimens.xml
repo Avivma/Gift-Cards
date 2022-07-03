@@ -3,4 +3,10 @@
     <dimen name="main_text_size">18dp</dimen>
     <dimen name="smaller_text_size">14dp</dimen>
     <dimen name="preference_margin">12dp</dimen>
+
+    <!-- store's cards -->
+    <dimen name="store_cards_size_width">55dp</dimen>
+    <dimen name="store_cards_size_height">38dp</dimen>
+    <dimen name="store_cards_circle_frame_size_width">61dp</dimen>
+    <dimen name="store_cards_circle_frame_size_height">42dp</dimen>
 </resources>

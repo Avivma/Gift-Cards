@@ -1,0 +1,12 @@
+<!-- More info: https://stackoverflow.com/questions/22105775/imageview-in-circular-through-xml -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle"
+    >
+    <solid android:color="@android:color/transparent" />
+
+    <stroke
+        android:width="5.5dp"
+        android:color="@color/top_background_color" />
+
+    <corners android:radius="10dp"/>
+</shape>
