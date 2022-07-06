@@ -18,6 +18,7 @@ import com.example.composefirsttry.L
 import com.example.composefirsttry.MyApplication
 import com.example.composefirsttry.R
 import com.example.composefirsttry.databinding.FragmentGiftCardStoresMainBinding
+import com.example.composefirsttry.databinding.GiftCardWithFrameLayoutBinding
 import com.example.composefirsttry.giftcard.GiftCardMainActivity
 import com.example.composefirsttry.giftcard.model.GiftCard
 import com.example.composefirsttry.giftcard.ui.main.states.StoreMainState
@@ -113,45 +114,23 @@ class GiftCardStoresMainFragment : Fragment() {
     }
 
     private fun setListeners() {
-        binding.maxCheckBox.checkBox.setOnClickListener { view ->
+        setCheckBoxListener(binding.maxCheckBox, GiftCard.MAX)
+        setCheckBoxListener(binding.corporateCheckBox, GiftCard.CORPORATE)
+        setCheckBoxListener(binding.hotCheckBox, GiftCard.HOT)
+    }
+
+    private fun setCheckBoxListener(checkBoxLayout: GiftCardWithFrameLayoutBinding, giftCard: GiftCard) {
+        checkBoxLayout.checkBox.setOnClickListener { view ->
             if (view is CheckedTextView) {
                 view.toggle()
-                bindChecked(binding.maxCheckBox.checkBox, view.isChecked)
-                bindChecked(binding.maxCheckBox.checkBoxCross, view.isChecked)
-                viewModel.action(StoresMainIntention.FilterByCard(GiftCard.MAX, view.isChecked))
+                bindChecked(checkBoxLayout.checkBox, view.isChecked)
+                bindChecked(checkBoxLayout.checkBoxCross, view.isChecked)
+                viewModel.action(StoresMainIntention.FilterByCard(giftCard, view.isChecked))
             }
         }
 
-        binding.maxCheckBox.checkBox.setOnLongClickListener {
-            Toast.makeText(requireContext(), cardToastMessage(GiftCard.MAX), Toast.LENGTH_LONG).show()
-            true
-        }
-
-        binding.corporateCheckBox.checkBox.setOnClickListener { view ->
-            if (view is CheckedTextView) {
-                view.toggle()
-                bindChecked(binding.corporateCheckBox.checkBox, view.isChecked)
-                bindChecked(binding.corporateCheckBox.checkBoxCross, view.isChecked)
-                viewModel.action(StoresMainIntention.FilterByCard(GiftCard.CORPORATE, view.isChecked))
-            }
-        }
-
-        binding.corporateCheckBox.checkBox.setOnLongClickListener {
-            Toast.makeText(requireContext(), cardToastMessage(GiftCard.CORPORATE), Toast.LENGTH_LONG).show()
-            true
-        }
-
-        binding.hotCheckBox.checkBox.setOnClickListener { view ->
-            if (view is CheckedTextView) {
-                view.toggle()
-                bindChecked(binding.hotCheckBox.checkBox, view.isChecked)
-                bindChecked(binding.hotCheckBox.checkBoxCross, view.isChecked)
-                viewModel.action(StoresMainIntention.FilterByCard(GiftCard.HOT, view.isChecked))
-            }
-        }
-
-        binding.hotCheckBox.checkBox.setOnLongClickListener {
-            Toast.makeText(requireContext(), cardToastMessage(GiftCard.HOT), Toast.LENGTH_LONG).show()
+        checkBoxLayout.checkBox.setOnLongClickListener {
+            Toast.makeText(requireContext(), cardToastMessage(giftCard), Toast.LENGTH_SHORT).show()
             true
         }
     }
