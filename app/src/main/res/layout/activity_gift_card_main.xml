@@ -55,6 +55,8 @@
         android:layout_height="wrap_content"
         android:background="@drawable/navigation_menu_background"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:itemTextColor="@drawable/bottom_nav_color"
+        app:itemIconTint="@drawable/bottom_nav_color"
         app:menu="@menu/navigation_menu"/>
 <!--    app:labelVisibilityMode="unlabeled"-->
 </androidx.constraintlayout.widget.ConstraintLayout>

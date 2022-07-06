@@ -20,6 +20,7 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="grey">#787878</color>
+    <color name="light_grey">#aa949494</color>
     <color name="very_light_grey">#e0e0e0</color>
     <color name="extreme_light_grey">#EFEFEF</color>
     <color name="transparent">@android:color/transparent</color>
