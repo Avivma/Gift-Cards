@@ -30,10 +30,10 @@ class StoresMainViewModel(app: Application, private val fragmentViewLifecycleOwn
     var corporateCardChecked: Boolean
     var hotCardChecked: Boolean
     private lateinit var storesLiveData: LiveData<List<Store>>
+    private lateinit var storesLiveDataObserver: Observer<List<Store>>
 
     private val stateMutableLiveData = MutableLiveData<StoreMainState>()
     val stateLiveData: LiveData<StoreMainState> = stateMutableLiveData
-    private lateinit var storesLiveDataObserver: Observer<List<Store>>
 
     init {
         (app as MyApplication).component.inject(this)
@@ -81,8 +81,12 @@ class StoresMainViewModel(app: Application, private val fragmentViewLifecycleOwn
                 is StoresMainIntention.FilterByPrefix -> filterByPrefix(intention.prefix)
                 is StoresMainIntention.FilterByCard -> filterByCard(intention.card, intention.isChecked)
                 StoresMainIntention.Refresh -> {
-//                    delay(500)
-                    giftCardRepo.refresh()
+                    if (firstTimeFetchData) {
+                        firstTimeFetchData = false
+                        giftCardRepo.refresh()
+                    } else {
+                        stateMutableLiveData.postValue(StoreMainState.DisplayData(getStores()))
+                    }
                 }
                 else -> L.e("Unfamiliar intention. Intention = ${intention.javaClass.simpleName}")
             }
@@ -125,7 +129,11 @@ class StoresMainViewModel(app: Application, private val fragmentViewLifecycleOwn
             else -> throw Exception("Unfamiliar GiftCard type!! (${card.name})")
     }
 
-    fun getStores(): List<Store> = storesLiveData.value ?: emptyList()
+    private fun getStores(): List<Store> = storesLiveData.value ?: emptyList()
+
+    companion object {
+        private var firstTimeFetchData = true
+    }
 }
 
 class StoresMainViewModelFactory(
