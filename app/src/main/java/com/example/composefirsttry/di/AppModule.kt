@@ -7,25 +7,24 @@ import com.example.composefirsttry.giftcard.db.GiftCardDatabase
 import com.example.composefirsttry.utils.SPKeys
 import dagger.Module
 import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
+import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
-@Module
-class AppModule(private val context: Context) {
-    @Singleton
-    @Provides
-    fun provideContext(): Context {
-        return context
-    }
 
+@InstallIn(SingletonComponent::class)
+@Module
+class AppModule {
     @Singleton
     @Provides
-    fun provideSharedPreferences(context: Context): SharedPreferences {
+    fun provideSharedPreferences(@ApplicationContext context: Context): SharedPreferences {
         return context.getSharedPreferences(SPKeys.SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE)
     }
 
     @Singleton
     @Provides
-    fun provideGiftCardDatabase(context: Context): GiftCardDatabase {
+    fun provideGiftCardDatabase(@ApplicationContext context: Context): GiftCardDatabase {
         return Room.databaseBuilder(context, GiftCardDatabase::class.java, GiftCardDatabase.DB_NAME)
             .fallbackToDestructiveMigration()
             .build()

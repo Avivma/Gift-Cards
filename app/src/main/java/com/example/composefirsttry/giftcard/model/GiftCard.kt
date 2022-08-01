@@ -8,12 +8,11 @@ sealed class GiftCard(
     val name: String,
     val discount: Float,
     @DrawableRes val imageRes: Int,
-    val longName: String,
-    val number: String,
-    val cvv: String,
-    val expirationDate: String,
-    val operator: String,
-    val isOutsideBank: Boolean
+    var longName: String,
+    var number: String,
+    var cvv: String,
+    var expirationDate: String,
+    var operator: String
 ): Serializable {
     object MAX : GiftCard(
         MAX_CARD_NAME,
@@ -23,8 +22,7 @@ sealed class GiftCard(
         "1111-1111-1111-111",
         "999",
         "01/26",
-        "MASTERCARD",
-        true
+        "MASTERCARD"
     )
 
     object CORPORATE : GiftCard(
@@ -35,8 +33,7 @@ sealed class GiftCard(
         "2222-2222-2222-222",
         "888",
         "10/25",
-        "ישראכרט",
-        true
+        "ישראכרט"
     )
 
     object HOT : GiftCard(
@@ -47,8 +44,7 @@ sealed class GiftCard(
         "3333-3333-3333-333",
         "777",
         "12/24",
-        "MASTERCARD",
-        true
+        "MASTERCARD"
     )
 
     companion object {

@@ -1,10 +1,8 @@
 package com.example.composefirsttry.giftcard.ui.main
 
-import android.app.Application
 import android.content.SharedPreferences
 import androidx.lifecycle.*
 import com.example.composefirsttry.L
-import com.example.composefirsttry.MyApplication
 import com.example.composefirsttry.giftcard.model.GiftCard
 import com.example.composefirsttry.giftcard.model.Store
 import com.example.composefirsttry.giftcard.repository.GiftCardRepo
@@ -13,22 +11,24 @@ import com.example.composefirsttry.giftcard.ui.main.states.StoresMainIntention
 import com.example.composefirsttry.giftcard.utils.DbToModelConverter
 import com.example.composefirsttry.utils.SPKeys
 import com.example.composefirsttry.utils.observeForeverFreshly
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class StoresMainViewModel(app: Application, private val fragmentViewLifecycleOwner: LifecycleOwner /*ignore - just to see that I can*/) : AndroidViewModel(app) {
-    @Inject
-    lateinit var sp: SharedPreferences
+@HiltViewModel
+class StoresMainViewModel @Inject constructor (
+    private val sp: SharedPreferences,
+    private val giftCardRepo: GiftCardRepo
+) : ViewModel() {
 
-    @Inject
-    lateinit var giftCardRepo: GiftCardRepo
+    var maxCardChecked: Boolean = sp.getBoolean(SPKeys.GIFT_CARD_MAX_CHECKBOX_STATE, true)
+    var corporateCardChecked: Boolean = sp.getBoolean(SPKeys.GIFT_CARD_CORPORATE_CHECKBOX_STATE, true)
+    var hotCardChecked: Boolean = sp.getBoolean(SPKeys.GIFT_CARD_HOT_CHECKBOX_STATE, true)
 
-    val searchTextMutableLiveData: MutableLiveData<String>
+    val searchTextMutableLiveData: MutableLiveData<String> = MutableLiveData<String>("")
     private lateinit var searchTextMutableLiveDataObserver: Observer<String>
-    var maxCardChecked: Boolean
-    var corporateCardChecked: Boolean
-    var hotCardChecked: Boolean
+
     private lateinit var storesLiveData: LiveData<List<Store>>
     private lateinit var storesLiveDataObserver: Observer<List<Store>>
 
@@ -36,13 +36,6 @@ class StoresMainViewModel(app: Application, private val fragmentViewLifecycleOwn
     val stateLiveData: LiveData<StoreMainState> = stateMutableLiveData
 
     init {
-        (app as MyApplication).component.inject(this)
-
-        searchTextMutableLiveData = MutableLiveData<String>("")
-        maxCardChecked = sp.getBoolean(SPKeys.GIFT_CARD_MAX_CHECKBOX_STATE, true)
-        corporateCardChecked = sp.getBoolean(SPKeys.GIFT_CARD_CORPORATE_CHECKBOX_STATE, true)
-        hotCardChecked = sp.getBoolean(SPKeys.GIFT_CARD_HOT_CHECKBOX_STATE, true)
-
         initListeners()
     }
 
@@ -136,10 +129,10 @@ class StoresMainViewModel(app: Application, private val fragmentViewLifecycleOwn
     }
 }
 
+/* //Just for learning
 class StoresMainViewModelFactory(
-    private val app: Application,
     private val fragmentViewLifecycleOwner: LifecycleOwner) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return StoresMainViewModel(app, fragmentViewLifecycleOwner) as T
+        return StoresMainViewModel(fragmentViewLifecycleOwner) as T
     }
-}
+}*/

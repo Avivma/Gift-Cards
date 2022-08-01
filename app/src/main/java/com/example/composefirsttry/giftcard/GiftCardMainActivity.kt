@@ -13,9 +13,11 @@ import com.example.composefirsttry.R
 import com.example.composefirsttry.databinding.ActivityGiftCardMainBinding
 import com.example.composefirsttry.giftcard.repository.GiftCardRepo
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 
+@AndroidEntryPoint
 class GiftCardMainActivity : AppCompatActivity() {
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityGiftCardMainBinding

@@ -1,6 +1,5 @@
 package com.example.composefirsttry.giftcard.ui.main
 
-import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -11,11 +10,10 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.composefirsttry.L
-import com.example.composefirsttry.MyApplication
 import com.example.composefirsttry.R
 import com.example.composefirsttry.databinding.FragmentGiftCardStoresMainBinding
 import com.example.composefirsttry.databinding.GiftCardWithFrameLayoutBinding
@@ -24,10 +22,12 @@ import com.example.composefirsttry.giftcard.model.GiftCard
 import com.example.composefirsttry.giftcard.ui.main.states.StoreMainState
 import com.example.composefirsttry.giftcard.ui.main.states.StoresMainIntention
 import com.example.composefirsttry.utils.bindChecked
-import com.example.composefirsttry.utils.getApplication
 import com.example.composefirsttry.utils.requireActivity
+import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
+
+@AndroidEntryPoint
 class GiftCardStoresMainFragment : Fragment() {
     private lateinit var viewModel: StoresMainViewModel
     private lateinit var binding: FragmentGiftCardStoresMainBinding
@@ -36,11 +36,6 @@ class GiftCardStoresMainFragment : Fragment() {
     @Inject
     lateinit var sp: SharedPreferences
 
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        getApplication<MyApplication>().component.inject(this)
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -48,8 +43,13 @@ class GiftCardStoresMainFragment : Fragment() {
     ): View {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_gift_card_stores_main, container, false)!!
 
-        viewModel = ViewModelProvider(this, StoresMainViewModelFactory(requireActivity().application, viewLifecycleOwner))
-            .get(StoresMainViewModel::class.java)
+
+    /*  //just for reminder
+        viewModel = ViewModelProvider(this, StoresMainViewModelFactory(viewLifecycleOwner))
+            .get(StoresMainViewModel::class.java)*/
+
+        val viewModel by viewModels<StoresMainViewModel>()
+        this.viewModel = viewModel
 
         adapter = StoresAdapter(emptyList(), sp)
         binding.storeRecyclerView.adapter = adapter
