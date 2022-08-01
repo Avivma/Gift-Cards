@@ -29,7 +29,7 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class GiftCardStoresMainFragment : Fragment() {
-    private lateinit var viewModel: StoresMainViewModel
+    private val viewModel: StoresMainViewModel by viewModels()
     private lateinit var binding: FragmentGiftCardStoresMainBinding
     private lateinit var adapter: StoresAdapter
 
@@ -47,9 +47,6 @@ class GiftCardStoresMainFragment : Fragment() {
     /*  //just for reminder
         viewModel = ViewModelProvider(this, StoresMainViewModelFactory(viewLifecycleOwner))
             .get(StoresMainViewModel::class.java)*/
-
-        val viewModel by viewModels<StoresMainViewModel>()
-        this.viewModel = viewModel
 
         adapter = StoresAdapter(emptyList(), sp)
         binding.storeRecyclerView.adapter = adapter
