@@ -14,6 +14,7 @@ import com.example.composefirsttry.utils.observeForeverFreshly
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 
 @HiltViewModel
@@ -74,8 +75,7 @@ class StoresMainViewModel @Inject constructor (
                 is StoresMainIntention.FilterByPrefix -> filterByPrefix(intention.prefix)
                 is StoresMainIntention.FilterByCard -> filterByCard(intention.card, intention.isChecked)
                 StoresMainIntention.Refresh -> {
-                    if (firstTimeFetchData) {
-                        firstTimeFetchData = false
+                    if (isFirstTimeDataFetched()) {
                         giftCardRepo.refresh()
                     } else {
                         stateMutableLiveData.postValue(StoreMainState.DisplayData(getStores()))
@@ -124,8 +124,10 @@ class StoresMainViewModel @Inject constructor (
 
     private fun getStores(): List<Store> = storesLiveData.value ?: emptyList()
 
+    private fun isFirstTimeDataFetched(): Boolean = firstTimeFetchData.getAndSet(false)
+
     companion object {
-        private var firstTimeFetchData = true
+        private var firstTimeFetchData: AtomicBoolean = AtomicBoolean(true)
     }
 }
 
