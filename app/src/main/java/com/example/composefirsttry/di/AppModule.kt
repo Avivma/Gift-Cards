@@ -18,13 +18,19 @@ import javax.inject.Singleton
 class AppModule {
     @Singleton
     @Provides
-    fun provideSharedPreferences(@ApplicationContext context: Context): SharedPreferences {
+    fun provideContext(@ApplicationContext context: Context): Context {
+        return context
+    }
+
+    @Singleton
+    @Provides
+    fun provideSharedPreferences(context: Context): SharedPreferences {
         return context.getSharedPreferences(SPKeys.SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE)
     }
 
     @Singleton
     @Provides
-    fun provideGiftCardDatabase(@ApplicationContext context: Context): GiftCardDatabase {
+    fun provideGiftCardDatabase(context: Context): GiftCardDatabase {
         return Room.databaseBuilder(context, GiftCardDatabase::class.java, GiftCardDatabase.DB_NAME)
             .fallbackToDestructiveMigration()
             .build()
