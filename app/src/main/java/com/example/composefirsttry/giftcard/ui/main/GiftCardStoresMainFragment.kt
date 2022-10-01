@@ -48,7 +48,8 @@ class GiftCardStoresMainFragment : Fragment() {
         viewModel = ViewModelProvider(this, StoresMainViewModelFactory(viewLifecycleOwner))
             .get(StoresMainViewModel::class.java)*/
 
-        adapter = StoresAdapter(emptyList(), sp)
+        adapter = StoresAdapter(emptyList(), requireContext(), sp)
+        adapter.setHasStableIds(true)
         binding.storeRecyclerView.adapter = adapter
         binding.storeRecyclerView.layoutManager = LinearLayoutManager(requireActivity())
 
@@ -67,7 +68,7 @@ class GiftCardStoresMainFragment : Fragment() {
                     requireActivity().finish()
                 }
             }
-        requireActivity().onBackPressedDispatcher.addCallback(this, callback)
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, callback)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -81,6 +82,11 @@ class GiftCardStoresMainFragment : Fragment() {
                 val direction = GiftCardStoresMainFragmentDirections.actionGiftCardsMainFragmentToCardsFragment(navigationIntention.card)
                 requireActivity<GiftCardMainActivity>().getNavController().navigate(direction)
             }
+        })
+
+        adapter.storeListener.removeObservers(viewLifecycleOwner)
+        adapter.storeListener.observe(viewLifecycleOwner, Observer { storeSelectionIntention ->
+            viewModel.action(storeSelectionIntention)
         })
 
         viewModel.stateLiveData.removeObservers(viewLifecycleOwner)
@@ -100,7 +106,19 @@ class GiftCardStoresMainFragment : Fragment() {
                 L.i("StoreMainState.DisplayData")
                 binding.progressCircular.visibility = if (state.progressBarVisible) View.VISIBLE else View.GONE
                 binding.storeRecyclerView.alpha = if (state.storesListFaded) 0.5f else 1f
+                if (state.hideStoreSelectionFilter) {
+                    binding.storesSelection.visibility = View.GONE
+                    binding.storesClearSelection.visibility = View.GONE
+                }
                 adapter.setStores(state.stores)
+            }
+            is StoreMainState.StoreSelected -> {
+                L.i("StoreMainState.StoreSelected")
+                binding.progressCircular.visibility = View.GONE
+                binding.storeRecyclerView.alpha = 1f
+                binding.storesSelection.visibility = if (state.storeSelectionFilterVisible) View.VISIBLE else View.GONE
+                binding.storesClearSelection.visibility = if (state.storeSelectionFilterVisible) View.VISIBLE else View.GONE
+                adapter.storeSelected(state.store)
             }
         }
     }
@@ -114,6 +132,8 @@ class GiftCardStoresMainFragment : Fragment() {
         setCheckBoxListener(binding.maxCheckBox, GiftCard.MAX)
         setCheckBoxListener(binding.corporateCheckBox, GiftCard.CORPORATE)
         setCheckBoxListener(binding.hotCheckBox, GiftCard.HOT)
+        binding.storesSelection.setOnClickListener { viewModel.action(StoresMainIntention.FilterBySelectedStores) }
+        binding.storesClearSelection.setOnClickListener { viewModel.action(StoresMainIntention.ClearStoresSelection) }
     }
 
     private fun setCheckBoxListener(checkBoxLayout: GiftCardWithFrameLayoutBinding, giftCard: GiftCard) {

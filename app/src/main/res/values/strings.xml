@@ -25,4 +25,6 @@
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
     <string name="navigation_menu_main">Stores</string>
     <string name="navigation_menu_cards">Cards</string>
+    <string name="stores_selection_text">Select</string>
+    <string name="stores_clear_selection_text">Clear</string>
 </resources>

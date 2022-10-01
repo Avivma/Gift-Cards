@@ -3,9 +3,10 @@ package com.example.composefirsttry.giftcard.ui.main.states
 import com.example.composefirsttry.giftcard.model.Store
 
 sealed class StoreMainState(
-    val progressBarVisible: Boolean,
-    val storesListFaded: Boolean) {
+    val progressBarVisible: Boolean = false,
+    val storesListFaded: Boolean = false) {
 
     object Waiting: StoreMainState(progressBarVisible = true, storesListFaded = true)
-    data class DisplayData(val stores: List<Store>): StoreMainState(progressBarVisible = false, storesListFaded = false)
+    data class DisplayData(val stores: List<Store>, val hideStoreSelectionFilter: Boolean = false): StoreMainState()
+    data class StoreSelected(val store: Store, val storeSelectionFilterVisible: Boolean): StoreMainState()
 }

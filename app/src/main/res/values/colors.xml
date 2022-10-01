@@ -28,6 +28,7 @@
     <!-- items -->
     <color name="top_background_color">@color/light_accent</color>
     <color name="store_text_color">@color/very_dark_accent</color>
+    <color name="selected_store_text_color">#3792fa</color>
     <color name="check_box_color">#575aff</color>
     <color name="search_frame_color">@color/colorSecondary</color>
     <color name="store_cards_frame_color">@color/light_accent</color>

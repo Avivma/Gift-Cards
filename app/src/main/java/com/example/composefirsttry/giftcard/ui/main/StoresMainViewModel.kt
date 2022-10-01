@@ -65,7 +65,7 @@ class StoresMainViewModel @Inject constructor (
 
     private fun sendFreshData() {
         L.i("sendFreshData")
-        filterByPrefix(searchTextMutableLiveData.value!!)
+        stateMutableLiveData.postValue(StoreMainState.DisplayData(getFilteredStored()))
     }
 
     fun action(intention: StoresMainIntention){
@@ -81,9 +81,81 @@ class StoresMainViewModel @Inject constructor (
                         stateMutableLiveData.postValue(StoreMainState.DisplayData(getStores()))
                     }
                 }
+                is StoresMainIntention.FilterBySelectedStores -> {
+                    filterBySelectedStores()
+                }
+                is StoresMainIntention.ClearStoresSelection -> {
+                    clearStoresSelection()
+                }
+                is StoresMainIntention.SelectStore -> {
+                    storeSelected(intention.store)
+                }
                 else -> L.e("Unfamiliar intention. Intention = ${intention.javaClass.simpleName}")
             }
         }
+    }
+
+    private fun clearStoresSelection() {
+        L.i("clearStoresSelection: storesHasBeenSelected= $storesHasBeenSelected")
+        if (storesHasBeenSelected == ACTIVE) { //deactivate
+            setStoresSelection(VISIBLE)
+            stateMutableLiveData.postValue(StoreMainState.DisplayData(getFilteredStored()))
+        } else { //make invisible
+            getStores().forEach { it.selected = false }
+            setStoresSelection(INVISIBLE)
+            stateMutableLiveData.postValue(StoreMainState.DisplayData(getFilteredStored(), hideStoreSelectionFilter = true))
+        }
+    }
+
+    private fun storeSelected(store: Store) {
+        store.selected = getStoreNewState(store)
+
+        when {
+            storesHasBeenSelected == INVISIBLE -> {
+                stateMutableLiveData.postValue(StoreMainState.StoreSelected(store, true))
+                setStoresSelection(VISIBLE)
+            }
+            getStores().any { it.selected } -> {
+                stateMutableLiveData.postValue(StoreMainState.StoreSelected(store, true))
+            }
+            storesHasBeenSelected == VISIBLE -> {
+                stateMutableLiveData.postValue(StoreMainState.StoreSelected(store, false))
+                setStoresSelection(INVISIBLE)
+            }
+            storesHasBeenSelected == ACTIVE -> {
+                stateMutableLiveData.postValue(StoreMainState.DisplayData(getFilteredStored(), hideStoreSelectionFilter = true))
+                setStoresSelection(INVISIBLE)
+            }
+        }
+
+/*        if (storesHasBeenSelected == INVISIBLE) {
+            stateMutableLiveData.postValue(StoreMainState.StoreSelected(store, true))
+            setStoresSelection(VISIBLE)
+        } else if (getStores().any { it.selected }) {
+            stateMutableLiveData.postValue(StoreMainState.StoreSelected(store, true))
+        } else {
+            if (storesHasBeenSelected == ACTIVE) {
+                stateMutableLiveData.postValue(StoreMainState.DisplayData(getFilteredStored(), hideStoreSelectionFilter = true))
+            } else { //storesHasBeenSelected == VISIBLE
+                stateMutableLiveData.postValue(StoreMainState.StoreSelected(store, false))
+            }
+            setStoresSelection(INVISIBLE)
+        }*/
+    }
+
+    private fun getStoreNewState(store: Store): Boolean = !store.selected //get reverse store selection state
+
+    private fun setStoresSelection(selectionState: Int) {
+        L.i("setStoreSelection: selectionState= $selectionState")
+        storesHasBeenSelected = selectionState
+    }
+
+    private fun getFilteredStored(): List<Store> = getStores().filter { store -> shouldStoreBeDisplayed(store, searchTextMutableLiveData.value!!) }
+
+    private fun filterBySelectedStores() {
+        L.i("filterBySelectedStores")
+        setStoresSelection(ACTIVE)
+        stateMutableLiveData.postValue(StoreMainState.DisplayData(getFilteredStored()))
     }
 
     private fun filterByCard(card: GiftCard, isChecked: Boolean) {
@@ -95,9 +167,7 @@ class StoresMainViewModel @Inject constructor (
             GiftCard.HOT -> hotCardChecked = isChecked
         }
 
-        val filteredStored: List<Store> = getStores().filter { store ->
-            shouldStoreBeDisplayed(store, searchTextMutableLiveData.value!!) }
-        stateMutableLiveData.postValue(StoreMainState.DisplayData(filteredStored))
+        stateMutableLiveData.postValue(StoreMainState.DisplayData(getFilteredStored()))
     }
 
     private fun filterByPrefix(prefix: String) {
@@ -109,7 +179,8 @@ class StoresMainViewModel @Inject constructor (
         return if ((store.maxCard && maxCardChecked) ||
             (store.corporateCard && corporateCardChecked) ||
             (store.hotCard && hotCardChecked)) {
-            store.storeName.lowercase().startsWith(prefix.lowercase())
+            (store.selected || storesHasBeenSelected != ACTIVE) //equivalent to: storesHasBeenSelected == ACTIVE -> store.selected
+                    && store.storeName.lowercase().startsWith(prefix.lowercase())
         } else {
             false
         }
@@ -128,6 +199,12 @@ class StoresMainViewModel @Inject constructor (
 
     companion object {
         private var firstTimeFetchData: AtomicBoolean = AtomicBoolean(true)
+
+        private const val INVISIBLE = 0
+        private const val VISIBLE = 1
+        private const val ACTIVE = 2
+
+        private var storesHasBeenSelected: Int = INVISIBLE
     }
 }
 
