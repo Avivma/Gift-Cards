@@ -127,20 +127,6 @@ class StoresMainViewModel @Inject constructor (
                 setStoresSelection(INVISIBLE)
             }
         }
-
-/*        if (storesHasBeenSelected == INVISIBLE) {
-            stateMutableLiveData.postValue(StoreMainState.StoreSelected(store, true))
-            setStoresSelection(VISIBLE)
-        } else if (getStores().any { it.selected }) {
-            stateMutableLiveData.postValue(StoreMainState.StoreSelected(store, true))
-        } else {
-            if (storesHasBeenSelected == ACTIVE) {
-                stateMutableLiveData.postValue(StoreMainState.DisplayData(getFilteredStored(), hideStoreSelectionFilter = true))
-            } else { //storesHasBeenSelected == VISIBLE
-                stateMutableLiveData.postValue(StoreMainState.StoreSelected(store, false))
-            }
-            setStoresSelection(INVISIBLE)
-        }*/
     }
 
     private fun getStoreNewState(store: Store): Boolean = !store.selected //get reverse store selection state
@@ -180,10 +166,15 @@ class StoresMainViewModel @Inject constructor (
             (store.corporateCard && corporateCardChecked) ||
             (store.hotCard && hotCardChecked)) {
             (store.selected || storesHasBeenSelected != ACTIVE) //equivalent to: storesHasBeenSelected == ACTIVE -> store.selected
-                    && store.storeName.lowercase().startsWith(prefix.lowercase())
+                    && doesStoreNameStartWithPrefix(store.storeName.lowercase(), prefix.lowercase())
         } else {
             false
         }
+    }
+
+    private fun doesStoreNameStartWithPrefix(storeName: String, complexPrefix: String): Boolean {
+        val acceptablePrefixes: List<String> = complexPrefix.split("||").map { it.trim() }
+        return acceptablePrefixes.any { storeName.startsWith(it) }
     }
 
     private fun getCardSp(card: GiftCard): String = when (card) {

@@ -134,6 +134,10 @@ class GiftCardStoresMainFragment : Fragment() {
         setCheckBoxListener(binding.hotCheckBox, GiftCard.HOT)
         binding.storesSelection.setOnClickListener { viewModel.action(StoresMainIntention.FilterBySelectedStores) }
         binding.storesClearSelection.setOnClickListener { viewModel.action(StoresMainIntention.ClearStoresSelection) }
+        binding.separationSearchMarkButton.setOnClickListener { //I use this way (not MVI) because, there is a problem with the livedata 2-way databinding. Updating this "searchTextMutableLiveData" doesn't reflect on the UI
+            binding.searchStore.setText("${binding.searchStore.text} || ")
+            binding.searchStore.setSelection(binding.searchStore.length())
+        }
     }
 
     private fun setCheckBoxListener(checkBoxLayout: GiftCardWithFrameLayoutBinding, giftCard: GiftCard) {
