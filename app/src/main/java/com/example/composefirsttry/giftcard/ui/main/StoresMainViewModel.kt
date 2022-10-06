@@ -65,16 +65,16 @@ class StoresMainViewModel @Inject constructor (
 
     private fun sendFreshData() {
         L.i("sendFreshData")
-        stateMutableLiveData.postValue(StoreMainState.DisplayData(getFilteredStored()))
+        stateMutableLiveData.postValue(StoreMainState.DisplayData(getFilteredStores()))
     }
 
     fun action(intention: StoresMainIntention){
-        stateMutableLiveData.value = StoreMainState.Waiting
         viewModelScope.launch(Dispatchers.IO) {
             when (intention) {
                 is StoresMainIntention.FilterByPrefix -> filterByPrefix(intention.prefix)
                 is StoresMainIntention.FilterByCard -> filterByCard(intention.card, intention.isChecked)
-                StoresMainIntention.Refresh -> {
+                is StoresMainIntention.Refresh -> {
+                    stateMutableLiveData.postValue(StoreMainState.Waiting)
                     if (isFirstTimeDataFetched()) {
                         giftCardRepo.refresh()
                     } else {
@@ -90,20 +90,43 @@ class StoresMainViewModel @Inject constructor (
                 is StoresMainIntention.SelectStore -> {
                     storeSelected(intention.store)
                 }
+                is StoresMainIntention.OpenStoreDialog -> {
+                    openStoreDialog(intention.store)
+                }
+                is StoresMainIntention.AddStoreToFavorites -> {
+                    addStoreToFavorites(intention.store)
+                }
                 else -> L.e("Unfamiliar intention. Intention = ${intention.javaClass.simpleName}")
             }
         }
+    }
+
+    private fun addStoreToFavorites(store: Store) {
+        giftCardRepo.addStoreToFavorites(DbToModelConverter.fromStoreToEntity(store))
+    }
+
+    private fun openStoreDialog(store: Store) {
+        //for testing only
+        L.i("Current favorites state (before adding '${store.storeName}'): ")
+        val list = getStores().filter { it.favorite }
+        if (list.isEmpty()) {
+           L.i(" - No favorites stores found")
+        } else {
+            list.forEach { L.i(" - Store '${it.storeName}' is FAVORITE") }
+        }
+
+        stateMutableLiveData.postValue(StoreMainState.StoreDialogOpened(store))
     }
 
     private fun clearStoresSelection() {
         L.i("clearStoresSelection: storesHasBeenSelected= $storesHasBeenSelected")
         if (storesHasBeenSelected == ACTIVE) { //deactivate
             setStoresSelection(VISIBLE)
-            stateMutableLiveData.postValue(StoreMainState.DisplayData(getFilteredStored()))
+            stateMutableLiveData.postValue(StoreMainState.DisplayData(getFilteredStores()))
         } else { //make invisible
             getStores().forEach { it.selected = false }
             setStoresSelection(INVISIBLE)
-            stateMutableLiveData.postValue(StoreMainState.DisplayData(getFilteredStored(), hideStoreSelectionFilter = true))
+            stateMutableLiveData.postValue(StoreMainState.DisplayData(getFilteredStores(), hideStoreSelectionFilter = true))
         }
     }
 
@@ -112,19 +135,19 @@ class StoresMainViewModel @Inject constructor (
 
         when {
             storesHasBeenSelected == INVISIBLE -> {
-                stateMutableLiveData.postValue(StoreMainState.StoreSelected(store, true))
                 setStoresSelection(VISIBLE)
+                stateMutableLiveData.postValue(StoreMainState.StoreSelected(store, true))
             }
             getStores().any { it.selected } -> {
                 stateMutableLiveData.postValue(StoreMainState.StoreSelected(store, true))
             }
             storesHasBeenSelected == VISIBLE -> {
-                stateMutableLiveData.postValue(StoreMainState.StoreSelected(store, false))
                 setStoresSelection(INVISIBLE)
+                stateMutableLiveData.postValue(StoreMainState.StoreSelected(store, false))
             }
             storesHasBeenSelected == ACTIVE -> {
-                stateMutableLiveData.postValue(StoreMainState.DisplayData(getFilteredStored(), hideStoreSelectionFilter = true))
                 setStoresSelection(INVISIBLE)
+                stateMutableLiveData.postValue(StoreMainState.DisplayData(getFilteredStores(), hideStoreSelectionFilter = true))
             }
         }
     }
@@ -136,12 +159,12 @@ class StoresMainViewModel @Inject constructor (
         storesHasBeenSelected = selectionState
     }
 
-    private fun getFilteredStored(): List<Store> = getStores().filter { store -> shouldStoreBeDisplayed(store, searchTextMutableLiveData.value!!) }
+    private fun getFilteredStores(): List<Store> = getStores().filter { store -> shouldStoreBeDisplayed(store, searchTextMutableLiveData.value!!) }
 
     private fun filterBySelectedStores() {
         L.i("filterBySelectedStores")
         setStoresSelection(ACTIVE)
-        stateMutableLiveData.postValue(StoreMainState.DisplayData(getFilteredStored()))
+        stateMutableLiveData.postValue(StoreMainState.DisplayData(getFilteredStores()))
     }
 
     private fun filterByCard(card: GiftCard, isChecked: Boolean) {
@@ -153,7 +176,7 @@ class StoresMainViewModel @Inject constructor (
             GiftCard.HOT -> hotCardChecked = isChecked
         }
 
-        stateMutableLiveData.postValue(StoreMainState.DisplayData(getFilteredStored()))
+        stateMutableLiveData.postValue(StoreMainState.DisplayData(getFilteredStores()))
     }
 
     private fun filterByPrefix(prefix: String) {

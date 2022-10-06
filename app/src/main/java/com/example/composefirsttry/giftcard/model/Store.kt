@@ -5,6 +5,7 @@ data class Store constructor(
     var maxCard: Boolean = false,
     var corporateCard: Boolean = false,
     var hotCard: Boolean = false,
+    var favorite: Boolean = false,
     var selected: Boolean = false
 ) {
 

@@ -20,12 +20,16 @@
     <!-- Sync Preferences -->
     <string name="sync_title">Sync email periodically</string>
     <string name="attachment_title">Download incoming attachments</string>
-    <string name="attachment_summary_on">Automatically download attachments for incoming emails
-    </string>
+    <string name="attachment_summary_on">Automatically download attachments for incoming emails</string>
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
     <string name="navigation_menu_main">Stores</string>
     <string name="navigation_menu_cards">Cards</string>
+    <string name="navigation_menu_favorites">Favorites</string>
     <string name="stores_selection_text">Select</string>
     <string name="stores_clear_selection_text">Clear</string>
     <string name="separation_button_text">OR</string>
+
+    <string name="store_dialog_title">@string/navigation_menu_favorites</string>
+    <string name="store_dialog_add_button_text">Add Store</string>
+    <string name="store_dialog_cancel_button_text">Cancel</string>
 </resources>

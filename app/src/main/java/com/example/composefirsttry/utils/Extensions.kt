@@ -4,7 +4,6 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
-import com.example.composefirsttry.L
 
 
 fun <T> Fragment.requireActivity() = requireActivity() as T
@@ -31,7 +30,7 @@ class FreshObserver<T>(
     private var version: Int = sinceVersion
 ) : Observer<T> {
     override fun onChanged(t: T) {
-        L.i("FreshObserver.onChanged - version: $version, sinceVersion: $sinceVersion")
+//        L.i("FreshObserver.onChanged - version: $version, sinceVersion: $sinceVersion")
         if (version > sinceVersion) {
             delegate.onChanged(t)
         }

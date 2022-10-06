@@ -9,4 +9,5 @@ sealed class StoreMainState(
     object Waiting: StoreMainState(progressBarVisible = true, storesListFaded = true)
     data class DisplayData(val stores: List<Store>, val hideStoreSelectionFilter: Boolean = false): StoreMainState()
     data class StoreSelected(val store: Store, val storeSelectionFilterVisible: Boolean): StoreMainState()
+    data class StoreDialogOpened(val store: Store) : StoreMainState()
 }

@@ -16,12 +16,14 @@ data class StoreEntity constructor(
     @ColumnInfo(name = "corporate_card")
     var corporateCard: Boolean = false,
     @ColumnInfo(name = "hot_card")
-    var hotCard: Boolean = false
+    var hotCard: Boolean = false,
+    @ColumnInfo(name = "favorite")
+    var favorite: Boolean = false
 ) {
     //    @PrimaryKey(autoGenerate = true)
 //    @ColumnInfo(name = "id")
 //    var Id: Int = 0
     override fun toString(): String {
-        return "StoreEntity(storeName='$storeName', storeNameHebrew='$storeNameHebrew', maxCard=$maxCard, corporateCard=$corporateCard, hotCard=$hotCard)"
+        return "StoreEntity(storeName='$storeName', storeNameHebrew='$storeNameHebrew', maxCard=$maxCard, corporateCard=$corporateCard, hotCard=$hotCard, favorite=$favorite)"
     }
 }

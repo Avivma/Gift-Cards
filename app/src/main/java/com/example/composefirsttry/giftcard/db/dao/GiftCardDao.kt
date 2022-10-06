@@ -18,6 +18,21 @@ interface GiftCardDao {
     @Query("SELECT * FROM gift_card_stores WHERE store_name LIKE :searchedPrefix || '%'")
     fun getStores(searchedPrefix: String): LiveData<List<StoreEntity>>
 
+    @Query("UPDATE gift_card_stores SET favorite = $BOOLEAN_TRUE WHERE store_name IN (:storesNames)")
+    fun addToFavorites(storesNames: List<String>)
+
+    @Query("UPDATE gift_card_stores SET favorite=$BOOLEAN_FALSE")
+    fun resetFavorites()
+
+    @Query("SELECT store_name FROM gift_card_stores WHERE favorite=$BOOLEAN_TRUE")
+    fun getFavoriteStoresNames(): List<String>
+
     @Query("DELETE FROM gift_card_stores")
     fun deleteAll()
+
+    companion object {
+        //the below values are based on the answer here: https://stackoverflow.com/a/47730858
+        const val BOOLEAN_TRUE = 1
+        const val BOOLEAN_FALSE = 0
+    }
 }

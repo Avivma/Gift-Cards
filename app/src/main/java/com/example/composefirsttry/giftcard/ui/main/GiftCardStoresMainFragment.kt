@@ -1,5 +1,6 @@
 package com.example.composefirsttry.giftcard.ui.main
 
+import android.app.AlertDialog
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -107,11 +108,17 @@ class GiftCardStoresMainFragment : Fragment() {
             }
             is StoreMainState.StoreSelected -> {
                 L.i("StoreMainState.StoreSelected")
-                binding.progressCircular.visibility = View.GONE
-                binding.storeRecyclerView.alpha = 1f
                 binding.storesSelection.visibility = if (state.storeSelectionFilterVisible) View.VISIBLE else View.GONE
                 binding.storesClearSelection.visibility = if (state.storeSelectionFilterVisible) View.VISIBLE else View.GONE
                 adapter.storeSelected(state.store)
+            }
+            is StoreMainState.StoreDialogOpened -> {
+                AlertDialog.Builder(requireActivity())
+                    .setTitle(R.string.store_dialog_title)
+                    .setNeutralButton(R.string.store_dialog_add_button_text) { _, _ -> viewModel.action(StoresMainIntention.AddStoreToFavorites(state.store)) }
+                    .setNegativeButton(R.string.store_dialog_cancel_button_text) { dialog, _ -> dialog.dismiss() }
+                    .show()
+
             }
         }
     }

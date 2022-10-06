@@ -11,6 +11,9 @@ sealed class StoresMainIntention {
     //Store Selection
     data class SelectStore(val store: Store): StoresMainIntention()
     object ClearStoresSelection: StoresMainIntention()
+    //Favorites
+    data class OpenStoreDialog(val store: Store) : StoresMainIntention()
+    class AddStoreToFavorites(val store: Store) : StoresMainIntention()
 
     object Refresh: StoresMainIntention()
 

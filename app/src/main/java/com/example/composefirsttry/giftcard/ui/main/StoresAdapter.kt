@@ -77,6 +77,10 @@ class StoresAdapter(giftCards: List<Store>, var context: Context, var sp: Shared
             binding.storeName.setOnClickListener {
                 mutableIntentionsListener.postValue(StoresMainIntention.SelectStore(store))
             }
+            binding.storeName.setOnLongClickListener {
+                mutableIntentionsListener.postValue(StoresMainIntention.OpenStoreDialog(store))
+                true
+            }
         }
     }
 }

@@ -32,9 +32,13 @@ class GiftCardRepo @Inject constructor(
     }
 
     private fun mergeToDb(storesServer: List<SheetItem>) {
+        val favoredStoresNames: List<String> = if (allStores.value != null) giftCardDao.getFavoriteStoresNames() else emptyList()
+
         giftCardDao.deleteAll()
-        val giftCards: List<StoreEntity> = convert(storesServer)
-        giftCardDao.insertAll(giftCards)
+        val storesDb: List<StoreEntity> = convert(storesServer)
+        giftCardDao.insertAll(storesDb)
+
+        if (favoredStoresNames.isNotEmpty()) giftCardDao.addToFavorites(favoredStoresNames)
     }
 
     private fun convert(storesServer: List<SheetItem>): List<StoreEntity> {
@@ -49,6 +53,14 @@ class GiftCardRepo @Inject constructor(
             )
         })
         return storesDb
+    }
+
+    fun addStoreToFavorites(store: StoreEntity) {
+        giftCardDao.addToFavorites(listOf(store.storeName))
+    }
+
+    fun resetFavorites() {
+        giftCardDao.resetFavorites()
     }
 
 /*    fun insertData(context: Context, giftCardName: String, firstStoreName: String) {

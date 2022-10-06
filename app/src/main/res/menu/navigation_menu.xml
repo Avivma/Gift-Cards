@@ -11,6 +11,12 @@
         android:icon="@drawable/navigation_menu_cards"
         android:menuCategory="secondary"
         android:title="@string/navigation_menu_cards"/>
+
+    <item
+        android:id="@+id/favoritesFragment"
+        android:icon="@drawable/navigation_menu_favorites"
+        android:menuCategory="secondary"
+        android:title="@string/navigation_menu_favorites"/>
 </menu>
 
 <!--    android:menuCategory="secondary"-->
