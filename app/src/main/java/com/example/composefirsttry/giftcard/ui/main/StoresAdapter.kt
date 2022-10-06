@@ -17,11 +17,9 @@ import com.example.composefirsttry.utils.SPKeys
 
 class StoresAdapter(giftCards: List<Store>, var context: Context, var sp: SharedPreferences): RecyclerView.Adapter<StoresAdapter.StoreRowHolder>() {
     private val stores: MutableList<Store> = ArrayList(giftCards)
-    var cardListener: LiveData<StoresMainIntention> = MutableLiveData()
-    private var mutableCardListener: MutableLiveData<StoresMainIntention> = cardListener as MutableLiveData<StoresMainIntention>
 
-    var storeListener: LiveData<StoresMainIntention> = MutableLiveData()
-    private var mutableStoreListener: MutableLiveData<StoresMainIntention> = storeListener as MutableLiveData<StoresMainIntention>
+    var intentionsListener: LiveData<StoresMainIntention> = MutableLiveData()
+    private var mutableIntentionsListener: MutableLiveData<StoresMainIntention> = intentionsListener as MutableLiveData<StoresMainIntention>
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): StoreRowHolder {
         val binding: StoreRowLayoutBinding = DataBindingUtil.inflate(LayoutInflater.from(parent.context), R.layout.store_row_layout, parent, false)
@@ -73,11 +71,11 @@ class StoresAdapter(giftCards: List<Store>, var context: Context, var sp: Shared
             binding.storeSelected = store.selected
 
             //set listeners
-            binding.cardMax.cardLayout.setOnClickListener { mutableCardListener.postValue(StoresMainIntention.NavigateToCardsScreen(GiftCard.MAX)) }
-            binding.cardCorporate.cardLayout.setOnClickListener { mutableCardListener.postValue(StoresMainIntention.NavigateToCardsScreen(GiftCard.CORPORATE)) }
-            binding.cardHot.cardLayout.setOnClickListener { mutableCardListener.postValue(StoresMainIntention.NavigateToCardsScreen(GiftCard.HOT)) }
+            binding.cardMax.cardLayout.setOnClickListener { mutableIntentionsListener.postValue(StoresMainIntention.Navigation.NavigateToCardsScreen(GiftCard.MAX)) }
+            binding.cardCorporate.cardLayout.setOnClickListener { mutableIntentionsListener.postValue(StoresMainIntention.Navigation.NavigateToCardsScreen(GiftCard.CORPORATE)) }
+            binding.cardHot.cardLayout.setOnClickListener { mutableIntentionsListener.postValue(StoresMainIntention.Navigation.NavigateToCardsScreen(GiftCard.HOT)) }
             binding.storeName.setOnClickListener {
-                mutableStoreListener.postValue(StoresMainIntention.SelectStore(store))
+                mutableIntentionsListener.postValue(StoresMainIntention.SelectStore(store))
             }
         }
     }

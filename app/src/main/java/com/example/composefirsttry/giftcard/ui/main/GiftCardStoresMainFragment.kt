@@ -76,17 +76,10 @@ class GiftCardStoresMainFragment : Fragment() {
         //Important fix: removeObservers and getViewLifecyclerOwner instead of activity to prevent multiple call to onChanged from unremoved observers.
         //More info: https://blog.usejournal.com/observe-livedata-from-viewmodel-in-fragment-fd7d14f9f5fb
 
-        adapter.cardListener.removeObservers(viewLifecycleOwner)
-        adapter.cardListener.observe(viewLifecycleOwner, Observer { navigationIntention ->
-            if (navigationIntention is StoresMainIntention.NavigateToCardsScreen) {
-                val direction = GiftCardStoresMainFragmentDirections.actionGiftCardsMainFragmentToCardsFragment(navigationIntention.card)
-                requireActivity<GiftCardMainActivity>().getNavController().navigate(direction)
-            }
-        })
-
-        adapter.storeListener.removeObservers(viewLifecycleOwner)
-        adapter.storeListener.observe(viewLifecycleOwner, Observer { storeSelectionIntention ->
-            viewModel.action(storeSelectionIntention)
+        adapter.intentionsListener.removeObservers(viewLifecycleOwner)
+        adapter.intentionsListener.observe(viewLifecycleOwner, Observer { intention ->
+            if (intention is StoresMainIntention.Navigation) navigate(intention)
+            else viewModel.action(intention)
         })
 
         viewModel.stateLiveData.removeObservers(viewLifecycleOwner)
@@ -119,6 +112,18 @@ class GiftCardStoresMainFragment : Fragment() {
                 binding.storesSelection.visibility = if (state.storeSelectionFilterVisible) View.VISIBLE else View.GONE
                 binding.storesClearSelection.visibility = if (state.storeSelectionFilterVisible) View.VISIBLE else View.GONE
                 adapter.storeSelected(state.store)
+            }
+        }
+    }
+
+    private fun navigate(navigationIntention: StoresMainIntention.Navigation) {
+        when (navigationIntention) {
+            is StoresMainIntention.Navigation.NavigateToCardsScreen -> {
+                val direction = GiftCardStoresMainFragmentDirections.actionGiftCardsMainFragmentToCardsFragment(navigationIntention.card)
+                requireActivity<GiftCardMainActivity>().getNavController().navigate(direction)
+            }
+            else -> {
+                L.e("Unfamiliar navigation (intention: ${navigationIntention.javaClass.simpleName})")
             }
         }
     }

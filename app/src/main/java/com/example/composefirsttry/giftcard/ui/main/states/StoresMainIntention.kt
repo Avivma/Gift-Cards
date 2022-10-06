@@ -4,11 +4,17 @@ import com.example.composefirsttry.giftcard.model.GiftCard
 import com.example.composefirsttry.giftcard.model.Store
 
 sealed class StoresMainIntention {
+    //Filters
     data class FilterByPrefix(val prefix: String): StoresMainIntention()
     data class FilterByCard(val card: GiftCard, val isChecked: Boolean): StoresMainIntention()
     object FilterBySelectedStores: StoresMainIntention()
-    data class NavigateToCardsScreen(val card: GiftCard): StoresMainIntention()
+    //Store Selection
     data class SelectStore(val store: Store): StoresMainIntention()
     object ClearStoresSelection: StoresMainIntention()
+
     object Refresh: StoresMainIntention()
+
+    sealed class Navigation: StoresMainIntention() {
+        data class NavigateToCardsScreen(val card: GiftCard): StoresMainIntention.Navigation()
+    }
 }
