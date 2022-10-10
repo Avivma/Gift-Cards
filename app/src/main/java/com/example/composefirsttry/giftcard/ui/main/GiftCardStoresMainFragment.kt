@@ -115,6 +115,7 @@ class GiftCardStoresMainFragment : Fragment() {
             is StoreMainState.StoreDialogOpened -> {
                 AlertDialog.Builder(requireActivity())
                     .setTitle(R.string.store_dialog_title)
+                    .setMessage(resources.getString(R.string.store_dialog_add_message, state.store.storeName))
                     .setNeutralButton(R.string.store_dialog_add_button_text) { _, _ -> viewModel.action(StoresMainIntention.AddStoreToFavorites(state.store)) }
                     .setNegativeButton(R.string.store_dialog_cancel_button_text) { dialog, _ -> dialog.dismiss() }
                     .show()

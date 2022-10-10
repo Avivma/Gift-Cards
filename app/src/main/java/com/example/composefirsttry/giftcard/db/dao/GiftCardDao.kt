@@ -19,7 +19,10 @@ interface GiftCardDao {
     fun getStores(searchedPrefix: String): LiveData<List<StoreEntity>>
 
     @Query("UPDATE gift_card_stores SET favorite = $BOOLEAN_TRUE WHERE store_name IN (:storesNames)")
-    fun addToFavorites(storesNames: List<String>)
+    fun updateAsFavorites(storesNames: List<String>)
+
+    @Query("UPDATE gift_card_stores SET favorite=$BOOLEAN_FALSE WHERE store_name LIKE :storeName")
+    fun removeStoreFromFavorites(storeName: String)
 
     @Query("UPDATE gift_card_stores SET favorite=$BOOLEAN_FALSE")
     fun resetFavorites()

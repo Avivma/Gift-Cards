@@ -13,7 +13,7 @@ sealed class StoresMainIntention {
     object ClearStoresSelection: StoresMainIntention()
     //Favorites
     data class OpenStoreDialog(val store: Store) : StoresMainIntention()
-    class AddStoreToFavorites(val store: Store) : StoresMainIntention()
+    data class AddStoreToFavorites(val store: Store) : StoresMainIntention()
 
     object Refresh: StoresMainIntention()
 

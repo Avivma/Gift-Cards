@@ -106,15 +106,6 @@ class StoresMainViewModel @Inject constructor (
     }
 
     private fun openStoreDialog(store: Store) {
-        //for testing only
-        L.i("Current favorites state (before adding '${store.storeName}'): ")
-        val list = getStores().filter { it.favorite }
-        if (list.isEmpty()) {
-           L.i(" - No favorites stores found")
-        } else {
-            list.forEach { L.i(" - Store '${it.storeName}' is FAVORITE") }
-        }
-
         stateMutableLiveData.postValue(StoreMainState.StoreDialogOpened(store))
     }
 

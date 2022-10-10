@@ -38,7 +38,7 @@ class GiftCardRepo @Inject constructor(
         val storesDb: List<StoreEntity> = convert(storesServer)
         giftCardDao.insertAll(storesDb)
 
-        if (favoredStoresNames.isNotEmpty()) giftCardDao.addToFavorites(favoredStoresNames)
+        if (favoredStoresNames.isNotEmpty()) giftCardDao.updateAsFavorites(favoredStoresNames)
     }
 
     private fun convert(storesServer: List<SheetItem>): List<StoreEntity> {
@@ -55,12 +55,19 @@ class GiftCardRepo @Inject constructor(
         return storesDb
     }
 
+    @WorkerThread
     fun addStoreToFavorites(store: StoreEntity) {
-        giftCardDao.addToFavorites(listOf(store.storeName))
+        giftCardDao.updateAsFavorites(listOf(store.storeName))
     }
 
+    @WorkerThread
     fun resetFavorites() {
         giftCardDao.resetFavorites()
+    }
+
+    @WorkerThread
+    fun removeStoreFromFavorites(storeName: String) {
+        giftCardDao.removeStoreFromFavorites(storeName)
     }
 
 /*    fun insertData(context: Context, giftCardName: String, firstStoreName: String) {

@@ -32,4 +32,10 @@
     <string name="store_dialog_title">@string/navigation_menu_favorites</string>
     <string name="store_dialog_add_button_text">Add Store</string>
     <string name="store_dialog_cancel_button_text">Cancel</string>
+    <string name="store_dialog_remove_button_text">Remove</string>
+    <string name="remove_all_favorites">Remove all</string>
+    <string name="favorites_screen_title">@string/navigation_menu_favorites</string>
+    <string name="store_dialog_remove_message">Do you want to remove \'%s\' store?</string>
+    <string name="store_dialog_add_message">Do you want to add \'%s\' store to favorites?</string>
+    <string name="store_dialog_remove_all_message">Do you want to remove all stores?</string>
 </resources>

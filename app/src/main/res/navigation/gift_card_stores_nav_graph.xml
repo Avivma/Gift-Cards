@@ -25,6 +25,17 @@
             android:defaultValue="@null" />
     </fragment>
 
+    <fragment
+        android:id="@+id/favoritesFragment"
+        android:name="com.example.composefirsttry.giftcard.ui.favorites.FavoritesFragment"
+        tools:layout="@layout/fragment_favorites"
+        android:label="FavoritesFragment" >
+        <action
+            android:id="@+id/action_favoritesFragment_to_cardsFragment"
+            app:argType="com.example.composefirsttry.giftcard.model.GiftCard"
+            app:destination="@id/cardsFragment" />
+    </fragment>
+
     <action
         android:id="@+id/go_to_mainFragment"
         app:destination="@id/giftCardsMainFragment"
