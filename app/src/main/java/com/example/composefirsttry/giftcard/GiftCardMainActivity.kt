@@ -1,6 +1,7 @@
 package com.example.composefirsttry.giftcard
 
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
@@ -12,7 +13,6 @@ import com.example.composefirsttry.L
 import com.example.composefirsttry.R
 import com.example.composefirsttry.databinding.ActivityGiftCardMainBinding
 import com.example.composefirsttry.giftcard.repository.GiftCardRepo
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -34,9 +34,7 @@ class GiftCardMainActivity : AppCompatActivity() {
         binding = ActivityGiftCardMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val navController: NavController = getNavController()
-        val bottomNavigationView = findViewById<BottomNavigationView>(R.id.activity_main_bottom_navigation_view)
-        setupWithNavController(bottomNavigationView, navController)
+        setupWithNavController(binding.activityMainBottomNavigationView, getNavController())
 
 //        binding.activityMainBottomNavigationView.setOnNavigationItemSelectedListener {
 //        binding.activityMainBottomNavigationView.setOnItemSelectedListener {
@@ -57,5 +55,9 @@ class GiftCardMainActivity : AppCompatActivity() {
     fun getNavController(): NavController {
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         return navHostFragment.navController
+    }
+
+    fun displayBottomNavigation(display: Boolean) {
+        binding.activityMainBottomNavigationView.visibility = if (display) View.VISIBLE else View.GONE
     }
 }

@@ -23,6 +23,13 @@
             app:argType="com.example.composefirsttry.giftcard.model.GiftCard"
             app:nullable="true"
             android:defaultValue="@null" />
+        <action
+            android:id="@+id/action_cardsFragment_to_addCardFragment"
+            app:destination="@id/addCardFragment"
+            app:enterAnim="@android:anim/fade_in"
+            app:exitAnim="@android:anim/fade_out"
+            app:popEnterAnim="@android:anim/fade_in"
+            app:popExitAnim="@android:anim/fade_out" />
     </fragment>
 
     <fragment
@@ -41,4 +48,17 @@
         app:destination="@id/giftCardsMainFragment"
         app:popUpTo="@id/giftCardsMainFragment"
         app:popUpToInclusive="true" />
+    <fragment
+        android:id="@+id/addCardFragment"
+        android:name="com.example.composefirsttry.giftcard.ui.addcard.AddCardFragment"
+        android:label="add_card_fragment"
+        tools:layout="@layout/add_card_fragment" >
+        <action
+            android:id="@+id/action_addCardFragment_to_cardsFragment"
+            app:destination="@id/cardsFragment"
+            app:enterAnim="@android:anim/fade_in"
+            app:exitAnim="@android:anim/fade_out"
+            app:popUpTo="@id/cardsFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
 </navigation>

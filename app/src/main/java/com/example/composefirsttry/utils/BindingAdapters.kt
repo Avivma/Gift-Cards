@@ -28,7 +28,9 @@ fun bindChecked(view: View, checked: Boolean) {
 
 @BindingAdapter("loadImage")
 fun loadImage(image: ImageView, @DrawableRes imageRes:  Int) {
-    image.setImageDrawable(ContextCompat.getDrawable(image.context, imageRes))
+    if (imageRes != 0) {
+        image.setImageDrawable(ContextCompat.getDrawable(image.context, imageRes))
+    }
 }
 
 @BindingAdapter("setDiscount")

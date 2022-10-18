@@ -33,21 +33,6 @@
             android:src="@drawable/ic_store"
             />
 
-<!--        <Button-->
-<!--            android:id="@+id/remove_favorites_button"-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:background="@color/transparent"-->
-<!--            android:text="@string/remove_all_favorites"-->
-<!--            android:gravity="center"-->
-<!--            android:textAllCaps="false"-->
-<!--            android:textSize="12sp"-->
-<!--            android:textColor="@color/very_dark_accent"-->
-<!--            app:layout_constraintTop_toTopOf="@+id/favorites_title"-->
-<!--            app:layout_constraintBottom_toBottomOf="@+id/favorites_title"-->
-<!--            app:layout_constraintEnd_toEndOf="parent"-->
-<!--            />-->
-
         <ImageButton
             android:id="@+id/remove_favorites_button"
             android:layout_width="60dp"

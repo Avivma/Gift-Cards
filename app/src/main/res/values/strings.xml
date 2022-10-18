@@ -38,4 +38,14 @@
     <string name="store_dialog_remove_message">Do you want to remove \'%s\' store?</string>
     <string name="store_dialog_add_message">Do you want to add \'%s\' store to favorites?</string>
     <string name="store_dialog_remove_all_message">Do you want to remove all stores?</string>
+    <string name="add_card_title">New Card</string>
+    <string name="add_card_select_card">Select card</string>
+    <string name="add_card_fill_details_message">Fill card details:</string>
+    <string name="add_card_button">Save</string>
+    <string name="add_card_name_hint">Card Name</string>
+    <string name="add_card_discount_hint">Discount (percentage)</string>
+    <string name="add_card_number_hint">Card Number</string>
+    <string name="add_card_cvv_hint">CVV</string>
+    <string name="add_card_expiration_hint">Expiration Date</string>
+    <string name="add_card_cards_dialog_title">Select Card</string>
 </resources>

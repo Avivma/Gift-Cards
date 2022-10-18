@@ -8,7 +8,9 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.composefirsttry.databinding.CardsFragmentBinding
+import com.example.composefirsttry.giftcard.GiftCardMainActivity
 import com.example.composefirsttry.giftcard.model.GiftCard
+import com.example.composefirsttry.utils.requireActivity
 
 class CardsFragment : Fragment() {
     private val args: CardsFragmentArgs by navArgs()
@@ -45,7 +47,12 @@ class CardsFragment : Fragment() {
         super.onStart()
         binding.clearAll.setOnClickListener {
             adapter.setCards(getAllCards())
-            it.visibility = View.GONE
+            binding.showClearAll = false
+        }
+
+        binding.addCard.setOnClickListener {
+            val direction = CardsFragmentDirections.actionCardsFragmentToAddCardFragment()
+            requireActivity<GiftCardMainActivity>().getNavController().navigate(direction)
         }
     }
 }

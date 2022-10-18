@@ -1,8 +1,12 @@
 <resources>
     <dimen name="fab_margin">16dp</dimen>
-    <dimen name="main_text_size">18dp</dimen>
-    <dimen name="smaller_text_size">14dp</dimen>
     <dimen name="preference_margin">12dp</dimen>
+    <dimen name="main_text_size">18sp</dimen>
+    <dimen name="smaller_text_size">14sp</dimen>
+    <dimen name="smallest_text_size">12sp</dimen>
+    <dimen name="title_text_size">32sp</dimen>
+    <dimen name="small_title_text_size">22sp</dimen>
+    <dimen name="small_main_text_size">16sp</dimen>
 
     <!-- store's cards -->
     <dimen name="store_cards_size_width">55dp</dimen>
