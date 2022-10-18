@@ -12,7 +12,7 @@ import androidx.navigation.ui.navigateUp
 import com.example.composefirsttry.L
 import com.example.composefirsttry.R
 import com.example.composefirsttry.databinding.ActivityGiftCardMainBinding
-import com.example.composefirsttry.giftcard.repository.GiftCardRepo
+import com.example.composefirsttry.giftcard.repository.StoresRepo
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -23,7 +23,7 @@ class GiftCardMainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityGiftCardMainBinding
 
     @Inject
-    lateinit var giftCardRepo: GiftCardRepo
+    lateinit var storesRepo: StoresRepo
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

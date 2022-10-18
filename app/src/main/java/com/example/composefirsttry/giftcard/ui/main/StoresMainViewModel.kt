@@ -5,7 +5,7 @@ import androidx.lifecycle.*
 import com.example.composefirsttry.L
 import com.example.composefirsttry.giftcard.model.GiftCard
 import com.example.composefirsttry.giftcard.model.Store
-import com.example.composefirsttry.giftcard.repository.GiftCardRepo
+import com.example.composefirsttry.giftcard.repository.StoresRepo
 import com.example.composefirsttry.giftcard.ui.main.states.StoreMainState
 import com.example.composefirsttry.giftcard.ui.main.states.StoresMainIntention
 import com.example.composefirsttry.giftcard.utils.DbToModelConverter
@@ -20,7 +20,7 @@ import javax.inject.Inject
 @HiltViewModel
 class StoresMainViewModel @Inject constructor (
     private val sp: SharedPreferences,
-    private val giftCardRepo: GiftCardRepo
+    private val storesRepo: StoresRepo
 ) : ViewModel() {
 
     var maxCardChecked: Boolean = sp.getBoolean(SPKeys.GIFT_CARD_MAX_CHECKBOX_STATE, true)
@@ -42,7 +42,7 @@ class StoresMainViewModel @Inject constructor (
 
     private fun initListeners() {
         //attach viewModel's stores to db
-        storesLiveData = Transformations.map(giftCardRepo.getAllStoresDb()) { storesEntities ->
+        storesLiveData = Transformations.map(storesRepo.getAllStoresDb()) { storesEntities ->
             storesEntities.map { storeEntity ->
                 DbToModelConverter.fromEntityToStore(storeEntity)
             }
@@ -76,7 +76,7 @@ class StoresMainViewModel @Inject constructor (
                 is StoresMainIntention.Refresh -> {
                     stateMutableLiveData.postValue(StoreMainState.Waiting)
                     if (isFirstTimeDataFetched()) {
-                        giftCardRepo.refresh()
+                        storesRepo.refresh()
                     } else {
                         stateMutableLiveData.postValue(StoreMainState.DisplayData(getStores()))
                     }
@@ -102,7 +102,7 @@ class StoresMainViewModel @Inject constructor (
     }
 
     private fun addStoreToFavorites(store: Store) {
-        giftCardRepo.addStoreToFavorites(DbToModelConverter.fromStoreToEntity(store))
+        storesRepo.addStoreToFavorites(DbToModelConverter.fromStoreToEntity(store))
     }
 
     private fun openStoreDialog(store: Store) {

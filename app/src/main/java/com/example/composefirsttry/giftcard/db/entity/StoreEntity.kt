@@ -3,8 +3,7 @@ package com.example.composefirsttry.giftcard.db.entity
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-
-@Entity(tableName = "gift_card_stores")
+@Entity(tableName = "stores_table")
 data class StoreEntity constructor(
     @PrimaryKey
     @ColumnInfo(name = "store_name")

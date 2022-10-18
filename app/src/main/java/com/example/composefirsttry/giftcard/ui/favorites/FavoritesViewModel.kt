@@ -3,7 +3,7 @@ package com.example.composefirsttry.giftcard.ui.favorites
 import androidx.lifecycle.*
 import com.example.composefirsttry.L
 import com.example.composefirsttry.giftcard.model.Store
-import com.example.composefirsttry.giftcard.repository.GiftCardRepo
+import com.example.composefirsttry.giftcard.repository.StoresRepo
 import com.example.composefirsttry.giftcard.ui.favorites.states.FavoritesIntention
 import com.example.composefirsttry.giftcard.ui.favorites.states.FavoritesState
 import com.example.composefirsttry.giftcard.utils.DbToModelConverter
@@ -15,7 +15,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class FavoritesViewModel @Inject constructor (
-    private val giftCardRepo: GiftCardRepo
+    private val storesRepo: StoresRepo
 ) : ViewModel() {
 
     private val stateMutableLiveData = MutableLiveData<FavoritesState>()
@@ -30,7 +30,7 @@ class FavoritesViewModel @Inject constructor (
 
     private fun initListeners() {
         //attach viewModel's stores to db
-        storesLiveData = Transformations.map(giftCardRepo.getAllStoresDb()) { storesEntities ->
+        storesLiveData = Transformations.map(storesRepo.getAllStoresDb()) { storesEntities ->
             storesEntities.map { storeEntity ->
                 DbToModelConverter.fromEntityToStore(storeEntity)
             }
@@ -79,11 +79,11 @@ class FavoritesViewModel @Inject constructor (
     }
 
     private fun removeStoreFromFavorites(store: Store) {
-        giftCardRepo.removeStoreFromFavorites(store.storeName)
+        storesRepo.removeStoreFromFavorites(store.storeName)
     }
 
     private fun removeAllStoresFromFavorites() {
-        giftCardRepo.resetFavorites()
+        storesRepo.resetFavorites()
     }
 
     private fun sendFreshData() {

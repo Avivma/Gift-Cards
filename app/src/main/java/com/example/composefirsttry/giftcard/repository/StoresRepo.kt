@@ -3,7 +3,7 @@ package com.example.composefirsttry.giftcard.repository
 import androidx.annotation.WorkerThread
 import androidx.lifecycle.LiveData
 import com.example.composefirsttry.giftcard.db.GiftCardDatabase
-import com.example.composefirsttry.giftcard.db.dao.GiftCardDao
+import com.example.composefirsttry.giftcard.db.dao.StoresDao
 import com.example.composefirsttry.giftcard.db.entity.StoreEntity
 import com.example.composefirsttry.giftcard.network.RestGiftCardService
 import com.example.composefirsttry.giftcard.network.sheet.SheetItem
@@ -12,12 +12,12 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class GiftCardRepo @Inject constructor(
+class StoresRepo @Inject constructor(
     db: GiftCardDatabase,
     private var restService: RestGiftCardService
 ) {
-    private val giftCardDao: GiftCardDao = db.giftCardDao()
-    private val allStores: LiveData<List<StoreEntity>> = giftCardDao.getAll()
+    private val storesDao: StoresDao = db.storesDao()
+    private val allStores: LiveData<List<StoreEntity>> = storesDao.getAll()
 
     fun getAllStoresDb(): LiveData<List<StoreEntity>> = allStores
 
@@ -32,13 +32,13 @@ class GiftCardRepo @Inject constructor(
     }
 
     private fun mergeToDb(storesServer: List<SheetItem>) {
-        val favoredStoresNames: List<String> = if (allStores.value != null) giftCardDao.getFavoriteStoresNames() else emptyList()
+        val favoredStoresNames: List<String> = if (allStores.value != null) storesDao.getFavoriteStoresNames() else emptyList()
 
-        giftCardDao.deleteAll()
+        storesDao.deleteAll()
         val storesDb: List<StoreEntity> = convert(storesServer)
-        giftCardDao.insertAll(storesDb)
+        storesDao.insertAll(storesDb)
 
-        if (favoredStoresNames.isNotEmpty()) giftCardDao.updateAsFavorites(favoredStoresNames)
+        if (favoredStoresNames.isNotEmpty()) storesDao.updateAsFavorites(favoredStoresNames)
     }
 
     private fun convert(storesServer: List<SheetItem>): List<StoreEntity> {
@@ -57,17 +57,17 @@ class GiftCardRepo @Inject constructor(
 
     @WorkerThread
     fun addStoreToFavorites(store: StoreEntity) {
-        giftCardDao.updateAsFavorites(listOf(store.storeName))
+        storesDao.updateAsFavorites(listOf(store.storeName))
     }
 
     @WorkerThread
     fun resetFavorites() {
-        giftCardDao.resetFavorites()
+        storesDao.resetFavorites()
     }
 
     @WorkerThread
     fun removeStoreFromFavorites(storeName: String) {
-        giftCardDao.removeStoreFromFavorites(storeName)
+        storesDao.removeStoreFromFavorites(storeName)
     }
 
 /*    fun insertData(context: Context, giftCardName: String, firstStoreName: String) {
