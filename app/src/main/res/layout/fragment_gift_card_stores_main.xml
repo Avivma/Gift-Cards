@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
-        <import type="com.example.composefirsttry.giftcard.model.GiftCard" />
+        <import type="com.example.composefirsttry.giftcard.logic.cards.model.GiftCard" />
         <variable
             name="model"
             type="com.example.composefirsttry.giftcard.ui.main.StoresMainViewModel"

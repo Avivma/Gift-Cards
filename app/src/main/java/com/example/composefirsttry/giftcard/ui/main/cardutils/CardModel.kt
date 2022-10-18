@@ -1,7 +1,7 @@
 package com.example.composefirsttry.giftcard.ui.main.cardutils
 
-import com.example.composefirsttry.giftcard.model.GiftCard
-import com.example.composefirsttry.giftcard.model.GiftCardType
+import com.example.composefirsttry.giftcard.logic.cards.model.GiftCard
+import com.example.composefirsttry.giftcard.logic.cards.model.GiftCardType
 
 class CardModel(
     private val maxCards: List<GiftCard> = listOf(),

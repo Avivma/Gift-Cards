@@ -1,4 +1,4 @@
-package com.example.composefirsttry.giftcard.network.sheet
+package com.example.composefirsttry.giftcard.logic.stores.network.sheet
 
 import com.google.gson.*
 import java.lang.reflect.Type

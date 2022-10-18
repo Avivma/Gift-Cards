@@ -8,10 +8,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.RecyclerView
 import com.example.composefirsttry.R
 import com.example.composefirsttry.databinding.StoreRowLayoutBinding
-import com.example.composefirsttry.giftcard.model.GiftCard
-import com.example.composefirsttry.giftcard.model.Store
+import com.example.composefirsttry.giftcard.logic.cards.model.GiftCard
+import com.example.composefirsttry.giftcard.logic.stores.model.Store
 import com.example.composefirsttry.giftcard.ui.favorites.states.FavoritesIntention
-import com.example.composefirsttry.giftcard.ui.main.states.StoresMainIntention
 
 class FavoritesAdapter (stores: List<Store>): RecyclerView.Adapter<FavoritesAdapter.StoreRowHolder>() {
     private val stores: MutableList<Store> = ArrayList(stores)
@@ -65,9 +64,12 @@ class FavoritesAdapter (stores: List<Store>): RecyclerView.Adapter<FavoritesAdap
             binding.storeSelected = false
 
             //set listeners
-            binding.cardMax.cardLayout.setOnClickListener { mutableIntentionsListener.postValue(FavoritesIntention.Navigation.NavigateToCardsScreen(GiftCard.MAX)) }
-            binding.cardCorporate.cardLayout.setOnClickListener { mutableIntentionsListener.postValue(FavoritesIntention.Navigation.NavigateToCardsScreen(GiftCard.CORPORATE)) }
-            binding.cardHot.cardLayout.setOnClickListener { mutableIntentionsListener.postValue(FavoritesIntention.Navigation.NavigateToCardsScreen(GiftCard.HOT)) }
+            binding.cardMax.cardLayout.setOnClickListener { mutableIntentionsListener.postValue(FavoritesIntention.Navigation.NavigateToCardsScreen(
+                GiftCard.MAX)) }
+            binding.cardCorporate.cardLayout.setOnClickListener { mutableIntentionsListener.postValue(FavoritesIntention.Navigation.NavigateToCardsScreen(
+                GiftCard.CORPORATE)) }
+            binding.cardHot.cardLayout.setOnClickListener { mutableIntentionsListener.postValue(FavoritesIntention.Navigation.NavigateToCardsScreen(
+                GiftCard.HOT)) }
             binding.storeName.setOnLongClickListener {
                 mutableIntentionsListener.postValue(FavoritesIntention.OpenStoreDialog(store))
                 true

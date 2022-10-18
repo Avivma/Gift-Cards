@@ -1,4 +1,4 @@
-package com.example.composefirsttry.giftcard.db.entity
+package com.example.composefirsttry.giftcard.logic.stores.db.entity
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
@@ -19,9 +19,6 @@ data class StoreEntity constructor(
     @ColumnInfo(name = "favorite")
     var favorite: Boolean = false
 ) {
-    //    @PrimaryKey(autoGenerate = true)
-//    @ColumnInfo(name = "id")
-//    var Id: Int = 0
     override fun toString(): String {
         return "StoreEntity(storeName='$storeName', storeNameHebrew='$storeNameHebrew', maxCard=$maxCard, corporateCard=$corporateCard, hotCard=$hotCard, favorite=$favorite)"
     }

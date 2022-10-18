@@ -1,4 +1,4 @@
-package com.example.composefirsttry.giftcard.model
+package com.example.composefirsttry.giftcard.logic.cards.model
 
 import androidx.annotation.DrawableRes
 import com.example.composefirsttry.R

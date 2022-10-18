@@ -5,7 +5,7 @@
 
     <data>
         <import type="android.view.View" />
-        <variable name="store" type="com.example.composefirsttry.giftcard.model.Store"/>
+        <variable name="store" type="com.example.composefirsttry.giftcard.logic.stores.model.Store"/>
 
         <variable name="maxCardChecked" type="java.lang.Boolean"/>
         <variable name="corporateCardChecked" type="java.lang.Boolean"/>

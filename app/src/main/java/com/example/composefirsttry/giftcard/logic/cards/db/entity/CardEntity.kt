@@ -1,9 +1,9 @@
-package com.example.composefirsttry.giftcard.db.entity
+package com.example.composefirsttry.giftcard.logic.cards.db.entity
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.example.composefirsttry.giftcard.db.entity.CardEntity.Companion.TABLE_NAME
+import com.example.composefirsttry.giftcard.logic.cards.db.entity.CardEntity.Companion.TABLE_NAME
 
 @Entity(tableName = TABLE_NAME)
 data class CardEntity constructor(
@@ -34,7 +34,6 @@ data class CardEntity constructor(
     @ColumnInfo(name = "creditCardExpirationDate")
     var creditCardExpirationDate: String
 ) {
-
     companion object {
         const val TABLE_NAME = "cards_table"
     }

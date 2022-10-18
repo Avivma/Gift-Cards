@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
     <data>
-        <variable name="card" type="com.example.composefirsttry.giftcard.model.GiftCard"/>
+        <variable name="card" type="com.example.composefirsttry.giftcard.logic.cards.model.GiftCard"/>
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"

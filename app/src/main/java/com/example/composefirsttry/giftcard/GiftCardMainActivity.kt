@@ -12,7 +12,7 @@ import androidx.navigation.ui.navigateUp
 import com.example.composefirsttry.L
 import com.example.composefirsttry.R
 import com.example.composefirsttry.databinding.ActivityGiftCardMainBinding
-import com.example.composefirsttry.giftcard.repository.StoresRepo
+import com.example.composefirsttry.giftcard.logic.stores.repository.StoresRepo
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 

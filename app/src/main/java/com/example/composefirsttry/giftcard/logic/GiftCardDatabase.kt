@@ -1,9 +1,9 @@
-package com.example.composefirsttry.giftcard.db
+package com.example.composefirsttry.giftcard.logic
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
-import com.example.composefirsttry.giftcard.db.dao.StoresDao
-import com.example.composefirsttry.giftcard.db.entity.StoreEntity
+import com.example.composefirsttry.giftcard.logic.stores.db.dao.StoresDao
+import com.example.composefirsttry.giftcard.logic.stores.db.entity.StoreEntity
 
 @Database(entities = [StoreEntity::class], version = 2, exportSchema = false)
 abstract class GiftCardDatabase : RoomDatabase() {

@@ -9,7 +9,7 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.composefirsttry.databinding.CardsFragmentBinding
 import com.example.composefirsttry.giftcard.GiftCardMainActivity
-import com.example.composefirsttry.giftcard.model.GiftCard
+import com.example.composefirsttry.giftcard.logic.cards.model.GiftCard
 import com.example.composefirsttry.utils.requireActivity
 
 class CardsFragment : Fragment() {

@@ -1,4 +1,4 @@
-package com.example.composefirsttry.giftcard.model
+package com.example.composefirsttry.giftcard.logic.stores.model
 
 data class Store constructor(
     var storeName: String,

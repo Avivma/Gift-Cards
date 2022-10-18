@@ -1,6 +1,6 @@
 package com.example.composefirsttry.giftcard.ui.main.states
 
-import com.example.composefirsttry.giftcard.model.Store
+import com.example.composefirsttry.giftcard.logic.stores.model.Store
 
 sealed class StoreMainState(
     val progressBarVisible: Boolean = false,

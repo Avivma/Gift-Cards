@@ -6,7 +6,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.composefirsttry.R
 import com.example.composefirsttry.databinding.CardDetailsLayoutBinding
-import com.example.composefirsttry.giftcard.model.GiftCard
+import com.example.composefirsttry.giftcard.logic.cards.model.GiftCard
 
 class CardAdapter (giftCards: List<GiftCard>): RecyclerView.Adapter<CardAdapter.CardHolder>() {
     private val cards: MutableList<GiftCard> = ArrayList(giftCards)

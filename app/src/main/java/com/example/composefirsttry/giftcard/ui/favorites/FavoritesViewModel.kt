@@ -2,8 +2,8 @@ package com.example.composefirsttry.giftcard.ui.favorites
 
 import androidx.lifecycle.*
 import com.example.composefirsttry.L
-import com.example.composefirsttry.giftcard.model.Store
-import com.example.composefirsttry.giftcard.repository.StoresRepo
+import com.example.composefirsttry.giftcard.logic.stores.model.Store
+import com.example.composefirsttry.giftcard.logic.stores.repository.StoresRepo
 import com.example.composefirsttry.giftcard.ui.favorites.states.FavoritesIntention
 import com.example.composefirsttry.giftcard.ui.favorites.states.FavoritesState
 import com.example.composefirsttry.giftcard.utils.DbToModelConverter

@@ -1,6 +1,6 @@
 package com.example.composefirsttry.giftcard.ui.favorites.states
 
-import com.example.composefirsttry.giftcard.model.Store
+import com.example.composefirsttry.giftcard.logic.stores.model.Store
 
 sealed class FavoritesState() {
     object Waiting : FavoritesState()

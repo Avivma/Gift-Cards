@@ -15,7 +15,7 @@ import com.example.composefirsttry.R
 import com.example.composefirsttry.databinding.AddCardFragmentBinding
 import com.example.composefirsttry.databinding.CardDialogRowBinding
 import com.example.composefirsttry.giftcard.GiftCardMainActivity
-import com.example.composefirsttry.giftcard.model.GiftCard
+import com.example.composefirsttry.giftcard.logic.cards.model.GiftCard
 import com.example.composefirsttry.utils.requireActivity
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout

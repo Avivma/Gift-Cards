@@ -10,8 +10,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.RecyclerView
 import com.example.composefirsttry.R
 import com.example.composefirsttry.databinding.StoreRowLayoutBinding
-import com.example.composefirsttry.giftcard.model.GiftCard
-import com.example.composefirsttry.giftcard.model.Store
+import com.example.composefirsttry.giftcard.logic.cards.model.GiftCard
+import com.example.composefirsttry.giftcard.logic.stores.model.Store
 import com.example.composefirsttry.giftcard.ui.main.states.StoresMainIntention
 import com.example.composefirsttry.utils.SPKeys
 
@@ -71,9 +71,12 @@ class StoresAdapter(giftCards: List<Store>, var context: Context, var sp: Shared
             binding.storeSelected = store.selected
 
             //set listeners
-            binding.cardMax.cardLayout.setOnClickListener { mutableIntentionsListener.postValue(StoresMainIntention.Navigation.NavigateToCardsScreen(GiftCard.MAX)) }
-            binding.cardCorporate.cardLayout.setOnClickListener { mutableIntentionsListener.postValue(StoresMainIntention.Navigation.NavigateToCardsScreen(GiftCard.CORPORATE)) }
-            binding.cardHot.cardLayout.setOnClickListener { mutableIntentionsListener.postValue(StoresMainIntention.Navigation.NavigateToCardsScreen(GiftCard.HOT)) }
+            binding.cardMax.cardLayout.setOnClickListener { mutableIntentionsListener.postValue(StoresMainIntention.Navigation.NavigateToCardsScreen(
+                GiftCard.MAX)) }
+            binding.cardCorporate.cardLayout.setOnClickListener { mutableIntentionsListener.postValue(StoresMainIntention.Navigation.NavigateToCardsScreen(
+                GiftCard.CORPORATE)) }
+            binding.cardHot.cardLayout.setOnClickListener { mutableIntentionsListener.postValue(StoresMainIntention.Navigation.NavigateToCardsScreen(
+                GiftCard.HOT)) }
             binding.storeName.setOnClickListener {
                 mutableIntentionsListener.postValue(StoresMainIntention.SelectStore(store))
             }

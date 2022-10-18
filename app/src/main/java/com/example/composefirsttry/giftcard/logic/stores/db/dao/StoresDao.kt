@@ -1,12 +1,12 @@
-package com.example.composefirsttry.giftcard.db.dao
+package com.example.composefirsttry.giftcard.logic.stores.db.dao
 
 import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.example.composefirsttry.giftcard.db.entity.StoreEntity
-import com.example.composefirsttry.giftcard.model.GiftCardType
+import com.example.composefirsttry.giftcard.logic.stores.db.entity.StoreEntity
+import com.example.composefirsttry.giftcard.logic.cards.model.GiftCardType
 
 @Dao
 interface StoresDao {

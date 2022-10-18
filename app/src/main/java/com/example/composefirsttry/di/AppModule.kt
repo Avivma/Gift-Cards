@@ -3,7 +3,7 @@ package com.example.composefirsttry.di
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.room.Room
-import com.example.composefirsttry.giftcard.db.GiftCardDatabase
+import com.example.composefirsttry.giftcard.logic.GiftCardDatabase
 import com.example.composefirsttry.utils.SPKeys
 import dagger.Module
 import dagger.Provides

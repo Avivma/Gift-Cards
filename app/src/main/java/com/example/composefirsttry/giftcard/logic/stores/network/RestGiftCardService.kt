@@ -1,7 +1,7 @@
-package com.example.composefirsttry.giftcard.network
+package com.example.composefirsttry.giftcard.logic.stores.network
 
-import com.example.composefirsttry.giftcard.network.sheet.SheetItem
-import com.example.composefirsttry.giftcard.network.sheet.SheetsUsingUrl
+import com.example.composefirsttry.giftcard.logic.stores.network.sheet.SheetItem
+import com.example.composefirsttry.giftcard.logic.stores.network.sheet.SheetsUsingUrl
 import javax.inject.Inject
 
 class RestGiftCardService @Inject constructor() {

@@ -1,7 +1,7 @@
 package com.example.composefirsttry.giftcard.utils
 
-import com.example.composefirsttry.giftcard.db.entity.StoreEntity
-import com.example.composefirsttry.giftcard.model.Store
+import com.example.composefirsttry.giftcard.logic.stores.db.entity.StoreEntity
+import com.example.composefirsttry.giftcard.logic.stores.model.Store
 
 object DbToModelConverter {
     fun fromEntityToStore(dbStore: StoreEntity): Store = Store(
