@@ -7,10 +7,5 @@ sealed class CardsIntention {
     data class RemoveCard(val card: GiftCard) : CardsIntention()
     object ClearAll : CardsIntention()
     object Refresh : CardsIntention()
-
-    sealed class Navigation: CardsIntention() {
-        data class NavigateToEditCard(val card: GiftCard): CardsIntention.Navigation()
-        object NavigateToAddCard: CardsIntention.Navigation()
-        object NavigateToLandingScreen: CardsIntention.Navigation()
-    }
+    data class NavigateToEditCard(val card: GiftCard): CardsIntention()
 }

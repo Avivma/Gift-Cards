@@ -51,14 +51,10 @@ class AddCardFragment : Fragment() {
         //Important fix: removeObservers and getViewLifecyclerOwner instead of activity to prevent multiple call to onChanged from unremoved observers.
         //More info: https://blog.usejournal.com/observe-livedata-from-viewmodel-in-fragment-fd7d14f9f5fb
 
-        viewModel.navigationLiveData.removeObservers(viewLifecycleOwner)
-        viewModel.navigationLiveData.observe(viewLifecycleOwner, Observer { intention ->
-            if (intention is AddCardIntention.Navigation) navigate(intention)
-            else throw Exception("Should not get here (intention = ${intention.javaClass.simpleName})")
+        viewModel.observeStateLiveData(viewLifecycleOwner, Observer { state ->
+            if (state is AddCardState.Navigation) navigate(state)
+            else render(state)
         })
-
-        viewModel.stateLiveData.removeObservers(viewLifecycleOwner)
-        viewModel.stateLiveData.observe(viewLifecycleOwner, Observer { state -> render(state) })
 
         viewModel.action(AddCardIntention.Refresh)
     }
@@ -87,9 +83,9 @@ class AddCardFragment : Fragment() {
         }
     }
 
-    private fun navigate(navigationIntention: AddCardIntention.Navigation) {
+    private fun navigate(navigationIntention: AddCardState.Navigation) {
         when (navigationIntention) {
-            is AddCardIntention.Navigation.NavigateBackToCardsScreen -> {
+            is AddCardState.Navigation.NavigateBackToCardsScreen -> {
                 val direction = AddCardFragmentDirections.actionAddCardFragmentToCardsFragment()
                 requireActivity<GiftCardMainActivity>().getNavController().navigate(direction)
             }

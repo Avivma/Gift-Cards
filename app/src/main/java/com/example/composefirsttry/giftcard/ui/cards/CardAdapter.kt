@@ -18,8 +18,6 @@ class CardAdapter(giftCards: List<GiftCard>): RecyclerView.Adapter<RecyclerView.
     var intentionsListener: LiveData<CardsIntention> = MutableLiveData()
     private var mutableIntentionsListener: MutableLiveData<CardsIntention> = intentionsListener as MutableLiveData<CardsIntention>
 
-    var dialogIntentionCallback: ((GiftCard) -> Unit)? = null
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
             CARD_HOLDER -> {
@@ -67,10 +65,10 @@ class CardAdapter(giftCards: List<GiftCard>): RecyclerView.Adapter<RecyclerView.
 
             //set listeners
             binding.edit.setOnClickListener {
-                mutableIntentionsListener.postValue(CardsIntention.Navigation.NavigateToEditCard(card))
+                mutableIntentionsListener.postValue(CardsIntention.NavigateToEditCard(card))
             }
             binding.remove.setOnClickListener {
-                dialogIntentionCallback!!(card) //regular listener - to workaround livedata os issue
+                mutableIntentionsListener.postValue(CardsIntention.OpenRemoveCardDialog(card))
             }
         }
     }

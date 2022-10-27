@@ -13,6 +13,7 @@ import com.example.composefirsttry.L
 import com.example.composefirsttry.R
 import com.example.composefirsttry.databinding.FragmentFavoritesBinding
 import com.example.composefirsttry.giftcard.GiftCardMainActivity
+import com.example.composefirsttry.giftcard.logic.cards.model.CardTypeWrapper
 import com.example.composefirsttry.giftcard.logic.cards.repository.CardUtils
 import com.example.composefirsttry.giftcard.ui.favorites.states.FavoritesIntention
 import com.example.composefirsttry.giftcard.ui.favorites.states.FavoritesState
@@ -48,13 +49,12 @@ class FavoritesFragment : Fragment() {
         //More info: https://blog.usejournal.com/observe-livedata-from-viewmodel-in-fragment-fd7d14f9f5fb
 
         adapter.intentionsListener.removeObservers(viewLifecycleOwner)
-        adapter.intentionsListener.observe(viewLifecycleOwner, Observer { intention ->
-            if (intention is FavoritesIntention.Navigation) navigate(intention)
-            else viewModel.action(intention)
-        })
+        adapter.intentionsListener.observe(viewLifecycleOwner, Observer { intention -> viewModel.action(intention) })
 
-        viewModel.stateLiveData.removeObservers(viewLifecycleOwner)
-        viewModel.stateLiveData.observe(viewLifecycleOwner, Observer { state -> render(state) })
+        viewModel.observeStateLiveData(viewLifecycleOwner, Observer { state ->
+            if (state is FavoritesState.Navigation) navigate(state)
+            else render(state)
+        })
 
         viewModel.action(FavoritesIntention.Refresh)
     }
@@ -92,10 +92,10 @@ class FavoritesFragment : Fragment() {
         }
     }
 
-    private fun navigate(navigationIntention: FavoritesIntention.Navigation) {
+    private fun navigate(navigationIntention: FavoritesState.Navigation) {
         when (navigationIntention) {
-            is FavoritesIntention.Navigation.NavigateToCardsScreen -> {
-                val direction = FavoritesFragmentDirections.actionFavoritesFragmentToCardsFragment(navigationIntention.card)
+            is FavoritesState.Navigation.NavigateToCardsScreen -> {
+                val direction = FavoritesFragmentDirections.actionFavoritesFragmentToCardsFragment(CardTypeWrapper(navigationIntention.giftCardType))
                 requireActivity<GiftCardMainActivity>().getNavController().navigate(direction)
             }
             else -> {

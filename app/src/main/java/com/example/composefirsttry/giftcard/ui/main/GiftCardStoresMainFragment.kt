@@ -19,6 +19,7 @@ import com.example.composefirsttry.R
 import com.example.composefirsttry.databinding.FragmentGiftCardStoresMainBinding
 import com.example.composefirsttry.databinding.GiftCardWithFrameLayoutBinding
 import com.example.composefirsttry.giftcard.GiftCardMainActivity
+import com.example.composefirsttry.giftcard.logic.cards.model.CardTypeWrapper
 import com.example.composefirsttry.giftcard.logic.cards.model.GiftCard
 import com.example.composefirsttry.giftcard.logic.cards.model.GiftCardType
 import com.example.composefirsttry.giftcard.logic.cards.repository.CardUtils
@@ -48,7 +49,6 @@ class GiftCardStoresMainFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_gift_card_stores_main, container, false)!!
-
 
     /*  //just for reminder
         viewModel = ViewModelProvider(this, StoresMainViewModelFactory(viewLifecycleOwner))
@@ -83,13 +83,12 @@ class GiftCardStoresMainFragment : Fragment() {
         //More info: https://blog.usejournal.com/observe-livedata-from-viewmodel-in-fragment-fd7d14f9f5fb
 
         adapter.intentionsListener.removeObservers(viewLifecycleOwner)
-        adapter.intentionsListener.observe(viewLifecycleOwner, Observer { intention ->
-            if (intention is StoresMainIntention.Navigation) navigate(intention)
-            else viewModel.action(intention)
-        })
+        adapter.intentionsListener.observe(viewLifecycleOwner, Observer { intention -> viewModel.action(intention) })
 
-        viewModel.stateLiveData.removeObservers(viewLifecycleOwner)
-        viewModel.stateLiveData.observe(viewLifecycleOwner, Observer { state -> render(state) })
+        viewModel.observeStateLiveData(viewLifecycleOwner, Observer { state ->
+            if (state is StoreMainState.Navigation) navigate(state)
+            else render(state)
+        })
 
         viewModel.action(StoresMainIntention.Refresh)
     }
@@ -135,10 +134,10 @@ class GiftCardStoresMainFragment : Fragment() {
         }
     }
 
-    private fun navigate(navigationIntention: StoresMainIntention.Navigation) {
+    private fun navigate(navigationIntention: StoreMainState.Navigation) {
         when (navigationIntention) {
-            is StoresMainIntention.Navigation.NavigateToCardsScreen -> {
-                val direction = GiftCardStoresMainFragmentDirections.actionGiftCardsMainFragmentToCardsFragment(navigationIntention.card)
+            is StoreMainState.Navigation.NavigateToCardsScreen -> {
+                val direction = GiftCardStoresMainFragmentDirections.actionGiftCardsMainFragmentToCardsFragment(CardTypeWrapper(navigationIntention.giftCardType))
                 requireActivity<GiftCardMainActivity>().getNavController().navigate(direction)
             }
             else -> {

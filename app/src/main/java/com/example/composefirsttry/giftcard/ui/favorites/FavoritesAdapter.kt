@@ -8,7 +8,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.RecyclerView
 import com.example.composefirsttry.R
 import com.example.composefirsttry.databinding.StoreRowLayoutBinding
-import com.example.composefirsttry.giftcard.logic.cards.model.GiftCard
 import com.example.composefirsttry.giftcard.logic.cards.model.GiftCardType
 import com.example.composefirsttry.giftcard.logic.cards.repository.CardUtils
 import com.example.composefirsttry.giftcard.logic.stores.model.Store
@@ -73,9 +72,9 @@ class FavoritesAdapter (stores: List<Store>, private val cardUtils: CardUtils): 
             binding.storeSelected = false
 
             //set listeners
-            binding.cardMax.cardLayout.setOnClickListener { mutableIntentionsListener.postValue(FavoritesIntention.Navigation.NavigateToCardsScreen(GiftCard.MAX)) }
-            binding.cardCorporate.cardLayout.setOnClickListener { mutableIntentionsListener.postValue(FavoritesIntention.Navigation.NavigateToCardsScreen(GiftCard.CORPORATE)) }
-            binding.cardHot.cardLayout.setOnClickListener { mutableIntentionsListener.postValue(FavoritesIntention.Navigation.NavigateToCardsScreen(GiftCard.HOT)) }
+            binding.cardMax.cardLayout.setOnClickListener { mutableIntentionsListener.postValue(FavoritesIntention.NavigateToCardsScreen(GiftCardType.MAX)) }
+            binding.cardCorporate.cardLayout.setOnClickListener { mutableIntentionsListener.postValue(FavoritesIntention.NavigateToCardsScreen(GiftCardType.ISRACARD)) }
+            binding.cardHot.cardLayout.setOnClickListener { mutableIntentionsListener.postValue(FavoritesIntention.NavigateToCardsScreen(GiftCardType.TAV_HAHAM)) }
             binding.storeNameTv.setOnLongClickListener {
                 mutableIntentionsListener.postValue(FavoritesIntention.OpenStoreDialog(store))
                 true

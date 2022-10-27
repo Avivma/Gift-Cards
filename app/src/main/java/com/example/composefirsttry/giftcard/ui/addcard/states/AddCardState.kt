@@ -20,4 +20,8 @@ sealed class AddCardState {
     data class CardImageChanged(val cardType: GiftCardType) : AddCardState()
 
     object CardsDialogOpened : AddCardState()
+
+    sealed class Navigation : AddCardState() {
+        object NavigateBackToCardsScreen : AddCardState.Navigation()
+    }
 }

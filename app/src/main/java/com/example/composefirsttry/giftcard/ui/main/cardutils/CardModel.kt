@@ -26,6 +26,12 @@ class CardModel(
         GiftCardType.TAV_HAHAM -> getName(tavHahamCards)
     }
 
+    fun getCards(cardType: GiftCardType): List<GiftCard> = when (cardType) {
+        GiftCardType.MAX -> maxCards
+        GiftCardType.ISRACARD -> isracardCards
+        GiftCardType.TAV_HAHAM -> tavHahamCards
+    }
+
     private fun getName(cards: List<GiftCard>): String {
         return when (cards.size) {
             0 -> "None"

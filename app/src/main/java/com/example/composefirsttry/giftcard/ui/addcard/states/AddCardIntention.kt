@@ -9,8 +9,4 @@ sealed class AddCardIntention {
     data class FocusCardField(val fieldType: CardFieldType, val hasFocus: Boolean) : AddCardIntention()
     data class SaveCard(val forceSave: Boolean = false) : AddCardIntention()
     object Refresh : AddCardIntention()
-
-    sealed class Navigation : AddCardIntention() {
-        object NavigateBackToCardsScreen : AddCardIntention.Navigation()
-    }
 }

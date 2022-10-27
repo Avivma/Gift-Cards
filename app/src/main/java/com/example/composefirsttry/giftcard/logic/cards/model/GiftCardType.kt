@@ -1,8 +1,9 @@
 package com.example.composefirsttry.giftcard.logic.cards.model
 
 import com.example.composefirsttry.R
+import java.io.Serializable
 
-enum class GiftCardType(val value: Int) {
+enum class GiftCardType(val value: Int): Serializable {
     MAX(GiftCardType.MAX_CARD_VALUE),
     ISRACARD(GiftCardType.ISRACARD_CARD_VALUE),
     TAV_HAHAM(GiftCardType.TAV_HAHAM_CARD_VALUE);

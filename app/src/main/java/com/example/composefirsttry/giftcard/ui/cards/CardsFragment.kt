@@ -12,6 +12,7 @@ import com.example.composefirsttry.L
 import com.example.composefirsttry.R
 import com.example.composefirsttry.databinding.CardsFragmentBinding
 import com.example.composefirsttry.giftcard.GiftCardMainActivity
+import com.example.composefirsttry.giftcard.logic.cards.model.CardTypeWrapper
 import com.example.composefirsttry.giftcard.logic.cards.model.GiftCard
 import com.example.composefirsttry.giftcard.ui.cards.states.CardsIntention
 import com.example.composefirsttry.giftcard.ui.cards.states.CardsState
@@ -25,20 +26,14 @@ class CardsFragment : Fragment() {
     private lateinit var binding: CardsFragmentBinding
     private lateinit var adapter: CardAdapter
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        L.i("onCreate")
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        L.i("onCreateView")
         //More info: https://stackoverflow.com/questions/59826066/databindingutil-inflates-layout-as-null
         binding = CardsFragmentBinding.inflate(inflater, container, false)
         adapter = CardAdapter(emptyList())
-        adapter.setHasStableIds(true)
+//        adapter.setHasStableIds(true) //add animation, BUT slow down cards entrance
         binding.recyclerView.adapter = adapter
         binding.recyclerView.layoutManager = LinearLayoutManager(requireActivity())
         sendArgsToViewModel()
@@ -46,66 +41,45 @@ class CardsFragment : Fragment() {
     }
 
     private fun sendArgsToViewModel() {
-        val args = arguments?.get("card")
+        val args = arguments?.get("cardType")
         if (args != null) {
-            viewModel.setArgCard(args as GiftCard)
+            viewModel.setArgCardType((args as CardTypeWrapper).giftCardType)
             arguments?.clear()
         }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-//        adapter.intentionsListener.removeObservers(viewLifecycleOwner)
-        if (!adapter.intentionsListener.hasObservers()) {
-            L.i("adapter.intentionsListener.hasObservers() = false")
-            adapter.intentionsListener.observe(viewLifecycleOwner, { intention ->
-                if (intention is CardsIntention.Navigation) navigate(intention)
-                else viewModel.action(intention)
-            })
-        }
-
-//        viewModel.stateLiveData.removeObservers(viewLifecycleOwner)
-        if (!viewModel.stateLiveData.hasObservers()) {
-            L.i("viewModel.stateLiveData.hasObservers() = false")
-            viewModel.stateLiveData.observe(viewLifecycleOwner, { state -> render(state) })
-        }
-
-//        viewModel.navigationLiveData.removeObservers(viewLifecycleOwner)
-        if (!viewModel.navigationLiveData.hasObservers()) {
-            L.i("viewModel.navigationLiveData.hasObservers() = false")
-            viewModel.navigationLiveData.observe(viewLifecycleOwner, { state -> navigate(state) })
-        }
+        adapter.intentionsListener.observe(viewLifecycleOwner, { intention -> viewModel.action(intention) })
+/*
+        //try1
+        viewModel.setObserver(true)
+        viewModel.stateLiveData.observe(viewLifecycleOwner, { state -> render(state) })
+        viewModel.setObserver(false)
+        viewModel.navigationLiveData.observe(viewLifecycleOwner, { state -> navigate(state) })
+        //try2
+        stateLiveDataObserver = viewModel.stateLiveData.observeFreshly(viewLifecycleOwner, { state -> render(state) })
+        navigationLiveDataObserver = viewModel.navigationLiveData.observeFreshly(viewLifecycleOwner, { state -> navigate(state) })
+*/
+        viewModel.observeStateLiveData(viewLifecycleOwner, { state ->
+            if (state is CardsState.Navigation) navigate(state)
+            else render(state)
+        })
 
         viewModel.action(CardsIntention.Refresh)
     }
 
-//    override fun onDestroyView() {
-//        super.onDestroyView()
-//        L.i("onDestroyView")
-//        adapter.intentionsListener.removeObservers(viewLifecycleOwner)
-//        viewModel.stateLiveData.removeObservers(viewLifecycleOwner)
-//        viewModel.navigationLiveData.removeObservers(viewLifecycleOwner)
-//    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        L.i("onDestroy")
-//        adapter.intentionsListener.removeObservers(viewLifecycleOwner)
-//        viewModel.stateLiveData.removeObservers(viewLifecycleOwner)
-//        viewModel.navigationLiveData.removeObservers(viewLifecycleOwner)
-    }
-
-    private fun navigate(navigationIntention: CardsIntention.Navigation) {
+    private fun navigate(navigationIntention: CardsState.Navigation) {
         when (navigationIntention) {
-            is CardsIntention.Navigation.NavigateToEditCard -> {
+            is CardsState.Navigation.NavigateToEditCard -> {
                 val direction = CardsFragmentDirections.actionCardsFragmentToAddCardFragment(navigationIntention.card)
                 requireActivity<GiftCardMainActivity>().getNavController().navigate(direction)
             }
-            is CardsIntention.Navigation.NavigateToAddCard -> {
+            is CardsState.Navigation.NavigateToAddCard -> {
                 val direction = CardsFragmentDirections.actionCardsFragmentToAddCardFragment()
                 requireActivity<GiftCardMainActivity>().getNavController().navigate(direction)
             }
-            is CardsIntention.Navigation.NavigateToLandingScreen -> {
+            is CardsState.Navigation.NavigateToLandingScreen -> {
                 val direction = CardsFragmentDirections.actionCardsFragmentToLandingFragment()
                 requireActivity<GiftCardMainActivity>().getNavController().navigate(direction)
             }
@@ -129,15 +103,10 @@ class CardsFragment : Fragment() {
     }
 
     private fun openRemoveCardDialog(card: GiftCard) {
-        L.i("openRemoveCardDialog - remove card dialog display (touch = $dialogDisplayFromTouch)")
         AlertDialog.Builder(requireActivity())
             .setTitle(R.string.cards_remove_card_dialog_title)
             .setNeutralButton(R.string.cards_dialog_remove_button_text) { _, _ -> viewModel.action(CardsIntention.RemoveCard(card)) }
             .setNegativeButton(R.string.cards_dialog_cancel_button_text) { dialog, _ -> dialog.dismiss() }
-            .setOnDismissListener {
-                dialogDisplayFromTouch = false
-                it.dismiss()
-            }
             .show()
     }
 
@@ -148,21 +117,7 @@ class CardsFragment : Fragment() {
         }
 
         binding.addCard.setOnClickListener {
-            navigate(CardsIntention.Navigation.NavigateToAddCard)
+            navigate(CardsState.Navigation.NavigateToAddCard)
         }
-
-        adapter.dialogIntentionCallback = { card ->
-            dialogDisplayFromTouch = true
-            viewModel.action(CardsIntention.OpenRemoveCardDialog(card))
-        }
-    }
-
-    override fun onStop() {
-        super.onStop()
-        adapter.dialogIntentionCallback = null
-    }
-
-    companion object {
-        var dialogDisplayFromTouch = false
     }
 }

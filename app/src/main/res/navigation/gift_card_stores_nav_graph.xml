@@ -10,7 +10,7 @@
         tools:layout="@layout/fragment_gift_card_stores_main">
         <action
             android:id="@+id/action_giftCardsMainFragment_to_cardsFragment"
-            app:argType="com.example.composefirsttry.giftcard.logic.cards.model.GiftCard"
+            app:argType="com.example.composefirsttry.giftcard.logic.cards.model.CardTypeWrapper"
             app:destination="@id/cardsFragment" />
     </fragment>
     <fragment
@@ -19,8 +19,8 @@
         android:label="cards_fragment"
         tools:layout="@layout/cards_fragment" >
         <argument
-            android:name="card"
-            app:argType="com.example.composefirsttry.giftcard.logic.cards.model.GiftCard"
+            android:name="cardType"
+            app:argType="com.example.composefirsttry.giftcard.logic.cards.model.CardTypeWrapper"
             app:nullable="true"
             android:defaultValue="@null" />
         <action
@@ -44,7 +44,7 @@
         android:label="FavoritesFragment" >
         <action
             android:id="@+id/action_favoritesFragment_to_cardsFragment"
-            app:argType="com.example.composefirsttry.giftcard.logic.cards.model.GiftCard"
+            app:argType="com.example.composefirsttry.giftcard.logic.cards.model.CardTypeWrapper"
             app:destination="@id/cardsFragment" />
     </fragment>
 

@@ -16,32 +16,18 @@
         android:paddingBottom="16dp"
         >
 
-        <ImageView
+        <ImageButton
             android:id="@+id/image"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginTop="40dp"
             android:layout_width="220dp"
-            android:layout_height="135dp"
-            android:paddingTop="15dp"
+            android:layout_height="140dp"
             tools:src="@drawable/max"
             android:scaleType="fitXY"
             android:background="@drawable/store_frame"
             app:loadImage="@{card.imageRes}"
-            />
-
-        <TextView
-            android:id="@+id/more_details"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="3dp"
-            app:layout_constraintTop_toTopOf="@id/image"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:textColor="@color/very_dark_accent"
-            android:textSize="12sp"
-            android:text="More details"
             />
 
         <ImageButton

@@ -1,6 +1,7 @@
 package com.example.composefirsttry.giftcard.ui.main.states
 
 import com.example.composefirsttry.giftcard.logic.cards.model.GiftCard
+import com.example.composefirsttry.giftcard.logic.cards.model.GiftCardType
 import com.example.composefirsttry.giftcard.logic.stores.model.Store
 
 sealed class StoresMainIntention {
@@ -14,10 +15,8 @@ sealed class StoresMainIntention {
     //Favorites
     data class OpenStoreDialog(val store: Store) : StoresMainIntention()
     data class AddStoreToFavorites(val store: Store) : StoresMainIntention()
+    //Navigation
+    data class NavigateToCardsScreen(val giftCardType: GiftCardType): StoresMainIntention()
 
     object Refresh: StoresMainIntention()
-
-    sealed class Navigation: StoresMainIntention() {
-        data class NavigateToCardsScreen(val card: GiftCard): StoresMainIntention.Navigation()
-    }
 }

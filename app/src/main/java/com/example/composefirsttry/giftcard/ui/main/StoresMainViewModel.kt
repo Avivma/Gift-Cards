@@ -40,8 +40,7 @@ class StoresMainViewModel @Inject constructor (
     private lateinit var storesLiveData: LiveData<List<Store>>
     private lateinit var storesLiveDataObserver: Observer<List<Store>>
 
-    private val stateMutableLiveData = MutableLiveData<StoreMainState>()
-    val stateLiveData: LiveData<StoreMainState> = stateMutableLiveData
+    private var stateMutableLiveData = MutableLiveData<StoreMainState>()
 
     private lateinit var cardsLiveData: LiveData<CardModel>
     private lateinit var cardsLiveDataObserver: Observer<CardModel>
@@ -95,9 +94,16 @@ class StoresMainViewModel @Inject constructor (
         cardsLiveData.removeObserver(cardsLiveDataObserver)
     }
 
+    //NOTE: Use this way, because LiveData stores events and triggers them once new LifecycleOwner is observe to them.
+    // ViewModel doesn't create new Livedata on backpress, but the fragment has new LifecycleOwner - this cause UX bug.
+    fun observeStateLiveData(owner: LifecycleOwner, observer: Observer<StoreMainState>) {
+        stateMutableLiveData = MutableLiveData<StoreMainState>()
+        stateMutableLiveData.observe(owner, observer)
+    }
+
     private fun sendFreshData() {
         L.i("sendFreshData")
-        stateMutableLiveData.postValue(StoreMainState.DisplayData(getCards(), getFilteredStores()))
+        stateMutableLiveData.postValue(StoreMainState.DisplayData(getCardModel(), getFilteredStores()))
     }
 
     fun action(intention: StoresMainIntention){
@@ -110,27 +116,22 @@ class StoresMainViewModel @Inject constructor (
                     if (isFirstTimeDataFetched()) {
                         storesRepo.refresh()
                     } else {
-                        stateMutableLiveData.postValue(StoreMainState.DisplayData(getCards(), getFilteredStores()))
+                        stateMutableLiveData.postValue(StoreMainState.DisplayData(getCardModel(), getFilteredStores()))
                     }
                 }
-                is StoresMainIntention.FilterBySelectedStores -> {
-                    filterBySelectedStores()
-                }
-                is StoresMainIntention.ClearStoresSelection -> {
-                    clearStoresSelection()
-                }
-                is StoresMainIntention.SelectStore -> {
-                    storeSelected(intention.store)
-                }
-                is StoresMainIntention.OpenStoreDialog -> {
-                    openStoreDialog(intention.store)
-                }
-                is StoresMainIntention.AddStoreToFavorites -> {
-                    addStoreToFavorites(intention.store)
-                }
+                is StoresMainIntention.FilterBySelectedStores -> filterBySelectedStores()
+                is StoresMainIntention.ClearStoresSelection -> clearStoresSelection()
+                is StoresMainIntention.SelectStore -> storeSelected(intention.store)
+                is StoresMainIntention.OpenStoreDialog -> openStoreDialog(intention.store)
+                is StoresMainIntention.AddStoreToFavorites -> addStoreToFavorites(intention.store)
+                is StoresMainIntention.NavigateToCardsScreen -> navigateToCardsScreen(intention.giftCardType)
                 else -> L.e("Unfamiliar intention. Intention = ${intention.javaClass.simpleName}")
             }
         }
+    }
+
+    private fun navigateToCardsScreen(giftCardType: GiftCardType) {
+        stateMutableLiveData.postValue(StoreMainState.Navigation.NavigateToCardsScreen(giftCardType))
     }
 
     private fun addStoreToFavorites(store: Store) {
@@ -145,11 +146,11 @@ class StoresMainViewModel @Inject constructor (
         L.i("clearStoresSelection: storesHasBeenSelected= $storesHasBeenSelected")
         if (storesHasBeenSelected == ACTIVE) { //deactivate
             setStoresSelection(VISIBLE)
-            stateMutableLiveData.postValue(StoreMainState.DisplayData(getCards(), getFilteredStores()))
+            stateMutableLiveData.postValue(StoreMainState.DisplayData(getCardModel(), getFilteredStores()))
         } else { //make invisible
             getStores().forEach { it.selected = false }
             setStoresSelection(INVISIBLE)
-            stateMutableLiveData.postValue(StoreMainState.DisplayData(getCards(), getFilteredStores(), hideStoreSelectionFilter = true))
+            stateMutableLiveData.postValue(StoreMainState.DisplayData(getCardModel(), getFilteredStores(), hideStoreSelectionFilter = true))
         }
     }
 
@@ -170,7 +171,7 @@ class StoresMainViewModel @Inject constructor (
             }
             storesHasBeenSelected == ACTIVE -> {
                 setStoresSelection(INVISIBLE)
-                stateMutableLiveData.postValue(StoreMainState.DisplayData(getCards(), getFilteredStores(), hideStoreSelectionFilter = true))
+                stateMutableLiveData.postValue(StoreMainState.DisplayData(getCardModel(), getFilteredStores(), hideStoreSelectionFilter = true))
             }
         }
     }
@@ -187,7 +188,7 @@ class StoresMainViewModel @Inject constructor (
     private fun filterBySelectedStores() {
         L.i("filterBySelectedStores")
         setStoresSelection(ACTIVE)
-        stateMutableLiveData.postValue(StoreMainState.DisplayData(getCards(), getFilteredStores()))
+        stateMutableLiveData.postValue(StoreMainState.DisplayData(getCardModel(), getFilteredStores()))
     }
 
     private fun filterByCard(card: GiftCard, isChecked: Boolean) {
@@ -199,16 +200,16 @@ class StoresMainViewModel @Inject constructor (
             GiftCard.HOT -> hotCardChecked = isChecked
         }
 
-        stateMutableLiveData.postValue(StoreMainState.DisplayData(getCards(), getFilteredStores()))
+        stateMutableLiveData.postValue(StoreMainState.DisplayData(getCardModel(), getFilteredStores()))
     }
 
     private fun filterByPrefix(prefix: String) {
         val filteredStored: List<Store> = getStores().filter { store -> shouldStoreBeDisplayed(store, prefix) }
-        stateMutableLiveData.postValue(StoreMainState.DisplayData(getCards(), filteredStored))
+        stateMutableLiveData.postValue(StoreMainState.DisplayData(getCardModel(), filteredStored))
     }
 
     private fun shouldStoreBeDisplayed(store: Store, prefix: String): Boolean {
-        val cardModel = getCards()
+        val cardModel = getCardModel()
         return if ((cardModel.hasCard(GiftCardType.MAX) && store.maxCard && maxCardChecked) ||
             (cardModel.hasCard(GiftCardType.ISRACARD) && store.corporateCard && corporateCardChecked) ||
             (cardModel.hasCard(GiftCardType.TAV_HAHAM) && store.hotCard && hotCardChecked)) {
@@ -233,7 +234,7 @@ class StoresMainViewModel @Inject constructor (
 
     private fun getStores(): List<Store> = storesLiveData.value ?: emptyList()
 
-    private fun getCards(): CardModel = cardsLiveData.value ?: CardModel()
+    private fun getCardModel(): CardModel = cardsLiveData.value ?: CardModel()
 
     private fun isFirstTimeDataFetched(): Boolean = firstTimeFetchData.getAndSet(false)
 

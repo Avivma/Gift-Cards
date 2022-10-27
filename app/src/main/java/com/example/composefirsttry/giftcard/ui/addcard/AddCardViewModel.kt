@@ -1,9 +1,7 @@
 package com.example.composefirsttry.giftcard.ui.addcard
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
+import androidx.lifecycle.Observer
 import com.example.composefirsttry.giftcard.logic.cards.model.CardFieldType
 import com.example.composefirsttry.giftcard.logic.cards.model.GiftCard
 import com.example.composefirsttry.giftcard.logic.cards.model.GiftCardType
@@ -37,11 +35,7 @@ class AddCardViewModel @Inject constructor(
 
     var cardType: GiftCardType? = null
 
-    private val stateMutableLiveData = MutableLiveData<AddCardState>()
-    val stateLiveData: LiveData<AddCardState> = stateMutableLiveData
-
-    private val navigationMutableLiveData = MutableLiveData<AddCardIntention>()
-    val navigationLiveData: LiveData<AddCardIntention> = navigationMutableLiveData
+    private var stateMutableLiveData = MutableLiveData<AddCardState>()
 
     init {
         fieldsMutableLiveDataMap[CardFieldType.Name] = nameMutableLiveData
@@ -53,6 +47,13 @@ class AddCardViewModel @Inject constructor(
 
     fun setArgCard(card: GiftCard?) {
         this.argCard = card
+    }
+
+    //NOTE: Use this way, because LiveData stores events and triggers them once new LifecycleOwner is observe to them.
+    // ViewModel doesn't create new Livedata on backpress, but the fragment has new LifecycleOwner - this cause UX bug.
+    fun observeStateLiveData(owner: LifecycleOwner, observer: Observer<AddCardState>) {
+        stateMutableLiveData = MutableLiveData<AddCardState>()
+        stateMutableLiveData.observe(owner, observer)
     }
 
     fun action(intention: AddCardIntention) {
@@ -106,7 +107,7 @@ class AddCardViewModel @Inject constructor(
         if (validator.isCardDetailsOk() || (forceSave && validator.isCardDetailsPartialFailed())) {
             val giftCard: GiftCard = collectGiftCard()
             cardsRepo.addCard(giftCard)
-            navigationMutableLiveData.postValue(AddCardIntention.Navigation.NavigateBackToCardsScreen)
+            stateMutableLiveData.postValue(AddCardState.Navigation.NavigateBackToCardsScreen)
         } else {
             checkForCardDetailsErrors(validator)
         }

@@ -2,6 +2,7 @@ package com.example.composefirsttry.giftcard.ui.favorites
 
 import androidx.lifecycle.*
 import com.example.composefirsttry.L
+import com.example.composefirsttry.giftcard.logic.cards.model.GiftCardType
 import com.example.composefirsttry.giftcard.logic.stores.model.Store
 import com.example.composefirsttry.giftcard.logic.stores.repository.StoresRepo
 import com.example.composefirsttry.giftcard.ui.favorites.states.FavoritesIntention
@@ -18,8 +19,7 @@ class FavoritesViewModel @Inject constructor (
     private val storesRepo: StoresRepo
 ) : ViewModel() {
 
-    private val stateMutableLiveData = MutableLiveData<FavoritesState>()
-    val stateLiveData: LiveData<FavoritesState> = stateMutableLiveData
+    private var stateMutableLiveData = MutableLiveData<FavoritesState>()
 
     private lateinit var storesLiveData: LiveData<List<Store>>
     private lateinit var storesLiveDataObserver: Observer<List<Store>>
@@ -46,6 +46,13 @@ class FavoritesViewModel @Inject constructor (
         storesLiveData.removeObserver(storesLiveDataObserver)
     }
 
+    //NOTE: Use this way, because LiveData stores events and triggers them once new LifecycleOwner is observe to them.
+    // ViewModel doesn't create new Livedata on backpress, but the fragment has new LifecycleOwner - this cause UX bug.
+    fun observeStateLiveData(owner: LifecycleOwner, observer: Observer<FavoritesState>) {
+        stateMutableLiveData = MutableLiveData<FavoritesState>()
+        stateMutableLiveData.observe(owner, observer)
+    }
+
     fun action(intention: FavoritesIntention){
         viewModelScope.launch(Dispatchers.IO) {
             when (intention) {
@@ -53,21 +60,18 @@ class FavoritesViewModel @Inject constructor (
                     stateMutableLiveData.postValue(FavoritesState.Waiting)
                     stateMutableLiveData.postValue(FavoritesState.DisplayData(getStores()))
                 }
-                is FavoritesIntention.OpenStoreDialog -> {
-                    openStoreDialog(intention.store)
-                }
-                is FavoritesIntention.RemoveStore -> {
-                    removeStoreFromFavorites(intention.store)
-                }
-                is FavoritesIntention.RemoveAllStores -> {
-                    removeAllStoresFromFavorites()
-                }
-                is FavoritesIntention.OpenRemoveAllDialog -> {
-                    removeAllDialog()
-                }
+                is FavoritesIntention.OpenStoreDialog -> openStoreDialog(intention.store)
+                is FavoritesIntention.RemoveStore -> removeStoreFromFavorites(intention.store)
+                is FavoritesIntention.RemoveAllStores -> removeAllStoresFromFavorites()
+                is FavoritesIntention.OpenRemoveAllDialog -> removeAllDialog()
+                is FavoritesIntention.NavigateToCardsScreen -> retrieveDataForNavigationToCardsScreen(intention.giftCardType)
                 else -> L.e("Unfamiliar intention. Intention = ${intention.javaClass.simpleName}")
             }
         }
+    }
+
+    private fun retrieveDataForNavigationToCardsScreen(giftCardType: GiftCardType) {
+        stateMutableLiveData.postValue(FavoritesState.Navigation.NavigateToCardsScreen(giftCardType))
     }
 
     private fun removeAllDialog() {

@@ -3,6 +3,7 @@ package com.example.composefirsttry.giftcard.ui.cards
 import androidx.lifecycle.*
 import com.example.composefirsttry.L
 import com.example.composefirsttry.giftcard.logic.cards.model.GiftCard
+import com.example.composefirsttry.giftcard.logic.cards.model.GiftCardType
 import com.example.composefirsttry.giftcard.logic.cards.repository.CardEncryptionHandler
 import com.example.composefirsttry.giftcard.logic.cards.repository.CardsRepo
 import com.example.composefirsttry.giftcard.ui.cards.states.CardsIntention
@@ -19,16 +20,13 @@ class CardsViewModel @Inject constructor(
     private val cardsRepo: CardsRepo,
     private val cardEncryptionHandler: CardEncryptionHandler
 ) : ViewModel() {
-    private val stateMutableLiveData = MutableLiveData<CardsState>()
-    val stateLiveData: LiveData<CardsState> = stateMutableLiveData
 
-    private val navigationMutableLiveData = MutableLiveData<CardsIntention.Navigation>()
-    val navigationLiveData: LiveData<CardsIntention.Navigation> = navigationMutableLiveData
+    private var stateMutableLiveData = MutableLiveData<CardsState>()
 
     private lateinit var cardsLiveData: LiveData<List<GiftCard>>
     private lateinit var cardsLiveDataObserver: Observer<List<GiftCard>>
 
-    private var argCard: GiftCard? = null
+    private var argCardType: GiftCardType? = null
 
     init {
         initListeners()
@@ -51,7 +49,7 @@ class CardsViewModel @Inject constructor(
         //notify when changes happens
         cardsLiveDataObserver = cardsLiveData.observeForeverFreshly(Observer { cards ->
             if (cards.isEmpty())
-                navigationMutableLiveData.postValue(CardsIntention.Navigation.NavigateToLandingScreen)
+                stateMutableLiveData.postValue(CardsState.Navigation.NavigateToLandingScreen)
             else
                 stateMutableLiveData.postValue(CardsState.DisplayData(getAllCards(), shouldShowClearAll()))
         })
@@ -62,13 +60,21 @@ class CardsViewModel @Inject constructor(
         cardsLiveData.removeObserver(cardsLiveDataObserver)
     }
 
+    //NOTE: Use this way, because LiveData stores events and triggers them once new LifecycleOwner is observe to them.
+    // ViewModel doesn't create new Livedata on backpress, but the fragment has new LifecycleOwner - this cause UX bug.
+    fun observeStateLiveData(owner: LifecycleOwner, observer: Observer<CardsState>) {
+        stateMutableLiveData = MutableLiveData<CardsState>()
+        stateMutableLiveData.observe(owner, observer)
+    }
+
     fun action(intention: CardsIntention) {
         viewModelScope.launch(Dispatchers.IO) {
             when (intention) {
                 is CardsIntention.OpenRemoveCardDialog -> stateMutableLiveData.postValue(CardsState.RemoveCardDialogOpened(intention.card))
                 is CardsIntention.RemoveCard -> removeCard(intention.card)
-                is CardsIntention.ClearAll -> clearAll()
-                is CardsIntention.Refresh -> refreshData()
+                CardsIntention.ClearAll -> clearAll()
+                CardsIntention.Refresh -> refreshData()
+                is CardsIntention.NavigateToEditCard -> stateMutableLiveData.postValue(CardsState.Navigation.NavigateToEditCard(intention.card))
                 else -> L.e("Unfamiliar CardsIntention (${intention.javaClass.simpleName})")
             }
         }
@@ -76,22 +82,23 @@ class CardsViewModel @Inject constructor(
 
     private fun refreshData() {
         if (receiveCardClickEvent()) { //display only the selected card
-            stateMutableLiveData.postValue(CardsState.DisplayData(listOf(argCard!!), showClearAll = true))
+            val cards = getAllCards().filter { it.type == argCardType!! }
+            stateMutableLiveData.postValue(CardsState.DisplayData(cards, showClearAll = true))
         } else { //regular
             stateMutableLiveData.postValue(CardsState.DisplayData(getAllCards(), showClearAll = false))
         }
     }
 
-    private fun receiveCardClickEvent(): Boolean = argCard != null
+    private fun receiveCardClickEvent(): Boolean = argCardType != null
 
     private fun shouldShowClearAll(): Boolean = receiveCardClickEvent()
 
-    fun setArgCard(argCard: GiftCard?) {
-        this.argCard = argCard
+    fun setArgCardType(argCardType: GiftCardType?) {
+        this.argCardType = argCardType
     }
 
     private fun clearAll() {
-        argCard = null
+        argCardType = null
         stateMutableLiveData.postValue(CardsState.DisplayData(getAllCards(), showClearAll = false))
     }
 
