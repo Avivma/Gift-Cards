@@ -60,7 +60,15 @@
         <item name="shapeAppearance">@style/ShapeAppearance.App.SmallComponent</item>
         <item name="hintTextColor">@color/colorPrimary</item>
         <item name="hintTextAppearance">@style/HintText</item>
-        <item name="android:layout_marginBottom">4dp</item>
+        <item name="android:paddingBottom">8dp</item>
+    </style>
+
+    <style name="ThemeOverlay.App.TextInputLayout.PartialError" parent="ThemeOverlay.App.TextInputLayout">
+<!--        <item name="colorError">@color/dark_accent</item>-->
+        <item name="colorError">@color/very_dark_accent</item>
+    </style>
+    <style name="Widget.App.TextInputLayout.PartialError" parent="Widget.App.TextInputLayout">
+        <item name="materialThemeOverlay">@style/ThemeOverlay.App.TextInputLayout.PartialError</item>
     </style>
     <!-- TextInputLayout - end -->
 

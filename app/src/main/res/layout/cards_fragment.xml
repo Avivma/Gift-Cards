@@ -18,10 +18,11 @@
             android:id="@+id/recycler_view"
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            android:background="@color/top_background_color"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            tools:listitem="@layout/card_details_layout"
-            tools:itemCount="3"
+            tools:listitem="@layout/card_row_layout"
+            tools:itemCount="4"
             />
 
         <ImageButton
@@ -38,17 +39,14 @@
             android:visibility="@{showClearAll ? View.VISIBLE : View.GONE, default=gone}"
             />
 
-        <ImageButton
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/add_card"
-            android:layout_width="60dp"
-            android:layout_height="0dp"
-            app:layout_constraintDimensionRatio="1:1"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:padding="12dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:src="@drawable/ic_add_card"
-            android:background="@color/transparent"
-            android:scaleType="fitXY"
+            android:layout_margin="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
             android:visibility="@{showClearAll ? View.GONE : View.VISIBLE, default=visible}"
             />
     </androidx.constraintlayout.widget.ConstraintLayout>

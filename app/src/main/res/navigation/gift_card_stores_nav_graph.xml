@@ -30,6 +30,11 @@
             app:exitAnim="@android:anim/fade_out"
             app:popEnterAnim="@android:anim/fade_in"
             app:popExitAnim="@android:anim/fade_out" />
+        <action
+            android:id="@+id/action_cardsFragment_to_landingFragment"
+            app:destination="@id/landingFragment"
+            app:popUpTo="@id/giftCardsMainFragment"
+            app:popUpToInclusive="true" />
     </fragment>
 
     <fragment
@@ -43,11 +48,6 @@
             app:destination="@id/cardsFragment" />
     </fragment>
 
-    <action
-        android:id="@+id/go_to_mainFragment"
-        app:destination="@id/giftCardsMainFragment"
-        app:popUpTo="@id/giftCardsMainFragment"
-        app:popUpToInclusive="true" />
     <fragment
         android:id="@+id/addCardFragment"
         android:name="com.example.composefirsttry.giftcard.ui.addcard.AddCardFragment"
@@ -60,5 +60,31 @@
             app:exitAnim="@android:anim/fade_out"
             app:popUpTo="@id/cardsFragment"
             app:popUpToInclusive="true" />
+        <argument
+            android:name="card"
+            app:argType="com.example.composefirsttry.giftcard.logic.cards.model.GiftCard"
+            app:nullable="true"
+            android:defaultValue="@null" />
     </fragment>
+    <fragment
+        android:id="@+id/landingFragment"
+        android:name="com.example.composefirsttry.giftcard.ui.landing.LandingFragment"
+        android:label="fragment_landing"
+        tools:layout="@layout/fragment_landing" >
+        <action
+            android:id="@+id/action_landingFragment_to_addCardFragment"
+            app:destination="@id/addCardFragment" />
+    </fragment>
+
+    <action
+        android:id="@+id/go_to_mainFragment"
+        app:destination="@id/giftCardsMainFragment"
+        app:popUpTo="@id/giftCardsMainFragment"
+        app:popUpToInclusive="true" />
+
+    <action
+        android:id="@+id/go_to_landingFragment"
+        app:destination="@id/landingFragment"
+        app:popUpTo="@id/landingFragment"
+        app:popUpToInclusive="true" />
 </navigation>

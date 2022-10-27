@@ -3,9 +3,14 @@ package com.example.composefirsttry.giftcard.ui.main
 import android.content.SharedPreferences
 import androidx.lifecycle.*
 import com.example.composefirsttry.L
+import com.example.composefirsttry.giftcard.logic.cards.db.entity.CardEntity
 import com.example.composefirsttry.giftcard.logic.cards.model.GiftCard
+import com.example.composefirsttry.giftcard.logic.cards.model.GiftCardType
+import com.example.composefirsttry.giftcard.logic.cards.repository.CardEncryptionHandler
+import com.example.composefirsttry.giftcard.logic.cards.repository.CardsRepo
 import com.example.composefirsttry.giftcard.logic.stores.model.Store
 import com.example.composefirsttry.giftcard.logic.stores.repository.StoresRepo
+import com.example.composefirsttry.giftcard.ui.main.cardutils.CardModel
 import com.example.composefirsttry.giftcard.ui.main.states.StoreMainState
 import com.example.composefirsttry.giftcard.ui.main.states.StoresMainIntention
 import com.example.composefirsttry.giftcard.utils.DbToModelConverter
@@ -20,7 +25,9 @@ import javax.inject.Inject
 @HiltViewModel
 class StoresMainViewModel @Inject constructor (
     private val sp: SharedPreferences,
-    private val storesRepo: StoresRepo
+    private val storesRepo: StoresRepo,
+    private val cardsRepo: CardsRepo,
+    private val cardEncryptionHandler: CardEncryptionHandler
 ) : ViewModel() {
 
     var maxCardChecked: Boolean = sp.getBoolean(SPKeys.GIFT_CARD_MAX_CHECKBOX_STATE, true)
@@ -35,6 +42,9 @@ class StoresMainViewModel @Inject constructor (
 
     private val stateMutableLiveData = MutableLiveData<StoreMainState>()
     val stateLiveData: LiveData<StoreMainState> = stateMutableLiveData
+
+    private lateinit var cardsLiveData: LiveData<CardModel>
+    private lateinit var cardsLiveDataObserver: Observer<CardModel>
 
     init {
         initListeners()
@@ -52,6 +62,27 @@ class StoresMainViewModel @Inject constructor (
             sendFreshData()
         })
 
+        //attach viewModel's cards to db
+        cardsLiveData = Transformations.map(cardsRepo.getAllCardsDb()) { cardsEntities ->
+            fun transformEntitiesToGiftCards(entities: List<CardEntity>): List<GiftCard> {
+                return entities.map { cardEntity ->
+                    val values = cardEncryptionHandler.getDecryptedValues(cardEntity)
+                    DbToModelConverter.getGiftCard(cardEntity, values)
+                }
+            }
+            fun fromGiftCardsToCardModel(giftCards: List<GiftCard>): CardModel {
+                val cardModel = CardModel()
+                giftCards.forEach { giftCard -> cardModel.addCard(giftCard)}
+                return cardModel
+            }
+            val giftCards = transformEntitiesToGiftCards(cardsEntities)
+            return@map fromGiftCardsToCardModel(giftCards)
+        }
+        //notify when changes happens
+        cardsLiveDataObserver = cardsLiveData.observeForeverFreshly(Observer { ignore ->
+            sendFreshData()
+        })
+
         searchTextMutableLiveDataObserver = searchTextMutableLiveData.observeForeverFreshly(Observer { textFilter ->
             action(StoresMainIntention.FilterByPrefix(textFilter))
         })
@@ -61,11 +92,12 @@ class StoresMainViewModel @Inject constructor (
         super.onCleared()
         searchTextMutableLiveData.removeObserver(searchTextMutableLiveDataObserver)
         storesLiveData.removeObserver(storesLiveDataObserver)
+        cardsLiveData.removeObserver(cardsLiveDataObserver)
     }
 
     private fun sendFreshData() {
         L.i("sendFreshData")
-        stateMutableLiveData.postValue(StoreMainState.DisplayData(getFilteredStores()))
+        stateMutableLiveData.postValue(StoreMainState.DisplayData(getCards(), getFilteredStores()))
     }
 
     fun action(intention: StoresMainIntention){
@@ -78,7 +110,7 @@ class StoresMainViewModel @Inject constructor (
                     if (isFirstTimeDataFetched()) {
                         storesRepo.refresh()
                     } else {
-                        stateMutableLiveData.postValue(StoreMainState.DisplayData(getStores()))
+                        stateMutableLiveData.postValue(StoreMainState.DisplayData(getCards(), getFilteredStores()))
                     }
                 }
                 is StoresMainIntention.FilterBySelectedStores -> {
@@ -113,11 +145,11 @@ class StoresMainViewModel @Inject constructor (
         L.i("clearStoresSelection: storesHasBeenSelected= $storesHasBeenSelected")
         if (storesHasBeenSelected == ACTIVE) { //deactivate
             setStoresSelection(VISIBLE)
-            stateMutableLiveData.postValue(StoreMainState.DisplayData(getFilteredStores()))
+            stateMutableLiveData.postValue(StoreMainState.DisplayData(getCards(), getFilteredStores()))
         } else { //make invisible
             getStores().forEach { it.selected = false }
             setStoresSelection(INVISIBLE)
-            stateMutableLiveData.postValue(StoreMainState.DisplayData(getFilteredStores(), hideStoreSelectionFilter = true))
+            stateMutableLiveData.postValue(StoreMainState.DisplayData(getCards(), getFilteredStores(), hideStoreSelectionFilter = true))
         }
     }
 
@@ -138,7 +170,7 @@ class StoresMainViewModel @Inject constructor (
             }
             storesHasBeenSelected == ACTIVE -> {
                 setStoresSelection(INVISIBLE)
-                stateMutableLiveData.postValue(StoreMainState.DisplayData(getFilteredStores(), hideStoreSelectionFilter = true))
+                stateMutableLiveData.postValue(StoreMainState.DisplayData(getCards(), getFilteredStores(), hideStoreSelectionFilter = true))
             }
         }
     }
@@ -155,7 +187,7 @@ class StoresMainViewModel @Inject constructor (
     private fun filterBySelectedStores() {
         L.i("filterBySelectedStores")
         setStoresSelection(ACTIVE)
-        stateMutableLiveData.postValue(StoreMainState.DisplayData(getFilteredStores()))
+        stateMutableLiveData.postValue(StoreMainState.DisplayData(getCards(), getFilteredStores()))
     }
 
     private fun filterByCard(card: GiftCard, isChecked: Boolean) {
@@ -167,18 +199,19 @@ class StoresMainViewModel @Inject constructor (
             GiftCard.HOT -> hotCardChecked = isChecked
         }
 
-        stateMutableLiveData.postValue(StoreMainState.DisplayData(getFilteredStores()))
+        stateMutableLiveData.postValue(StoreMainState.DisplayData(getCards(), getFilteredStores()))
     }
 
     private fun filterByPrefix(prefix: String) {
         val filteredStored: List<Store> = getStores().filter { store -> shouldStoreBeDisplayed(store, prefix) }
-        stateMutableLiveData.postValue(StoreMainState.DisplayData(filteredStored))
+        stateMutableLiveData.postValue(StoreMainState.DisplayData(getCards(), filteredStored))
     }
 
     private fun shouldStoreBeDisplayed(store: Store, prefix: String): Boolean {
-        return if ((store.maxCard && maxCardChecked) ||
-            (store.corporateCard && corporateCardChecked) ||
-            (store.hotCard && hotCardChecked)) {
+        val cardModel = getCards()
+        return if ((cardModel.hasCard(GiftCardType.MAX) && store.maxCard && maxCardChecked) ||
+            (cardModel.hasCard(GiftCardType.ISRACARD) && store.corporateCard && corporateCardChecked) ||
+            (cardModel.hasCard(GiftCardType.TAV_HAHAM) && store.hotCard && hotCardChecked)) {
             (store.selected || storesHasBeenSelected != ACTIVE) //equivalent to: storesHasBeenSelected == ACTIVE -> store.selected
                     && doesStoreNameStartWithPrefix(store.storeName.lowercase(), prefix.lowercase())
         } else {
@@ -199,6 +232,8 @@ class StoresMainViewModel @Inject constructor (
     }
 
     private fun getStores(): List<Store> = storesLiveData.value ?: emptyList()
+
+    private fun getCards(): CardModel = cardsLiveData.value ?: CardModel()
 
     private fun isFirstTimeDataFetched(): Boolean = firstTimeFetchData.getAndSet(false)
 

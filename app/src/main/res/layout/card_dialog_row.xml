@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
     <data>
-        <variable name="card" type="com.example.composefirsttry.giftcard.logic.cards.model.GiftCard"/>
+        <import type="com.example.composefirsttry.giftcard.logic.cards.model.GiftCardType" />
+        <variable name="cardType" type="com.example.composefirsttry.giftcard.logic.cards.model.GiftCardType"/>
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -19,7 +20,7 @@
             app:layout_constraintStart_toStartOf="parent"
             android:layout_marginStart="12dp"
             tools:src="@drawable/max"
-            app:loadImage="@{card.imageRes}"
+            app:loadImage="@{GiftCardType.getCardImage(cardType)}"
             />
 
         <TextView
@@ -32,7 +33,7 @@
             android:layout_marginStart="12dp"
             android:textSize="@dimen/small_main_text_size"
             android:textColor="@color/dark_accent"
-            android:text="@{card.name}"
+            android:text="@{cardType.name()}"
             tools:text="Max"
             />
 

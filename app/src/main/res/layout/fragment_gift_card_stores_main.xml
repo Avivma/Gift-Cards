@@ -3,11 +3,15 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
-        <import type="com.example.composefirsttry.giftcard.logic.cards.model.GiftCard" />
+        <import type="android.view.View" />
+        <import type="com.example.composefirsttry.giftcard.logic.cards.model.GiftCardType" />
         <variable
             name="model"
             type="com.example.composefirsttry.giftcard.ui.main.StoresMainViewModel"
             />
+        <variable name="maxCardVisible" type="java.lang.Boolean"/>
+        <variable name="corporateCardVisible" type="java.lang.Boolean"/>
+        <variable name="hotCardVisible" type="java.lang.Boolean"/>
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout xmlns:tools="http://schemas.android.com/tools"
@@ -118,8 +122,10 @@
             app:layout_constraintEnd_toStartOf="@+id/corporate_check_box"
             app:layout_constraintTop_toBottomOf="@id/search_store"
             app:cardCheckedLayoutWithFrame="@{model.maxCardChecked}"
-            app:cardNameLayoutWithFrame="@{GiftCard.MAX_CARD_NAME}"
+            app:cardNameLayoutWithFrame="@{GiftCardType.MAX.name()}"
             app:cardImageLayoutWithFrame="@{@drawable/max}"
+            android:visibility="@{maxCardVisible ? View.VISIBLE : View.GONE, default=invisible}"
+            tools:visibility="visible"
             />
 
         <include
@@ -128,12 +134,15 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="4dp"
+            android:layout_marginTop="12dp"
             app:layout_constraintStart_toEndOf="@id/max_check_box"
             app:layout_constraintEnd_toStartOf="@+id/hot_check_box"
-            app:layout_constraintTop_toTopOf="@id/max_check_box"
+            app:layout_constraintTop_toBottomOf="@id/search_store"
             app:cardCheckedLayoutWithFrame="@{model.corporateCardChecked}"
-            app:cardNameLayoutWithFrame="@{GiftCard.CORPORATE_CARD_NAME}"
+            app:cardNameLayoutWithFrame="@{GiftCardType.ISRACARD.name()}"
             app:cardImageLayoutWithFrame="@{@drawable/corporate}"
+            android:visibility="@{corporateCardVisible ? View.VISIBLE : View.GONE, default=invisible}"
+            tools:visibility="visible"
             />
 
         <include
@@ -142,13 +151,23 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="4dp"
+            android:layout_marginTop="12dp"
             app:layout_constraintStart_toEndOf="@id/corporate_check_box"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/max_check_box"
+            app:layout_constraintTop_toBottomOf="@id/search_store"
             app:cardCheckedLayoutWithFrame="@{model.hotCardChecked}"
-            app:cardNameLayoutWithFrame="@{GiftCard.HOT_CARD_NAME}"
+            app:cardNameLayoutWithFrame="@{GiftCardType.TAV_HAHAM.name()}"
             app:cardImageLayoutWithFrame="@{@drawable/hot}"
+            android:visibility="@{hotCardVisible ? View.VISIBLE : View.GONE, default=invisible}"
+            tools:visibility="visible"
             />
+
+        <androidx.constraintlayout.widget.Barrier
+            android:id="@+id/barrier"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:barrierDirection="bottom"
+            app:constraint_referenced_ids="max_check_box, corporate_check_box,hot_check_box" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/store_recycler_view"
@@ -158,7 +177,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/max_check_box"
+            app:layout_constraintTop_toBottomOf="@id/barrier"
             tools:itemCount="10"
             tools:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             tools:listitem="@layout/store_row_layout"

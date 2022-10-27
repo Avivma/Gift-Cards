@@ -4,10 +4,16 @@ import com.example.composefirsttry.giftcard.logic.cards.model.GiftCard
 import com.example.composefirsttry.giftcard.logic.cards.model.GiftCardType
 
 class CardModel(
-    private val maxCards: List<GiftCard> = listOf(),
-    private val isracardCards: List<GiftCard> = listOf(),
-    private val tavHahamCards: List<GiftCard> = listOf()
+    private val maxCards: MutableList<GiftCard> = mutableListOf(),
+    private val isracardCards: MutableList<GiftCard> = mutableListOf(),
+    private val tavHahamCards: MutableList<GiftCard> = mutableListOf()
 ) {
+    fun addCard(giftCard: GiftCard) = when (giftCard.type) {
+        GiftCardType.MAX -> maxCards.add(giftCard)
+        GiftCardType.ISRACARD -> isracardCards.add(giftCard)
+        GiftCardType.TAV_HAHAM -> tavHahamCards.add(giftCard)
+    }
+
     fun hasCard(cardType: GiftCardType) = when (cardType) {
         GiftCardType.MAX -> maxCards.isNotEmpty()
         GiftCardType.ISRACARD -> isracardCards.isNotEmpty()
@@ -24,7 +30,7 @@ class CardModel(
         return when (cards.size) {
             0 -> "None"
             1 -> cards[0].name
-            else -> "${cards.size} cards}"
+            else -> "${cards.size} cards"
         }
     }
 
@@ -35,11 +41,12 @@ class CardModel(
     }
 
     private fun getNames(cards: List<GiftCard>): String {
-        val message = StringBuilder()
+        return cards.joinToString { it.name }
+/*        val message = StringBuilder()
         cards.forEach {
             if (message.isEmpty()) message.append(it.name)
             else message.append(", ${it.name}")
         }
-        return message.toString()
+        return message.toString()*/
     }
 }

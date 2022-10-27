@@ -1,9 +1,11 @@
 package com.example.composefirsttry.giftcard
 
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
+import androidx.navigation.NavOptions
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
@@ -12,6 +14,7 @@ import androidx.navigation.ui.navigateUp
 import com.example.composefirsttry.L
 import com.example.composefirsttry.R
 import com.example.composefirsttry.databinding.ActivityGiftCardMainBinding
+import com.example.composefirsttry.giftcard.logic.cards.repository.CardUtils
 import com.example.composefirsttry.giftcard.logic.stores.repository.StoresRepo
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -25,6 +28,12 @@ class GiftCardMainActivity : AppCompatActivity() {
     @Inject
     lateinit var storesRepo: StoresRepo
 
+    @Inject
+    lateinit var sp: SharedPreferences
+
+    @Inject
+    lateinit var cardUtils: CardUtils
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         L.setup()
@@ -36,14 +45,28 @@ class GiftCardMainActivity : AppCompatActivity() {
 
         setupWithNavController(binding.activityMainBottomNavigationView, getNavController())
 
-//        binding.activityMainBottomNavigationView.setOnNavigationItemSelectedListener {
-//        binding.activityMainBottomNavigationView.setOnItemSelectedListener {
-//            when(it.itemId){
-//                R.id.giftCardsMainFragment -> goToMainFragment()
-//                R.id.cardsFragment -> goToCardsFragment()
-//            }
-//            true
-//        }
+        if (shouldNavigateToLandingScreen()) {
+            navigateToLandingScreen()
+            return
+        }
+
+/*        binding.activityMainBottomNavigationView.setOnNavigationItemSelectedListener {
+        binding.activityMainBottomNavigationView.setOnItemSelectedListener {
+            when(it.itemId){
+                R.id.giftCardsMainFragment -> goToMainFragment()
+                R.id.cardsFragment -> goToCardsFragment()
+            }
+            true
+        }*/
+    }
+
+    private fun shouldNavigateToLandingScreen(): Boolean = !cardUtils.hasAnyCard()
+
+    private fun navigateToLandingScreen() {
+        val navOptions: NavOptions = NavOptions.Builder()
+            .setPopUpTo(R.id.giftCardsMainFragment, true)
+            .build()
+        getNavController().navigate(R.id.go_to_landingFragment, null, navOptions)
     }
 
     override fun onSupportNavigateUp(): Boolean {

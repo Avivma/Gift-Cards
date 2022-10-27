@@ -20,6 +20,8 @@ import com.example.composefirsttry.databinding.FragmentGiftCardStoresMainBinding
 import com.example.composefirsttry.databinding.GiftCardWithFrameLayoutBinding
 import com.example.composefirsttry.giftcard.GiftCardMainActivity
 import com.example.composefirsttry.giftcard.logic.cards.model.GiftCard
+import com.example.composefirsttry.giftcard.logic.cards.model.GiftCardType
+import com.example.composefirsttry.giftcard.logic.cards.repository.CardUtils
 import com.example.composefirsttry.giftcard.ui.main.states.StoreMainState
 import com.example.composefirsttry.giftcard.ui.main.states.StoresMainIntention
 import com.example.composefirsttry.utils.bindChecked
@@ -37,6 +39,9 @@ class GiftCardStoresMainFragment : Fragment() {
     @Inject
     lateinit var sp: SharedPreferences
 
+    @Inject
+    lateinit var cardUtils: CardUtils
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -49,7 +54,7 @@ class GiftCardStoresMainFragment : Fragment() {
         viewModel = ViewModelProvider(this, StoresMainViewModelFactory(viewLifecycleOwner))
             .get(StoresMainViewModel::class.java)*/
 
-        adapter = StoresAdapter(emptyList(), requireContext(), sp)
+        adapter = StoresAdapter(emptyList(), requireContext(), sp, cardUtils)
         adapter.setHasStableIds(true)
         binding.storeRecyclerView.adapter = adapter
         binding.storeRecyclerView.layoutManager = LinearLayoutManager(requireActivity())
@@ -105,6 +110,12 @@ class GiftCardStoresMainFragment : Fragment() {
                     binding.storesClearSelection.visibility = View.GONE
                 }
                 adapter.setStores(state.stores)
+                binding.maxCardVisible = state.cardModel.hasCard(GiftCardType.MAX)
+                binding.corporateCardVisible = state.cardModel.hasCard(GiftCardType.ISRACARD)
+                binding.hotCardVisible= state.cardModel.hasCard(GiftCardType.TAV_HAHAM)
+                binding.maxCheckBox.cardNameLayoutWithFrame = state.cardModel.getName(GiftCardType.MAX)
+                binding.corporateCheckBox.cardNameLayoutWithFrame = state.cardModel.getName(GiftCardType.ISRACARD)
+                binding.hotCheckBox.cardNameLayoutWithFrame = state.cardModel.getName(GiftCardType.TAV_HAHAM)
             }
             is StoreMainState.StoreSelected -> {
                 L.i("StoreMainState.StoreSelected")

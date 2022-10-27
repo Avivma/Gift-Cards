@@ -13,10 +13,12 @@ import com.example.composefirsttry.L
 import com.example.composefirsttry.R
 import com.example.composefirsttry.databinding.FragmentFavoritesBinding
 import com.example.composefirsttry.giftcard.GiftCardMainActivity
+import com.example.composefirsttry.giftcard.logic.cards.repository.CardUtils
 import com.example.composefirsttry.giftcard.ui.favorites.states.FavoritesIntention
 import com.example.composefirsttry.giftcard.ui.favorites.states.FavoritesState
 import com.example.composefirsttry.utils.requireActivity
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class FavoritesFragment : Fragment() {
@@ -24,13 +26,16 @@ class FavoritesFragment : Fragment() {
     private lateinit var binding: FragmentFavoritesBinding
     private lateinit var adapter: FavoritesAdapter
 
+    @Inject
+    lateinit var cardUtils: CardUtils
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         //More info: https://stackoverflow.com/questions/59826066/databindingutil-inflates-layout-as-null
         binding = FragmentFavoritesBinding.inflate(inflater, container, false)
-        adapter = FavoritesAdapter(emptyList())
+        adapter = FavoritesAdapter(emptyList(), cardUtils)
         adapter.setHasStableIds(true)
         binding.recyclerView.adapter = adapter
         binding.recyclerView.layoutManager = LinearLayoutManager(requireActivity())

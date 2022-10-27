@@ -30,7 +30,6 @@
             android:textColor="@color/very_dark_accent"
             android:gravity="center"
             app:layout_constraintTop_toTopOf="parent"
-            android:src="@drawable/ic_store"
             />
 
         <ImageButton

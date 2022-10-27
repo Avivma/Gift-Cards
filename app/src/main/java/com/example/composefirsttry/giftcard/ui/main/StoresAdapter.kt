@@ -11,11 +11,13 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.composefirsttry.R
 import com.example.composefirsttry.databinding.StoreRowLayoutBinding
 import com.example.composefirsttry.giftcard.logic.cards.model.GiftCard
+import com.example.composefirsttry.giftcard.logic.cards.model.GiftCardType
+import com.example.composefirsttry.giftcard.logic.cards.repository.CardUtils
 import com.example.composefirsttry.giftcard.logic.stores.model.Store
 import com.example.composefirsttry.giftcard.ui.main.states.StoresMainIntention
 import com.example.composefirsttry.utils.SPKeys
 
-class StoresAdapter(giftCards: List<Store>, var context: Context, var sp: SharedPreferences): RecyclerView.Adapter<StoresAdapter.StoreRowHolder>() {
+class StoresAdapter(giftCards: List<Store>, var context: Context, var sp: SharedPreferences, private val cardUtils: CardUtils): RecyclerView.Adapter<StoresAdapter.StoreRowHolder>() {
     private val stores: MutableList<Store> = ArrayList(giftCards)
 
     var intentionsListener: LiveData<StoresMainIntention> = MutableLiveData()
@@ -39,6 +41,10 @@ class StoresAdapter(giftCards: List<Store>, var context: Context, var sp: Shared
     private var corporateCardChecked: Boolean = true
     private var hotCardChecked: Boolean = true
 
+    private var maxCardExist: Boolean = false
+    private var corporateCardExist: Boolean = false
+    private var hotCardExist: Boolean = false
+
     override fun getItemId(position: Int): Long {
         return stores[position].storeName.hashCode().toLong()
     }
@@ -47,6 +53,9 @@ class StoresAdapter(giftCards: List<Store>, var context: Context, var sp: Shared
         maxCardChecked = sp.getBoolean(SPKeys.GIFT_CARD_MAX_CHECKBOX_STATE, true)
         corporateCardChecked = sp.getBoolean(SPKeys.GIFT_CARD_CORPORATE_CHECKBOX_STATE, true)
         hotCardChecked = sp.getBoolean(SPKeys.GIFT_CARD_HOT_CHECKBOX_STATE, true)
+        maxCardExist = cardUtils.hasCard(GiftCardType.MAX)
+        corporateCardExist = cardUtils.hasCard(GiftCardType.ISRACARD)
+        hotCardExist = cardUtils.hasCard(GiftCardType.TAV_HAHAM)
         this.stores.clear()
         this.stores.addAll(giftCards)
         this.notifyDataSetChanged()
@@ -64,23 +73,20 @@ class StoresAdapter(giftCards: List<Store>, var context: Context, var sp: Shared
     inner class StoreRowHolder(private val binding: StoreRowLayoutBinding): RecyclerView.ViewHolder(binding.root) {
         fun binding(store: Store) {
             //set binding variables
-            binding.store = store
-            binding.maxCardChecked = maxCardChecked
-            binding.corporateCardChecked = corporateCardChecked
-            binding.hotCardChecked = hotCardChecked
+            binding.maxCardVisible = store.maxCard && maxCardExist && maxCardChecked
+            binding.corporateCardVisible = store.corporateCard && corporateCardExist && corporateCardChecked
+            binding.hotCardVisible = store.hotCard && hotCardExist && hotCardChecked
+            binding.storeName = store.storeName
             binding.storeSelected = store.selected
 
             //set listeners
-            binding.cardMax.cardLayout.setOnClickListener { mutableIntentionsListener.postValue(StoresMainIntention.Navigation.NavigateToCardsScreen(
-                GiftCard.MAX)) }
-            binding.cardCorporate.cardLayout.setOnClickListener { mutableIntentionsListener.postValue(StoresMainIntention.Navigation.NavigateToCardsScreen(
-                GiftCard.CORPORATE)) }
-            binding.cardHot.cardLayout.setOnClickListener { mutableIntentionsListener.postValue(StoresMainIntention.Navigation.NavigateToCardsScreen(
-                GiftCard.HOT)) }
-            binding.storeName.setOnClickListener {
+            binding.cardMax.cardLayout.setOnClickListener { mutableIntentionsListener.postValue(StoresMainIntention.Navigation.NavigateToCardsScreen(GiftCard.MAX)) }
+            binding.cardCorporate.cardLayout.setOnClickListener { mutableIntentionsListener.postValue(StoresMainIntention.Navigation.NavigateToCardsScreen(GiftCard.CORPORATE)) }
+            binding.cardHot.cardLayout.setOnClickListener { mutableIntentionsListener.postValue(StoresMainIntention.Navigation.NavigateToCardsScreen(GiftCard.HOT)) }
+            binding.storeNameTv.setOnClickListener {
                 mutableIntentionsListener.postValue(StoresMainIntention.SelectStore(store))
             }
-            binding.storeName.setOnLongClickListener {
+            binding.storeNameTv.setOnLongClickListener {
                 mutableIntentionsListener.postValue(StoresMainIntention.OpenStoreDialog(store))
                 true
             }

@@ -1,23 +1,24 @@
 package com.example.composefirsttry.giftcard.logic.cards.model
 
 import androidx.annotation.DrawableRes
-import com.example.composefirsttry.R
 import java.io.Serializable
 
-sealed class GiftCard(
+open class GiftCard(
+    val type: GiftCardType,
     val name: String,
-    val discount: Float,
     @DrawableRes val imageRes: Int,
-    var longName: String,
-    var number: String,
-    var cvv: String,
-    var expirationDate: String,
-    var operator: String
+    var discount: Float,
+    var longName: String = "",
+    var number: String = "",
+    var cvv: String = "",
+    var expirationDate: String = "",
+    var operator: String = ""
 ): Serializable {
     object MAX : GiftCard(
+        GiftCardType.MAX,
         MAX_CARD_NAME,
+        imageRes = GiftCardType.getCardImage(GiftCardType.MAX),
         16.5f,
-        imageRes = R.drawable.max,
         "Gift Card MAX executive",
         "1111-1111-1111-111",
         "999",
@@ -26,9 +27,10 @@ sealed class GiftCard(
     )
 
     object CORPORATE : GiftCard(
+        GiftCardType.ISRACARD,
         CORPORATE_CARD_NAME,
+        imageRes = GiftCardType.getCardImage(GiftCardType.ISRACARD),
         19f,
-        imageRes = R.drawable.corporate,
         "GiftCard ישראכרט",
         "2222-2222-2222-222",
         "888",
@@ -37,9 +39,10 @@ sealed class GiftCard(
     )
 
     object HOT : GiftCard(
+        GiftCardType.TAV_HAHAM,
         HOT_CARD_NAME,
+        imageRes = GiftCardType.getCardImage(GiftCardType.TAV_HAHAM),
         15f,
-        imageRes = R.drawable.hot,
         "הוט התו החכם",
         "3333-3333-3333-333",
         "777",
@@ -47,7 +50,7 @@ sealed class GiftCard(
         "MASTERCARD"
     )
 
-    companion object {
+    private companion object {
         const val MAX_CARD_NAME = "Max"
         const val CORPORATE_CARD_NAME = "Corporate"
         const val HOT_CARD_NAME = "Hot"
