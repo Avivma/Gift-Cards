@@ -11,7 +11,6 @@ object SPKeys {
     const val GIFT_CARD_MAX_CHECKBOX_STATE = "gift_card_max_checkbox_state"
     const val GIFT_CARD_CORPORATE_CHECKBOX_STATE = "gift_card_corporate_checkbox_state"
     const val GIFT_CARD_HOT_CHECKBOX_STATE = "gift_card_hot_checkbox_state"
-    const val GIFT_CARD_AMOUNT_CARDS_INSERTED = "gift_card_amount_cards_inserted"
     const val GIFT_CARD_AMOUNT_MAX_CARDS = "gift_card_amount_max_cards"
     const val GIFT_CARD_AMOUNT_ISRACARD_CARDS = "gift_card_amount_isracard_cards"
     const val GIFT_CARD_AMOUNT_TAV_HAHAM_CARDS = "gift_card_amount_tav_haham_cards"

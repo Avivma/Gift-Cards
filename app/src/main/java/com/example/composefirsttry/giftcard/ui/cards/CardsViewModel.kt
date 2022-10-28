@@ -41,10 +41,7 @@ class CardsViewModel @Inject constructor(
         })*/
         //attach viewModel's cards to db
         cardsLiveData = Transformations.map(cardsRepo.getAllCardsDb()) { cardsEntities ->
-            cardsEntities.map { cardEntity ->
-                val values = cardEncryptionHandler.getDecryptedValues(cardEntity)
-                DbToModelConverter.getGiftCard(cardEntity, values)
-            }
+            cardsEntities.map { cardEntity -> DbToModelConverter.getGiftCard(cardEntity) }
         }
         //notify when changes happens
         cardsLiveDataObserver = cardsLiveData.observeForeverFreshly(Observer { cards ->
@@ -103,7 +100,7 @@ class CardsViewModel @Inject constructor(
     }
 
     private fun removeCard(card: GiftCard) {
-        cardsRepo.removeCard(card)
+        cardsRepo.removeCard(card.id)
     }
 
     private fun getAllCards(): List<GiftCard> = cardsLiveData.value ?: listOf()

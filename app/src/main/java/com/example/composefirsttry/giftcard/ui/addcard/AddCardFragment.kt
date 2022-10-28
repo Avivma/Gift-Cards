@@ -21,6 +21,7 @@ import com.example.composefirsttry.giftcard.logic.cards.model.GiftCard
 import com.example.composefirsttry.giftcard.logic.cards.model.GiftCardType
 import com.example.composefirsttry.giftcard.ui.addcard.states.AddCardIntention
 import com.example.composefirsttry.giftcard.ui.addcard.states.AddCardState
+import com.example.composefirsttry.giftcard.utils.CardUtils
 import com.example.composefirsttry.utils.requireActivity
 import com.google.android.material.textfield.TextInputEditText
 import dagger.hilt.android.AndroidEntryPoint
@@ -152,7 +153,7 @@ class AddCardFragment : Fragment() {
     private fun changedCardImage(cardType: GiftCardType) {
         binding.showConcreteCard = true
         binding.showCardErrorSign = false
-        binding.imageRes = GiftCardType.getCardImage(cardType)
+        binding.imageRes = CardUtils.getCardImage(cardType)
     }
 
     private fun openCardsList() {

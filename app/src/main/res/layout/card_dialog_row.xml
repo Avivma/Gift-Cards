@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools">
     <data>
         <import type="com.example.composefirsttry.giftcard.logic.cards.model.GiftCardType" />
+        <import type="com.example.composefirsttry.giftcard.utils.CardUtils" />
         <variable name="cardType" type="com.example.composefirsttry.giftcard.logic.cards.model.GiftCardType"/>
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -20,7 +21,7 @@
             app:layout_constraintStart_toStartOf="parent"
             android:layout_marginStart="12dp"
             tools:src="@drawable/max"
-            app:loadImage="@{GiftCardType.getCardImage(cardType)}"
+            app:loadImage="@{CardUtils.getCardImage(cardType)}"
             />
 
         <TextView
@@ -33,7 +34,7 @@
             android:layout_marginStart="12dp"
             android:textSize="@dimen/small_main_text_size"
             android:textColor="@color/dark_accent"
-            android:text="@{cardType.name()}"
+            android:text="@{CardUtils.getCardName(cardType)}"
             tools:text="Max"
             />
 

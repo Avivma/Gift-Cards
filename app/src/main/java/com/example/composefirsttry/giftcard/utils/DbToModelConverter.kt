@@ -3,7 +3,7 @@ package com.example.composefirsttry.giftcard.utils
 import com.example.composefirsttry.giftcard.logic.cards.db.entity.CardEntity
 import com.example.composefirsttry.giftcard.logic.cards.model.CardSecureFields
 import com.example.composefirsttry.giftcard.logic.cards.model.GiftCard
-import com.example.composefirsttry.giftcard.logic.cards.model.GiftCardType
+import com.example.composefirsttry.giftcard.logic.cards.model.GiftCardExtended
 import com.example.composefirsttry.giftcard.logic.stores.db.entity.StoreEntity
 import com.example.composefirsttry.giftcard.logic.stores.model.Store
 
@@ -25,9 +25,10 @@ object DbToModelConverter {
         favorite = store.favorite
     )
 
-    fun getGiftCard(cardEntityWithEncryptedFields: CardEntity, secureFields: CardSecureFields.Values): GiftCard {
-        return GiftCard(
-            type = GiftCardType.getCardType(cardEntityWithEncryptedFields.type),
+    fun getGiftCardExtended(cardEntityWithEncryptedFields: CardEntity, secureFields: CardSecureFields.Values): GiftCardExtended {
+        return GiftCardExtended(
+            id = cardEntityWithEncryptedFields.cardId,
+            type = CardUtils.getCardType(cardEntityWithEncryptedFields.type),
             name = cardEntityWithEncryptedFields.name,
             imageRes = cardEntityWithEncryptedFields.imageRes,
             discount = cardEntityWithEncryptedFields.discount
@@ -36,6 +37,16 @@ object DbToModelConverter {
             cvv = secureFields.cvv
             expirationDate = secureFields.expirationDate
         }
+    }
+
+    fun getGiftCard(cardEntityWithEncryptedFields: CardEntity): GiftCard {
+        return GiftCard(
+            id = cardEntityWithEncryptedFields.cardId,
+            type = CardUtils.getCardType(cardEntityWithEncryptedFields.type),
+            name = cardEntityWithEncryptedFields.name,
+            imageRes = cardEntityWithEncryptedFields.imageRes,
+            discount = cardEntityWithEncryptedFields.discount
+        )
     }
 
     fun getCardEntity(giftCard: GiftCard, secureFields: CardSecureFields.Keys): CardEntity {

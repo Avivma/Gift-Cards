@@ -32,6 +32,12 @@ class CardModel(
         GiftCardType.TAV_HAHAM -> tavHahamCards
     }
 
+    fun getDiscount(cardType: GiftCardType): Float = when (cardType) {
+        GiftCardType.MAX -> maxCards.maxOf { it.discount }
+        GiftCardType.ISRACARD -> isracardCards.maxOf { it.discount }
+        GiftCardType.TAV_HAHAM -> tavHahamCards.maxOf { it.discount }
+    }
+
     private fun getName(cards: List<GiftCard>): String {
         return when (cards.size) {
             0 -> "None"

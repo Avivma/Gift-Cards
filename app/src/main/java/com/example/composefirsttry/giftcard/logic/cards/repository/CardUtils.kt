@@ -8,7 +8,9 @@ import javax.inject.Singleton
 
 @Singleton
 class CardUtils @Inject constructor(private val sp: SharedPreferences) {
-    fun hasAnyCard(): Boolean = sp.getInt(SPKeys.GIFT_CARD_AMOUNT_CARDS_INSERTED, 0) > 0
+    fun hasAnyCard(): Boolean = (sp.getInt(SPKeys.GIFT_CARD_AMOUNT_MAX_CARDS, 0) +
+                sp.getInt(SPKeys.GIFT_CARD_AMOUNT_ISRACARD_CARDS, 0) +
+                sp.getInt(SPKeys.GIFT_CARD_AMOUNT_TAV_HAHAM_CARDS, 0)) > 0
 
     fun hasCard(cardType: GiftCardType): Boolean {
         return when (cardType) {

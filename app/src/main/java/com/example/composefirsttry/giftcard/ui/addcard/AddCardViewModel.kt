@@ -4,11 +4,13 @@ import androidx.lifecycle.*
 import androidx.lifecycle.Observer
 import com.example.composefirsttry.giftcard.logic.cards.model.CardFieldType
 import com.example.composefirsttry.giftcard.logic.cards.model.GiftCard
+import com.example.composefirsttry.giftcard.logic.cards.model.GiftCardExtended
 import com.example.composefirsttry.giftcard.logic.cards.model.GiftCardType
 import com.example.composefirsttry.giftcard.logic.cards.repository.CardsRepo
 import com.example.composefirsttry.giftcard.ui.addcard.states.AddCardIntention
 import com.example.composefirsttry.giftcard.ui.addcard.states.AddCardState
 import com.example.composefirsttry.giftcard.ui.addcard.utils.AddCardValidator
+import com.example.composefirsttry.giftcard.utils.CardUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -71,18 +73,19 @@ class AddCardViewModel @Inject constructor(
 
     private fun refresh() {
         if (argCard != null) {
-            editCard(argCard!!)
+            editCard(argCard!!.id)
         }
     }
 
-    private fun editCard(giftCard: GiftCard) {
+    private fun editCard(cardId: Int) {
+        val giftCardExtended: GiftCardExtended = cardsRepo.getCard(cardId)
         val fieldsValueMap: HashMap<CardFieldType, String> = hashMapOf()
-        fieldsValueMap[CardFieldType.Name] = giftCard.name
-        fieldsValueMap[CardFieldType.Discount] = giftCard.discount.toString()
-        fieldsValueMap[CardFieldType.Number] = giftCard.number
-        fieldsValueMap[CardFieldType.Cvv] = giftCard.cvv
-        fieldsValueMap[CardFieldType.ExpirationDate] = giftCard.expirationDate
-        cardType = giftCard.type
+        fieldsValueMap[CardFieldType.Name] = giftCardExtended.name
+        fieldsValueMap[CardFieldType.Discount] = giftCardExtended.discount.toString()
+        fieldsValueMap[CardFieldType.Number] = giftCardExtended.number
+        fieldsValueMap[CardFieldType.Cvv] = giftCardExtended.cvv
+        fieldsValueMap[CardFieldType.ExpirationDate] = giftCardExtended.expirationDate
+        cardType = giftCardExtended.type
         stateMutableLiveData.postValue(AddCardState.DisplayDataEditCard(fieldsValueMap, cardType!!))
     }
 
@@ -105,8 +108,9 @@ class AddCardViewModel @Inject constructor(
         validator.validateCardFields(getFieldsValue())
 
         if (validator.isCardDetailsOk() || (forceSave && validator.isCardDetailsPartialFailed())) {
-            val giftCard: GiftCard = collectGiftCard()
-            cardsRepo.addCard(giftCard)
+            val giftCardExtended: GiftCardExtended = collectGiftCardData()
+            if (argCard != null) cardsRepo.editCard(giftCardExtended.apply { id = argCard!!.id })
+            else cardsRepo.addCard(giftCardExtended)
             stateMutableLiveData.postValue(AddCardState.Navigation.NavigateBackToCardsScreen)
         } else {
             checkForCardDetailsErrors(validator)
@@ -122,11 +126,11 @@ class AddCardViewModel @Inject constructor(
         return fieldsValueMap
     }
 
-    private fun collectGiftCard(): GiftCard {
-        return GiftCard(
+    private fun collectGiftCardData(): GiftCardExtended {
+        return GiftCardExtended(
             type = cardType!!,
             name = fieldsMutableLiveDataMap.getValue(CardFieldType.Name).value!!,
-            imageRes = GiftCardType.getCardImage(cardType!!),
+            imageRes = CardUtils.getCardImage(cardType!!),
             discount = fieldsMutableLiveDataMap.getValue(CardFieldType.Discount).value!!.toFloat()
         ).apply {
             number = fieldsMutableLiveDataMap.getValue(CardFieldType.Number).value!!

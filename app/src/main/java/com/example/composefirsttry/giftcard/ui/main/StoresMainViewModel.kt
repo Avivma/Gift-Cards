@@ -6,13 +6,13 @@ import com.example.composefirsttry.L
 import com.example.composefirsttry.giftcard.logic.cards.db.entity.CardEntity
 import com.example.composefirsttry.giftcard.logic.cards.model.GiftCard
 import com.example.composefirsttry.giftcard.logic.cards.model.GiftCardType
-import com.example.composefirsttry.giftcard.logic.cards.repository.CardEncryptionHandler
 import com.example.composefirsttry.giftcard.logic.cards.repository.CardsRepo
 import com.example.composefirsttry.giftcard.logic.stores.model.Store
 import com.example.composefirsttry.giftcard.logic.stores.repository.StoresRepo
 import com.example.composefirsttry.giftcard.ui.main.cardutils.CardModel
 import com.example.composefirsttry.giftcard.ui.main.states.StoreMainState
 import com.example.composefirsttry.giftcard.ui.main.states.StoresMainIntention
+import com.example.composefirsttry.giftcard.utils.CardUtils
 import com.example.composefirsttry.giftcard.utils.DbToModelConverter
 import com.example.composefirsttry.utils.SPKeys
 import com.example.composefirsttry.utils.observeForeverFreshly
@@ -26,8 +26,7 @@ import javax.inject.Inject
 class StoresMainViewModel @Inject constructor (
     private val sp: SharedPreferences,
     private val storesRepo: StoresRepo,
-    private val cardsRepo: CardsRepo,
-    private val cardEncryptionHandler: CardEncryptionHandler
+    private val cardsRepo: CardsRepo
 ) : ViewModel() {
 
     var maxCardChecked: Boolean = sp.getBoolean(SPKeys.GIFT_CARD_MAX_CHECKBOX_STATE, true)
@@ -64,10 +63,7 @@ class StoresMainViewModel @Inject constructor (
         //attach viewModel's cards to db
         cardsLiveData = Transformations.map(cardsRepo.getAllCardsDb()) { cardsEntities ->
             fun transformEntitiesToGiftCards(entities: List<CardEntity>): List<GiftCard> {
-                return entities.map { cardEntity ->
-                    val values = cardEncryptionHandler.getDecryptedValues(cardEntity)
-                    DbToModelConverter.getGiftCard(cardEntity, values)
-                }
+                return entities.map { cardEntity -> DbToModelConverter.getGiftCard(cardEntity) }
             }
             fun fromGiftCardsToCardModel(giftCards: List<GiftCard>): CardModel {
                 val cardModel = CardModel()
@@ -110,7 +106,7 @@ class StoresMainViewModel @Inject constructor (
         viewModelScope.launch(Dispatchers.IO) {
             when (intention) {
                 is StoresMainIntention.FilterByPrefix -> filterByPrefix(intention.prefix)
-                is StoresMainIntention.FilterByCard -> filterByCard(intention.card, intention.isChecked)
+                is StoresMainIntention.FilterByCard -> filterByCard(intention.giftCardType, intention.isChecked)
                 is StoresMainIntention.Refresh -> {
                     stateMutableLiveData.postValue(StoreMainState.Waiting)
                     if (isFirstTimeDataFetched()) {
@@ -125,9 +121,15 @@ class StoresMainViewModel @Inject constructor (
                 is StoresMainIntention.OpenStoreDialog -> openStoreDialog(intention.store)
                 is StoresMainIntention.AddStoreToFavorites -> addStoreToFavorites(intention.store)
                 is StoresMainIntention.NavigateToCardsScreen -> navigateToCardsScreen(intention.giftCardType)
+                is StoresMainIntention.CheckCardDiscount -> checkCardDiscount(intention.giftCardType)
                 else -> L.e("Unfamiliar intention. Intention = ${intention.javaClass.simpleName}")
             }
         }
+    }
+
+    private fun checkCardDiscount(giftCardType: GiftCardType) {
+        val cards = getCardModel().getCards(giftCardType)
+        stateMutableLiveData.postValue(StoreMainState.DisplayToast(cards, cards.size == 1))
     }
 
     private fun navigateToCardsScreen(giftCardType: GiftCardType) {
@@ -191,13 +193,13 @@ class StoresMainViewModel @Inject constructor (
         stateMutableLiveData.postValue(StoreMainState.DisplayData(getCardModel(), getFilteredStores()))
     }
 
-    private fun filterByCard(card: GiftCard, isChecked: Boolean) {
-        L.i("filterByCard: card= ${card.name}, isChecked= $isChecked")
-        sp.edit().putBoolean(getCardSp(card), isChecked).commit()
-        when (card) {
-            GiftCard.MAX -> maxCardChecked = isChecked
-            GiftCard.CORPORATE -> corporateCardChecked = isChecked
-            GiftCard.HOT -> hotCardChecked = isChecked
+    private fun filterByCard(giftCardType: GiftCardType, isChecked: Boolean) {
+        L.i("filterByCard: card= ${CardUtils.getCardName(giftCardType)}, isChecked= $isChecked")
+        sp.edit().putBoolean(getCardSp(giftCardType), isChecked).commit()
+        when (giftCardType) {
+            GiftCardType.MAX -> maxCardChecked = isChecked
+            GiftCardType.ISRACARD -> corporateCardChecked = isChecked
+            GiftCardType.TAV_HAHAM -> hotCardChecked = isChecked
         }
 
         stateMutableLiveData.postValue(StoreMainState.DisplayData(getCardModel(), getFilteredStores()))
@@ -225,11 +227,11 @@ class StoresMainViewModel @Inject constructor (
         return acceptablePrefixes.any { storeName.startsWith(it) }
     }
 
-    private fun getCardSp(card: GiftCard): String = when (card) {
-            GiftCard.MAX -> SPKeys.GIFT_CARD_MAX_CHECKBOX_STATE
-            GiftCard.CORPORATE -> SPKeys.GIFT_CARD_CORPORATE_CHECKBOX_STATE
-            GiftCard.HOT -> SPKeys.GIFT_CARD_HOT_CHECKBOX_STATE
-            else -> throw Exception("Unfamiliar GiftCard type!! (${card.name})")
+    private fun getCardSp(giftCardType: GiftCardType): String = when (giftCardType) {
+            GiftCardType.MAX -> SPKeys.GIFT_CARD_MAX_CHECKBOX_STATE
+            GiftCardType.ISRACARD -> SPKeys.GIFT_CARD_CORPORATE_CHECKBOX_STATE
+            GiftCardType.TAV_HAHAM -> SPKeys.GIFT_CARD_HOT_CHECKBOX_STATE
+            else -> throw Exception("Unfamiliar GiftCard type!! (${CardUtils.getCardName(giftCardType)})")
     }
 
     private fun getStores(): List<Store> = storesLiveData.value ?: emptyList()

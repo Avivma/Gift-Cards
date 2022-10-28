@@ -2,10 +2,14 @@ package com.example.composefirsttry.giftcard.logic.cards.db.entity
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.PrimaryKey
 import com.example.composefirsttry.giftcard.logic.cards.db.entity.CardEntity.Companion.TABLE_NAME
 
-@Entity(tableName = TABLE_NAME, primaryKeys = ["type","name"])
+@Entity(tableName = TABLE_NAME)
 data class CardEntity constructor(
+    @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = "id")
+    var cardId: Int = 0,
     @ColumnInfo(name = "type")
     var type: Int,
     @ColumnInfo(name = "name")

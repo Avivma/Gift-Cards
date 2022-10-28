@@ -19,7 +19,6 @@ import com.example.composefirsttry.R
 import com.example.composefirsttry.databinding.FragmentGiftCardStoresMainBinding
 import com.example.composefirsttry.databinding.GiftCardWithFrameLayoutBinding
 import com.example.composefirsttry.giftcard.GiftCardMainActivity
-import com.example.composefirsttry.giftcard.logic.cards.model.CardTypeWrapper
 import com.example.composefirsttry.giftcard.logic.cards.model.GiftCard
 import com.example.composefirsttry.giftcard.logic.cards.model.GiftCardType
 import com.example.composefirsttry.giftcard.logic.cards.repository.CardUtils
@@ -29,8 +28,6 @@ import com.example.composefirsttry.utils.bindChecked
 import com.example.composefirsttry.utils.requireActivity
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
-
-
 @AndroidEntryPoint
 class GiftCardStoresMainFragment : Fragment() {
     private val viewModel: StoresMainViewModel by viewModels()
@@ -131,13 +128,16 @@ class GiftCardStoresMainFragment : Fragment() {
                     .show()
 
             }
+            is StoreMainState.DisplayToast -> {
+                Toast.makeText(requireContext(), cardToastMessage(state.cards, state.singleCard), Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
     private fun navigate(navigationIntention: StoreMainState.Navigation) {
         when (navigationIntention) {
             is StoreMainState.Navigation.NavigateToCardsScreen -> {
-                val direction = GiftCardStoresMainFragmentDirections.actionGiftCardsMainFragmentToCardsFragment(CardTypeWrapper(navigationIntention.giftCardType))
+                val direction = GiftCardStoresMainFragmentDirections.actionGiftCardsMainFragmentToCardsFragment(navigationIntention.giftCardType)
                 requireActivity<GiftCardMainActivity>().getNavController().navigate(direction)
             }
             else -> {
@@ -152,9 +152,9 @@ class GiftCardStoresMainFragment : Fragment() {
     }
 
     private fun setListeners() {
-        setCheckBoxListener(binding.maxCheckBox, GiftCard.MAX)
-        setCheckBoxListener(binding.corporateCheckBox, GiftCard.CORPORATE)
-        setCheckBoxListener(binding.hotCheckBox, GiftCard.HOT)
+        setCheckBoxListener(binding.maxCheckBox, GiftCardType.MAX)
+        setCheckBoxListener(binding.corporateCheckBox, GiftCardType.ISRACARD)
+        setCheckBoxListener(binding.hotCheckBox, GiftCardType.TAV_HAHAM)
         binding.storesSelection.setOnClickListener { viewModel.action(StoresMainIntention.FilterBySelectedStores) }
         binding.storesClearSelection.setOnClickListener { viewModel.action(StoresMainIntention.ClearStoresSelection) }
         binding.separationSearchMarkButton.setOnClickListener { //I use this way (not MVI) because, there is a problem with the livedata 2-way databinding. Updating this "searchTextMutableLiveData" doesn't reflect on the UI
@@ -163,26 +163,33 @@ class GiftCardStoresMainFragment : Fragment() {
         }
     }
 
-    private fun setCheckBoxListener(checkBoxLayout: GiftCardWithFrameLayoutBinding, giftCard: GiftCard) {
+    private fun setCheckBoxListener(checkBoxLayout: GiftCardWithFrameLayoutBinding, giftCardType: GiftCardType) {
         checkBoxLayout.checkBox.setOnClickListener { view ->
             if (view is CheckedTextView) {
                 view.toggle()
                 bindChecked(checkBoxLayout.checkBox, view.isChecked)
                 bindChecked(checkBoxLayout.checkBoxCross, view.isChecked)
-                viewModel.action(StoresMainIntention.FilterByCard(giftCard, view.isChecked))
+                viewModel.action(StoresMainIntention.FilterByCard(giftCardType, view.isChecked))
             }
         }
 
         checkBoxLayout.checkBox.setOnLongClickListener {
-            Toast.makeText(requireContext(), cardToastMessage(giftCard), Toast.LENGTH_SHORT).show()
+            viewModel.action(StoresMainIntention.CheckCardDiscount(giftCardType))
             true
         }
     }
 
-    private fun cardToastMessage(giftCard: GiftCard) =
-        "${giftCard.name} card has ${giftCard.discount.toString().removeSuffix(".0")}% discount"
+    private fun cardToastMessage(giftCards: List<GiftCard>, singleCard: Boolean) =
+        if (singleCard) {
+            val giftCard = giftCards[0]
+            "${giftCard.name} card has ${giftCard.discount.toString().removeSuffix(".0")}% discount"
+        } else {
+            "${giftCards.size} Cards' discount: ${giftCards.joinToString { "${it.discount.toString().removeSuffix(".0")}%" }}"
+        }
 
 //    fun refresh() {
 //        viewModel.action(StoresMainIntention.Refresh)
 //    }
 }
+
+

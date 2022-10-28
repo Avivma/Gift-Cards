@@ -4,7 +4,7 @@ import android.content.SharedPreferences
 import com.example.composefirsttry.di.EncryptedSp
 import com.example.composefirsttry.giftcard.logic.cards.db.entity.CardEntity
 import com.example.composefirsttry.giftcard.logic.cards.model.CardSecureFields
-import com.example.composefirsttry.giftcard.logic.cards.model.GiftCard
+import com.example.composefirsttry.giftcard.logic.cards.model.GiftCardExtended
 import javax.inject.Inject
 import javax.inject.Singleton
 @Singleton
@@ -19,7 +19,7 @@ class CardEncryptionHandler @Inject constructor(
         )
     }
 
-    fun getEncryptedKeys(giftCard: GiftCard): CardSecureFields.Keys {
+    fun getEncryptedKeys(giftCard: GiftCardExtended): CardSecureFields.Keys {
         return CardSecureFields.Keys(
             number = createSpKey("number", giftCard.number),
             cvv = createSpKey("cvv", giftCard.cvv),

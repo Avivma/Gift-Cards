@@ -13,7 +13,6 @@ import com.example.composefirsttry.L
 import com.example.composefirsttry.R
 import com.example.composefirsttry.databinding.FragmentFavoritesBinding
 import com.example.composefirsttry.giftcard.GiftCardMainActivity
-import com.example.composefirsttry.giftcard.logic.cards.model.CardTypeWrapper
 import com.example.composefirsttry.giftcard.logic.cards.repository.CardUtils
 import com.example.composefirsttry.giftcard.ui.favorites.states.FavoritesIntention
 import com.example.composefirsttry.giftcard.ui.favorites.states.FavoritesState
@@ -95,7 +94,7 @@ class FavoritesFragment : Fragment() {
     private fun navigate(navigationIntention: FavoritesState.Navigation) {
         when (navigationIntention) {
             is FavoritesState.Navigation.NavigateToCardsScreen -> {
-                val direction = FavoritesFragmentDirections.actionFavoritesFragmentToCardsFragment(CardTypeWrapper(navigationIntention.giftCardType))
+                val direction = FavoritesFragmentDirections.actionFavoritesFragmentToCardsFragment(navigationIntention.giftCardType)
                 requireActivity<GiftCardMainActivity>().getNavController().navigate(direction)
             }
             else -> {

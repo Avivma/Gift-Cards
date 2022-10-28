@@ -4,60 +4,26 @@ import androidx.annotation.DrawableRes
 import java.io.Serializable
 
 open class GiftCard(
-    val type: GiftCardType,
-    val name: String,
-    @DrawableRes val imageRes: Int,
-    var discount: Float,
+    open var id: Int = -1,
+    open val type: GiftCardType,
+    open val name: String,
+    @DrawableRes open val imageRes: Int,
+    open var discount: Float
+): Serializable
+
+class GiftCardExtended(
+    override var id: Int = -1,
+    override val type: GiftCardType,
+    override val name: String,
+    @DrawableRes override val imageRes: Int,
+    override var discount: Float,
     var longName: String = "",
     var number: String = "",
     var cvv: String = "",
     var expirationDate: String = "",
-    var operator: String = ""
-): Serializable {
-    object MAX : GiftCard(
-        GiftCardType.MAX,
-        MAX_CARD_NAME,
-        imageRes = GiftCardType.getCardImage(GiftCardType.MAX),
-        16.5f,
-        "Gift Card MAX executive",
-        "1111-1111-1111-111",
-        "999",
-        "01/26",
-        "MASTERCARD"
-    )
+    var operator: String = "") : GiftCard(id, type, name, imageRes, discount)
 
-    object CORPORATE : GiftCard(
-        GiftCardType.ISRACARD,
-        CORPORATE_CARD_NAME,
-        imageRes = GiftCardType.getCardImage(GiftCardType.ISRACARD),
-        19f,
-        "GiftCard ישראכרט",
-        "2222-2222-2222-222",
-        "888",
-        "10/25",
-        "ישראכרט"
-    )
-
-    object HOT : GiftCard(
-        GiftCardType.TAV_HAHAM,
-        HOT_CARD_NAME,
-        imageRes = GiftCardType.getCardImage(GiftCardType.TAV_HAHAM),
-        15f,
-        "הוט התו החכם",
-        "3333-3333-3333-333",
-        "777",
-        "12/24",
-        "MASTERCARD"
-    )
-
-    private companion object {
-        const val MAX_CARD_NAME = "Max"
-        const val CORPORATE_CARD_NAME = "Corporate"
-        const val HOT_CARD_NAME = "Hot"
-    }
-}
-
-
+// card id
 // card image
 // card name
 // card discount
