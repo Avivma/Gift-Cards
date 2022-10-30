@@ -6,9 +6,12 @@ sealed class CardsState {
     data class DisplayData(val giftCards: List<GiftCard>, val showClearAll: Boolean) : CardsState()
     data class RemoveCardDialogOpened(val giftCard: GiftCard) : CardsState()
 
-    sealed class Navigation: CardsState() {
-        data class NavigateToEditCard(val card: GiftCard): CardsState.Navigation()
-        object NavigateToAddCard: CardsState.Navigation()
-        object NavigateToLandingScreen: CardsState.Navigation()
+    sealed class Navigation : CardsState() {
+        data class NavigateToEditCard(val card: GiftCard) : CardsState.Navigation()
+        object NavigateToAddCard : CardsState.Navigation()
+        object NavigateToLandingScreen : CardsState.Navigation()
+        data class NavigateOutsideToMax(val applicationId: String) : CardsState.Navigation()
+        data class NavigateOutsideToIsracard(val siteAddress: String) : CardsState.Navigation()
+        data class NavigateOutsideToTavHaham(val applicationId: String) : CardsState.Navigation()
     }
 }

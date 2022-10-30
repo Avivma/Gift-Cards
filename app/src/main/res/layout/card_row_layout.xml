@@ -26,8 +26,27 @@
             android:layout_height="140dp"
             tools:src="@drawable/max"
             android:scaleType="fitXY"
-            android:background="@drawable/store_frame"
+            android:padding="4dp"
+            android:elevation="8dp"
+            android:background="@color/cards_card_frame_color"
             app:loadImage="@{card.imageRes}"
+            />
+
+        <ImageButton
+            android:id="@+id/load_money"
+            android:layout_width="50dp"
+            android:layout_height="0dp"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintTop_toTopOf="@+id/image"
+            app:layout_constraintBottom_toTopOf="@id/edit"
+            app:layout_constraintStart_toEndOf="@id/image"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:paddingStart="6dp"
+            android:paddingEnd="14dp"
+            android:src="@drawable/ic_load_money"
+            android:background="@color/transparent"
+            android:scaleType="fitXY"
             />
 
         <ImageButton
@@ -35,7 +54,7 @@
             android:layout_width="50dp"
             android:layout_height="0dp"
             app:layout_constraintDimensionRatio="1:1"
-            app:layout_constraintTop_toTopOf="@+id/image"
+            app:layout_constraintTop_toBottomOf="@+id/load_money"
             app:layout_constraintBottom_toTopOf="@id/remove"
             app:layout_constraintStart_toEndOf="@id/image"
             android:padding="10dp"

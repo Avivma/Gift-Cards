@@ -64,8 +64,17 @@ class CardsViewModel @Inject constructor(
                 CardsIntention.ClearAll -> clearAll()
                 CardsIntention.Refresh -> refreshData()
                 is CardsIntention.NavigateToEditCard -> stateMutableLiveData.postValue(CardsState.Navigation.NavigateToEditCard(intention.card))
+                is CardsIntention.NavigateOutsideToLoadMoney -> navigateOutsideToLoadMoney(intention.card)
                 else -> L.e("Unfamiliar CardsIntention (${intention.javaClass.simpleName})")
             }
+        }
+    }
+
+    private fun navigateOutsideToLoadMoney(card: GiftCard) {
+        when (card.type) {
+            GiftCardType.MAX -> stateMutableLiveData.postValue(CardsState.Navigation.NavigateOutsideToMax("com.ideomobile.leumicard"))
+            GiftCardType.ISRACARD -> stateMutableLiveData.postValue(CardsState.Navigation.NavigateOutsideToIsracard("https://service.isracard.co.il/isracard/externals?reqName=GiftCardCharging_934"))
+            GiftCardType.TAV_HAHAM -> stateMutableLiveData.postValue(CardsState.Navigation.NavigateOutsideToTavHaham("com.hot.benefits"))
         }
     }
 

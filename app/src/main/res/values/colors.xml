@@ -33,6 +33,7 @@
     <color name="search_frame_color">@color/colorSecondary</color>
     <color name="store_cards_frame_color">@color/light_accent</color>
     <color name="store_solid_color">@color/light_accent_transparent</color>
+    <color name="cards_card_frame_color">@color/top_background_color</color>
 
 <!--    <color name="temp">#9965C2</color>-->
 

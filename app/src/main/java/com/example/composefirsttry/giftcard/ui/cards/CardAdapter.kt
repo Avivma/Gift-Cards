@@ -70,6 +70,9 @@ class CardAdapter(giftCards: List<GiftCard>): RecyclerView.Adapter<RecyclerView.
             binding.remove.setOnClickListener {
                 mutableIntentionsListener.postValue(CardsIntention.OpenRemoveCardDialog(card))
             }
+            binding.loadMoney.setOnClickListener {
+                mutableIntentionsListener.postValue(CardsIntention.NavigateOutsideToLoadMoney(card))
+            }
         }
     }
     inner class CardHolderFooter(binding: CardRowFooterLayoutBinding): RecyclerView.ViewHolder(binding.root)

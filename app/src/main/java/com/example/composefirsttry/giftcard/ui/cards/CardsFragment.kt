@@ -1,6 +1,8 @@
 package com.example.composefirsttry.giftcard.ui.cards
 
 import android.app.AlertDialog
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -83,10 +85,31 @@ class CardsFragment : Fragment() {
                 val direction = CardsFragmentDirections.actionCardsFragmentToLandingFragment()
                 requireActivity<GiftCardMainActivity>().getNavController().navigate(direction)
             }
+            is CardsState.Navigation.NavigateOutsideToMax -> launchApplication(navigationIntention.applicationId)
+            is CardsState.Navigation.NavigateOutsideToIsracard -> launchSite(navigationIntention.siteAddress)
+            is CardsState.Navigation.NavigateOutsideToTavHaham -> launchApplication(navigationIntention.applicationId)
             else -> {
                 L.e("Unfamiliar navigation (intention: ${navigationIntention.javaClass.simpleName})")
             }
         }
+    }
+
+    private fun launchApplication(applicationId: String) {
+        var launchIntent = requireContext().packageManager.getLaunchIntentForPackage(applicationId)
+        L.i("launchMaxApplication: launchIntent = ${if (launchIntent != null) "valid" else "null"}")
+        if (launchIntent == null) {
+            launchIntent = Intent(Intent.ACTION_VIEW)
+            launchIntent.data = Uri.parse("market://details?id=$applicationId")
+        }
+        launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        requireContext().startActivity(launchIntent)
+    }
+
+    private fun launchSite(siteAddress: String) {
+        val launchIntent = Intent(Intent.ACTION_VIEW, Uri.parse(siteAddress))
+        L.i("launchMaxApplication: launchIntent = ${"valid"}")
+        launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        requireContext().startActivity(launchIntent)
     }
 
     private fun render(state: CardsState) {

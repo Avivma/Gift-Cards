@@ -9,6 +9,7 @@ sealed class CardsIntention {
     object ClearAll : CardsIntention()
     object Refresh : CardsIntention()
     data class NavigateToEditCard(val card: GiftCard) : CardsIntention()
+    data class NavigateOutsideToLoadMoney(val card: GiftCard) : CardsIntention()
 
     sealed class NavigatedType : CardsState() {
         object ShowAll : NavigatedType()
