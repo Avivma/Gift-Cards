@@ -4,7 +4,6 @@ import androidx.lifecycle.*
 import com.example.composefirsttry.L
 import com.example.composefirsttry.giftcard.logic.cards.model.GiftCard
 import com.example.composefirsttry.giftcard.logic.cards.model.GiftCardType
-import com.example.composefirsttry.giftcard.logic.cards.repository.CardEncryptionHandler
 import com.example.composefirsttry.giftcard.logic.cards.repository.CardsRepo
 import com.example.composefirsttry.giftcard.ui.cards.states.CardsIntention
 import com.example.composefirsttry.giftcard.ui.cards.states.CardsState
@@ -18,7 +17,6 @@ import javax.inject.Inject
 @HiltViewModel
 class CardsViewModel @Inject constructor(
     private val cardsRepo: CardsRepo,
-    private val cardEncryptionHandler: CardEncryptionHandler
 ) : ViewModel() {
 
     private var stateMutableLiveData = MutableLiveData<CardsState>()
@@ -26,19 +24,13 @@ class CardsViewModel @Inject constructor(
     private lateinit var cardsLiveData: LiveData<List<GiftCard>>
     private lateinit var cardsLiveDataObserver: Observer<List<GiftCard>>
 
-    private var argCardType: GiftCardType? = null
+    private var navigationEventType: CardsIntention.NavigatedType = CardsIntention.NavigatedType.ShowAll
 
     init {
         initListeners()
     }
 
     private fun initListeners() {
-/*        cardsRepo.getCardsExistLiveData.observe(viewLifecycleOwner, Observer { hasCards ->
-            if (!hasCards) {
-                val direction = CardsFragmentDirections.actionCardsFragmentToLandingFragment()
-                requireActivity<GiftCardMainActivity>().getNavController().navigate(direction)
-            }
-        })*/
         //attach viewModel's cards to db
         cardsLiveData = Transformations.map(cardsRepo.getAllCardsDb()) { cardsEntities ->
             cardsEntities.map { cardEntity -> DbToModelConverter.getGiftCard(cardEntity) }
@@ -79,23 +71,27 @@ class CardsViewModel @Inject constructor(
 
     private fun refreshData() {
         if (receiveCardClickEvent()) { //display only the selected card
-            val cards = getAllCards().filter { it.type == argCardType!! }
+            val cards = getAllCards().filter { it.type == (navigationEventType as CardsIntention.NavigatedType.SingleCard).argCardType }
             stateMutableLiveData.postValue(CardsState.DisplayData(cards, showClearAll = true))
         } else { //regular
             stateMutableLiveData.postValue(CardsState.DisplayData(getAllCards(), showClearAll = false))
         }
     }
 
-    private fun receiveCardClickEvent(): Boolean = argCardType != null
+    private fun receiveCardClickEvent(): Boolean = when (navigationEventType) {
+        CardsIntention.NavigatedType.ShowAll -> false
+        is CardsIntention.NavigatedType.SingleCard -> true
+    }
 
     private fun shouldShowClearAll(): Boolean = receiveCardClickEvent()
 
     fun setArgCardType(argCardType: GiftCardType?) {
-        this.argCardType = argCardType
+        if (argCardType == null) this.navigationEventType = CardsIntention.NavigatedType.ShowAll
+        else this.navigationEventType = CardsIntention.NavigatedType.SingleCard(argCardType = argCardType)
     }
 
     private fun clearAll() {
-        argCardType = null
+        navigationEventType = CardsIntention.NavigatedType.ShowAll
         stateMutableLiveData.postValue(CardsState.DisplayData(getAllCards(), showClearAll = false))
     }
 
