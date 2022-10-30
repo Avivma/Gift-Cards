@@ -33,9 +33,6 @@ class StoresMainViewModel @Inject constructor (
     var corporateCardChecked: Boolean = sp.getBoolean(SPKeys.GIFT_CARD_CORPORATE_CHECKBOX_STATE, true)
     var hotCardChecked: Boolean = sp.getBoolean(SPKeys.GIFT_CARD_HOT_CHECKBOX_STATE, true)
 
-    val searchTextMutableLiveData: MutableLiveData<String> = MutableLiveData<String>("")
-    private lateinit var searchTextMutableLiveDataObserver: Observer<String>
-
     private lateinit var storesLiveData: LiveData<List<Store>>
     private lateinit var storesLiveDataObserver: Observer<List<Store>>
 
@@ -77,15 +74,10 @@ class StoresMainViewModel @Inject constructor (
         cardsLiveDataObserver = cardsLiveData.observeForeverFreshly(Observer { ignore ->
             sendFreshData()
         })
-
-        searchTextMutableLiveDataObserver = searchTextMutableLiveData.observeForeverFreshly(Observer { textFilter ->
-            action(StoresMainIntention.FilterByPrefix(textFilter))
-        })
     }
 
     override fun onCleared() {
         super.onCleared()
-        searchTextMutableLiveData.removeObserver(searchTextMutableLiveDataObserver)
         storesLiveData.removeObserver(storesLiveDataObserver)
         cardsLiveData.removeObserver(cardsLiveDataObserver)
     }
@@ -107,24 +99,36 @@ class StoresMainViewModel @Inject constructor (
             when (intention) {
                 is StoresMainIntention.FilterByPrefix -> filterByPrefix(intention.prefix)
                 is StoresMainIntention.FilterByCard -> filterByCard(intention.giftCardType, intention.isChecked)
-                is StoresMainIntention.Refresh -> {
+                StoresMainIntention.ClearSearchBox -> clearSearchBox()
+                StoresMainIntention.Refresh -> {
                     stateMutableLiveData.postValue(StoreMainState.Waiting)
                     if (isFirstTimeDataFetched()) {
                         storesRepo.refresh()
                     } else {
-                        stateMutableLiveData.postValue(StoreMainState.DisplayData(getCardModel(), getFilteredStores()))
+                        filterByPrefix(searchTextValue_static)
                     }
                 }
-                is StoresMainIntention.FilterBySelectedStores -> filterBySelectedStores()
-                is StoresMainIntention.ClearStoresSelection -> clearStoresSelection()
+                StoresMainIntention.FilterBySelectedStores -> filterBySelectedStores()
+                StoresMainIntention.ClearStoresSelection -> clearStoresSelection()
                 is StoresMainIntention.SelectStore -> storeSelected(intention.store)
                 is StoresMainIntention.OpenStoreDialog -> openStoreDialog(intention.store)
                 is StoresMainIntention.AddStoreToFavorites -> addStoreToFavorites(intention.store)
                 is StoresMainIntention.NavigateToCardsScreen -> navigateToCardsScreen(intention.giftCardType)
                 is StoresMainIntention.CheckCardDiscount -> checkCardDiscount(intention.giftCardType)
+                StoresMainIntention.AddSeparationMarkToSearch -> addSeparationMarkToSearch()
                 else -> L.e("Unfamiliar intention. Intention = ${intention.javaClass.simpleName}")
             }
         }
+    }
+
+    private fun addSeparationMarkToSearch() {
+        searchTextValue_static += " || " //separation mark = "||"
+        stateMutableLiveData.postValue(StoreMainState.SearchBoxTextChanged(searchTextValue_static, searchTextValue_static.length))
+    }
+
+    private fun clearSearchBox() {
+        searchTextValue_static = ""
+        stateMutableLiveData.postValue(StoreMainState.SearchBoxTextChanged("", 0))
     }
 
     private fun checkCardDiscount(giftCardType: GiftCardType) {
@@ -185,7 +189,7 @@ class StoresMainViewModel @Inject constructor (
         storesHasBeenSelected = selectionState
     }
 
-    private fun getFilteredStores(): List<Store> = getStores().filter { store -> shouldStoreBeDisplayed(store, searchTextMutableLiveData.value!!) }
+    private fun getFilteredStores(): List<Store> = getStores().filter { store -> shouldStoreBeDisplayed(store, searchTextValue_static) }
 
     private fun filterBySelectedStores() {
         L.i("filterBySelectedStores")
@@ -206,8 +210,9 @@ class StoresMainViewModel @Inject constructor (
     }
 
     private fun filterByPrefix(prefix: String) {
-        val filteredStored: List<Store> = getStores().filter { store -> shouldStoreBeDisplayed(store, prefix) }
-        stateMutableLiveData.postValue(StoreMainState.DisplayData(getCardModel(), filteredStored))
+        searchTextValue_static = prefix
+        val filteredStores: List<Store> = getStores().filter { store -> shouldStoreBeDisplayed(store, prefix) }
+        stateMutableLiveData.postValue(StoreMainState.DisplayData(getCardModel(), filteredStores, searchIconVisible = prefix.isEmpty()))
     }
 
     private fun shouldStoreBeDisplayed(store: Store, prefix: String): Boolean {
@@ -242,6 +247,7 @@ class StoresMainViewModel @Inject constructor (
 
     companion object {
         private var firstTimeFetchData: AtomicBoolean = AtomicBoolean(true)
+        var searchTextValue_static: String = ""
 
         private const val INVISIBLE = 0
         private const val VISIBLE = 1

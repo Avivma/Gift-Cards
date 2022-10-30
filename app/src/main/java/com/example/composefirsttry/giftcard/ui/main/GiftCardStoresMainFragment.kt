@@ -3,6 +3,8 @@ package com.example.composefirsttry.giftcard.ui.main
 import android.app.AlertDialog
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,7 +17,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.composefirsttry.L
-import com.example.composefirsttry.R
 import com.example.composefirsttry.databinding.FragmentGiftCardStoresMainBinding
 import com.example.composefirsttry.databinding.GiftCardWithFrameLayoutBinding
 import com.example.composefirsttry.giftcard.GiftCardMainActivity
@@ -28,6 +29,8 @@ import com.example.composefirsttry.utils.bindChecked
 import com.example.composefirsttry.utils.requireActivity
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+
+
 @AndroidEntryPoint
 class GiftCardStoresMainFragment : Fragment() {
     private val viewModel: StoresMainViewModel by viewModels()
@@ -45,7 +48,7 @@ class GiftCardStoresMainFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_gift_card_stores_main, container, false)!!
+        binding = DataBindingUtil.inflate(inflater, com.example.composefirsttry.R.layout.fragment_gift_card_stores_main, container, false)!!
 
     /*  //just for reminder
         viewModel = ViewModelProvider(this, StoresMainViewModelFactory(viewLifecycleOwner))
@@ -58,6 +61,7 @@ class GiftCardStoresMainFragment : Fragment() {
 
         L.i("Checkboxes state BEFORE attach model: binding.maxCheckBox= ${binding.maxCheckBox.checkBoxCross.visibility == View.VISIBLE}, binding.corporateCheckBox= ${binding.corporateCheckBox.checkBoxCross.visibility == View.VISIBLE}, binding.hotCheckBox= ${binding.hotCheckBox.checkBoxCross.visibility == View.VISIBLE}")
         binding.model = viewModel
+        binding.searchIconVisible = true
         L.i("Checkboxes state AFTER attach model: binding.maxCheckBox= ${binding.maxCheckBox.checkBoxCross.visibility == View.VISIBLE}, binding.corporateCheckBox= ${binding.corporateCheckBox.checkBoxCross.visibility == View.VISIBLE}, binding.hotCheckBox= ${binding.hotCheckBox.checkBoxCross.visibility == View.VISIBLE}")
 
         handleOnBackPressed()
@@ -112,6 +116,11 @@ class GiftCardStoresMainFragment : Fragment() {
                 binding.maxCheckBox.cardNameLayoutWithFrame = state.cardModel.getName(GiftCardType.MAX)
                 binding.corporateCheckBox.cardNameLayoutWithFrame = state.cardModel.getName(GiftCardType.ISRACARD)
                 binding.hotCheckBox.cardNameLayoutWithFrame = state.cardModel.getName(GiftCardType.TAV_HAHAM)
+                binding.searchIconVisible = state.searchIconVisible
+            }
+            is StoreMainState.SearchBoxTextChanged -> {
+                binding.searchStore.setText(state.searchText)
+                binding.searchStore.setSelection(state.cursorPosition)
             }
             is StoreMainState.StoreSelected -> {
                 L.i("StoreMainState.StoreSelected")
@@ -121,10 +130,10 @@ class GiftCardStoresMainFragment : Fragment() {
             }
             is StoreMainState.StoreDialogOpened -> {
                 AlertDialog.Builder(requireActivity())
-                    .setTitle(R.string.store_dialog_title)
-                    .setMessage(resources.getString(R.string.store_dialog_add_message, state.store.storeName))
-                    .setNeutralButton(R.string.store_dialog_add_button_text) { _, _ -> viewModel.action(StoresMainIntention.AddStoreToFavorites(state.store)) }
-                    .setNegativeButton(R.string.store_dialog_cancel_button_text) { dialog, _ -> dialog.dismiss() }
+                    .setTitle(com.example.composefirsttry.R.string.store_dialog_title)
+                    .setMessage(resources.getString(com.example.composefirsttry.R.string.store_dialog_add_message, state.store.storeName))
+                    .setNeutralButton(com.example.composefirsttry.R.string.store_dialog_add_button_text) { _, _ -> viewModel.action(StoresMainIntention.AddStoreToFavorites(state.store)) }
+                    .setNegativeButton(com.example.composefirsttry.R.string.store_dialog_cancel_button_text) { dialog, _ -> dialog.dismiss() }
                     .show()
 
             }
@@ -157,10 +166,16 @@ class GiftCardStoresMainFragment : Fragment() {
         setCheckBoxListener(binding.hotCheckBox, GiftCardType.TAV_HAHAM)
         binding.storesSelection.setOnClickListener { viewModel.action(StoresMainIntention.FilterBySelectedStores) }
         binding.storesClearSelection.setOnClickListener { viewModel.action(StoresMainIntention.ClearStoresSelection) }
-        binding.separationSearchMarkButton.setOnClickListener { //I use this way (not MVI) because, there is a problem with the livedata 2-way databinding. Updating this "searchTextMutableLiveData" doesn't reflect on the UI
-            binding.searchStore.setText("${binding.searchStore.text} || ")
-            binding.searchStore.setSelection(binding.searchStore.length())
-        }
+        binding.separationSearchMarkButton.setOnClickListener { viewModel.action(StoresMainIntention.AddSeparationMarkToSearch) }
+        binding.clearTextIcon.setOnClickListener { viewModel.action(StoresMainIntention.ClearSearchBox) }
+        binding.searchStore.addTextChangedListener(object : TextWatcher {
+            //I use this way (not MVI) because, there is a problem with the livedata 2-way databinding. Updating this "searchTextMutableLiveData" doesn't reflect on the UI
+            override fun afterTextChanged(text: Editable) {
+                viewModel.action(StoresMainIntention.FilterByPrefix(text.toString()))
+            }
+            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
+        })
     }
 
     private fun setCheckBoxListener(checkBoxLayout: GiftCardWithFrameLayoutBinding, giftCardType: GiftCardType) {
