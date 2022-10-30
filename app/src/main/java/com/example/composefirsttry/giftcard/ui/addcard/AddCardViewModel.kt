@@ -33,7 +33,7 @@ class AddCardViewModel @Inject constructor(
 
     private val fieldsMutableLiveDataMap: HashMap<CardFieldType, MutableLiveData<String>> = hashMapOf()
 
-    private var argCard: GiftCard? = null // TODO: 24/10/2022 change to event
+    private var navigatedEvent: AddCardIntention.NavigatedType = AddCardIntention.NavigatedType.AddCard
 
     var cardType: GiftCardType? = null
 
@@ -47,9 +47,16 @@ class AddCardViewModel @Inject constructor(
         fieldsMutableLiveDataMap[CardFieldType.ExpirationDate] = expirationDateMutableLiveData
     }
 
-    fun setArgCard(card: GiftCard?) {
-        this.argCard = card
+    fun setArgs(card: GiftCard?, fragmentId: Int) {
+        navigatedEvent = when {
+            !hasReceivedCardInput(card) -> AddCardIntention.NavigatedType.AddCard
+            fragmentId == AddCardFragment.CARDS_SCREEN -> AddCardIntention.NavigatedType.EditCardFromCards(card!!)
+            fragmentId == AddCardFragment.CARD_DETAILS_SCREEN -> AddCardIntention.NavigatedType.EditCardFromCardDetails(card!!)
+            else -> throw Exception("Unfamiliar use case (fragmentId = $fragmentId)")
+        }
     }
+
+    private fun hasReceivedCardInput(card: GiftCard?) = card != null
 
     //NOTE: Use this way, because LiveData stores events and triggers them once new LifecycleOwner is observe to them.
     // ViewModel doesn't create new Livedata on backpress, but the fragment has new LifecycleOwner - this cause UX bug.
@@ -72,8 +79,9 @@ class AddCardViewModel @Inject constructor(
     }
 
     private fun refresh() {
-        if (argCard != null) {
-            editCard(argCard!!.id)
+        when (val event = navigatedEvent) {
+            is AddCardIntention.NavigatedType.EditCardFromCards -> editCard(event.card.id)
+            is AddCardIntention.NavigatedType.EditCardFromCardDetails -> editCard(event.card.id)
         }
     }
 
@@ -109,9 +117,20 @@ class AddCardViewModel @Inject constructor(
 
         if (validator.isCardDetailsOk() || (forceSave && validator.isCardDetailsPartialFailed())) {
             val giftCardExtended: GiftCardExtended = collectGiftCardData()
-            if (argCard != null) cardsRepo.editCard(giftCardExtended.apply { id = argCard!!.id })
-            else cardsRepo.addCard(giftCardExtended)
-            stateMutableLiveData.postValue(AddCardState.Navigation.NavigateBackToCardsScreen)
+            when(val event = navigatedEvent) {
+                AddCardIntention.NavigatedType.AddCard -> {
+                    cardsRepo.addCard(giftCardExtended)
+                    stateMutableLiveData.postValue(AddCardState.Navigation.NavigateBackToCardsScreen)
+                }
+                is AddCardIntention.NavigatedType.EditCardFromCards -> {
+                    cardsRepo.editCard(giftCardExtended.apply { id = event.card.id })
+                    stateMutableLiveData.postValue(AddCardState.Navigation.NavigateBackToCardsScreen)
+                }
+                is AddCardIntention.NavigatedType.EditCardFromCardDetails -> {
+                    cardsRepo.editCard(giftCardExtended.apply { id = event.card.id })
+                    stateMutableLiveData.postValue(AddCardState.Navigation.NavigateBackToCardDetails(giftCardExtended))
+                }
+            }
         } else {
             checkForCardDetailsErrors(validator)
         }

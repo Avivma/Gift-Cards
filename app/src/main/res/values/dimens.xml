@@ -16,4 +16,6 @@
     <dimen name="card_details_table_row_padding_horizontal">18dp</dimen>
     <dimen name="card_details_table_row_padding_vertical">8dp</dimen>
     <dimen name="card_details_table_text_size">18sp</dimen>
+    <dimen name="card_details_label_text_size">12sp</dimen>
+    <dimen name="card_details_value_text_size">20sp</dimen>
 </resources>

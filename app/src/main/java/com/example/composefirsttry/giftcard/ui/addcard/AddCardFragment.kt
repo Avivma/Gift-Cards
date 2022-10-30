@@ -42,7 +42,8 @@ class AddCardFragment : Fragment() {
     private fun sendArgsToViewModel() {
         val args = arguments?.get("card")
         if (args != null) {
-            viewModel.setArgCard(args as GiftCard)
+            val fragmentId: Int = arguments?.get("fragmentId") as Int
+            viewModel.setArgs(args as GiftCard, fragmentId)
             arguments?.clear()
         }
     }
@@ -86,8 +87,12 @@ class AddCardFragment : Fragment() {
 
     private fun navigate(navigationIntention: AddCardState.Navigation) {
         when (navigationIntention) {
-            is AddCardState.Navigation.NavigateBackToCardsScreen -> {
+            AddCardState.Navigation.NavigateBackToCardsScreen -> {
                 val direction = AddCardFragmentDirections.actionAddCardFragmentToCardsFragment()
+                requireActivity<GiftCardMainActivity>().getNavController().navigate(direction)
+            }
+            is AddCardState.Navigation.NavigateBackToCardDetails -> {
+                val direction = AddCardFragmentDirections.actionAddCardFragmentToCardDetailsFragment(navigationIntention.card)
                 requireActivity<GiftCardMainActivity>().getNavController().navigate(direction)
             }
             else -> {
@@ -168,6 +173,12 @@ class AddCardFragment : Fragment() {
     }
 
     private fun getAllCards(): List<GiftCardType> = listOf(GiftCardType.MAX, GiftCardType.ISRACARD, GiftCardType.TAV_HAHAM)
+
+    companion object {
+        // TODO: 31/10/2022 move to some utils location
+        const val CARDS_SCREEN = 1
+        const val CARD_DETAILS_SCREEN = 2
+    }
 }
 
 

@@ -9,10 +9,11 @@ sealed class CardsIntention {
     object ClearAll : CardsIntention()
     object Refresh : CardsIntention()
     data class NavigateToEditCard(val card: GiftCard) : CardsIntention()
+    data class NavigateToCardDetails(val card: GiftCard) : CardsIntention()
     data class NavigateOutsideToLoadMoney(val card: GiftCard) : CardsIntention()
 
-    sealed class NavigatedType : CardsState() {
+    sealed class NavigatedType : CardsIntention() {
         object ShowAll : NavigatedType()
-        data class SingleCard(val argCardType: GiftCardType) : NavigatedType()
+        data class SingleCardType(val argCardType: GiftCardType) : NavigatedType()
     }
 }

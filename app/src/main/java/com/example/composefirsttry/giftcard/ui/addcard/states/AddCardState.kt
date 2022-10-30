@@ -2,6 +2,7 @@ package com.example.composefirsttry.giftcard.ui.addcard.states
 
 import com.example.composefirsttry.giftcard.logic.cards.model.CardFieldStatus
 import com.example.composefirsttry.giftcard.logic.cards.model.CardFieldType
+import com.example.composefirsttry.giftcard.logic.cards.model.GiftCardExtended
 import com.example.composefirsttry.giftcard.logic.cards.model.GiftCardType
 import java.util.*
 
@@ -22,6 +23,7 @@ sealed class AddCardState {
     object CardsDialogOpened : AddCardState()
 
     sealed class Navigation : AddCardState() {
+        data class NavigateBackToCardDetails(val card: GiftCardExtended) : Navigation()
         object NavigateBackToCardsScreen : AddCardState.Navigation()
     }
 }

@@ -3,7 +3,6 @@ package com.example.composefirsttry.giftcard.logic.cards.repository
 import android.content.SharedPreferences
 import androidx.annotation.WorkerThread
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import com.example.composefirsttry.di.EncryptedSp
 import com.example.composefirsttry.giftcard.logic.GiftCardDatabase
 import com.example.composefirsttry.giftcard.logic.cards.db.dao.CardsDao
@@ -20,39 +19,12 @@ class CardsRepo @Inject constructor(
     db: GiftCardDatabase,
     private val sp: SharedPreferences,
     @EncryptedSp private val encryptedSP: SharedPreferences,
-    private val encryptionHandler: CardEncryptionHandler,
-    private val cardUtils: CardUtils
+    private val encryptionHandler: CardEncryptionHandler
 ) {
     private val cardsDao: CardsDao = db.cardsDao()
     private val allCards: LiveData<List<CardEntity>> = cardsDao.getAll()
 
     fun getAllCardsDb(): LiveData<List<CardEntity>> = allCards
-
-    private val cardsExistMutableLiveData = MutableLiveData<Boolean>()
-    val getCardsExistLiveData: LiveData<Boolean> = cardsExistMutableLiveData
-
-//    @WorkerThread
-//    fun getAllCardsPlainDataOnly(): List<CardEntity> = allCards.value!!
-
-/*    @WorkerThread
-    fun addCard(card: CardEntity) {
-        cardsDao.insert(card)
-    }
-
-    @WorkerThread
-    fun editCard(card: CardEntity) {
-        addCard(card) //perform "update" in case of conflict: OnConflictStrategy.REPLACE
-    }
-
-    @WorkerThread
-    fun removeCard(card: CardEntity) {
-        cardsDao.remove(card)
-    }
-
-    @WorkerThread
-    fun getCard(cardKey: CardDbKey): CardEntity {
-        return cardsDao.getCardDetails(cardKey.type.value, cardKey.name)
-    }*/
 
     @WorkerThread
     fun addCard(giftCard: GiftCardExtended) {
@@ -120,7 +92,6 @@ class CardsRepo @Inject constructor(
     private fun updateCardsAmount(cardType: GiftCardType, addition: Int) {
         val (cardSpKey, specificCardAmount) = updateSpecificCardsAmount(cardType, addition)
         sp.edit().putInt(cardSpKey, specificCardAmount).commit()
-        cardsExistMutableLiveData.postValue(cardUtils.hasAnyCard())
     }
 
     private fun updateSpecificCardsAmount(type: GiftCardType, addition: Int): Pair<String, Int> {

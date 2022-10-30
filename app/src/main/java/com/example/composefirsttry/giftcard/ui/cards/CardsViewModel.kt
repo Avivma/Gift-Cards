@@ -7,6 +7,7 @@ import com.example.composefirsttry.giftcard.logic.cards.model.GiftCardType
 import com.example.composefirsttry.giftcard.logic.cards.repository.CardsRepo
 import com.example.composefirsttry.giftcard.ui.cards.states.CardsIntention
 import com.example.composefirsttry.giftcard.ui.cards.states.CardsState
+import com.example.composefirsttry.giftcard.ui.utils.NavigateOutsideHandler
 import com.example.composefirsttry.giftcard.utils.DbToModelConverter
 import com.example.composefirsttry.utils.observeForeverFreshly
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -24,7 +25,7 @@ class CardsViewModel @Inject constructor(
     private lateinit var cardsLiveData: LiveData<List<GiftCard>>
     private lateinit var cardsLiveDataObserver: Observer<List<GiftCard>>
 
-    private var navigationEventType: CardsIntention.NavigatedType = CardsIntention.NavigatedType.ShowAll
+    private var navigatedEvent: CardsIntention.NavigatedType = CardsIntention.NavigatedType.ShowAll
 
     init {
         initListeners()
@@ -64,6 +65,7 @@ class CardsViewModel @Inject constructor(
                 CardsIntention.ClearAll -> clearAll()
                 CardsIntention.Refresh -> refreshData()
                 is CardsIntention.NavigateToEditCard -> stateMutableLiveData.postValue(CardsState.Navigation.NavigateToEditCard(intention.card))
+                is CardsIntention.NavigateToCardDetails -> stateMutableLiveData.postValue(CardsState.Navigation.NavigateToCardDetails(intention.card))
                 is CardsIntention.NavigateOutsideToLoadMoney -> navigateOutsideToLoadMoney(intention.card)
                 else -> L.e("Unfamiliar CardsIntention (${intention.javaClass.simpleName})")
             }
@@ -72,35 +74,34 @@ class CardsViewModel @Inject constructor(
 
     private fun navigateOutsideToLoadMoney(card: GiftCard) {
         when (card.type) {
-            GiftCardType.MAX -> stateMutableLiveData.postValue(CardsState.Navigation.NavigateOutsideToMax("com.ideomobile.leumicard"))
-            GiftCardType.ISRACARD -> stateMutableLiveData.postValue(CardsState.Navigation.NavigateOutsideToIsracard("https://service.isracard.co.il/isracard/externals?reqName=GiftCardCharging_934"))
-            GiftCardType.TAV_HAHAM -> stateMutableLiveData.postValue(CardsState.Navigation.NavigateOutsideToTavHaham("com.hot.benefits"))
+            GiftCardType.MAX -> stateMutableLiveData.postValue(CardsState.Navigation.NavigateOutsideToMax(NavigateOutsideHandler.MAX_APPLICATION_ID))
+            GiftCardType.ISRACARD -> stateMutableLiveData.postValue(CardsState.Navigation.NavigateOutsideToIsracard(NavigateOutsideHandler.ISRACARD_SITE_ADDRESS))
+            GiftCardType.TAV_HAHAM -> stateMutableLiveData.postValue(CardsState.Navigation.NavigateOutsideToTavHaham(NavigateOutsideHandler.TAV_HAHAM_APPLICATION_ID))
         }
     }
 
     private fun refreshData() {
-        if (receiveCardClickEvent()) { //display only the selected card
-            val cards = getAllCards().filter { it.type == (navigationEventType as CardsIntention.NavigatedType.SingleCard).argCardType }
-            stateMutableLiveData.postValue(CardsState.DisplayData(cards, showClearAll = true))
-        } else { //regular
-            stateMutableLiveData.postValue(CardsState.DisplayData(getAllCards(), showClearAll = false))
+        when (val event = navigatedEvent) {
+            is CardsIntention.NavigatedType.SingleCardType -> {
+                val cards = getAllCards().filter { it.type == event.argCardType }
+                stateMutableLiveData.postValue(CardsState.DisplayData(cards, showClearAll = true))
+            }
+            CardsIntention.NavigatedType.ShowAll -> stateMutableLiveData.postValue(CardsState.DisplayData(getAllCards(), showClearAll = false))
         }
     }
 
-    private fun receiveCardClickEvent(): Boolean = when (navigationEventType) {
+    private fun shouldShowClearAll(): Boolean = when (navigatedEvent) {
         CardsIntention.NavigatedType.ShowAll -> false
-        is CardsIntention.NavigatedType.SingleCard -> true
+        is CardsIntention.NavigatedType.SingleCardType -> true
     }
 
-    private fun shouldShowClearAll(): Boolean = receiveCardClickEvent()
-
     fun setArgCardType(argCardType: GiftCardType?) {
-        if (argCardType == null) this.navigationEventType = CardsIntention.NavigatedType.ShowAll
-        else this.navigationEventType = CardsIntention.NavigatedType.SingleCard(argCardType = argCardType)
+        if (argCardType == null) this.navigatedEvent = CardsIntention.NavigatedType.ShowAll
+        else this.navigatedEvent = CardsIntention.NavigatedType.SingleCardType(argCardType = argCardType)
     }
 
     private fun clearAll() {
-        navigationEventType = CardsIntention.NavigatedType.ShowAll
+        navigatedEvent = CardsIntention.NavigatedType.ShowAll
         stateMutableLiveData.postValue(CardsState.DisplayData(getAllCards(), showClearAll = false))
     }
 

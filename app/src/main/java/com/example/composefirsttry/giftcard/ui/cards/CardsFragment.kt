@@ -1,8 +1,5 @@
 package com.example.composefirsttry.giftcard.ui.cards
 
-import android.app.AlertDialog
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,22 +8,27 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.composefirsttry.L
-import com.example.composefirsttry.R
 import com.example.composefirsttry.databinding.CardsFragmentBinding
 import com.example.composefirsttry.giftcard.GiftCardMainActivity
 import com.example.composefirsttry.giftcard.logic.cards.model.GiftCard
 import com.example.composefirsttry.giftcard.logic.cards.model.GiftCardType
+import com.example.composefirsttry.giftcard.ui.addcard.AddCardFragment
 import com.example.composefirsttry.giftcard.ui.cards.states.CardsIntention
 import com.example.composefirsttry.giftcard.ui.cards.states.CardsState
+import com.example.composefirsttry.giftcard.ui.utils.NavigateOutsideHandler
+import com.example.composefirsttry.giftcard.ui.utils.UiUtils
 import com.example.composefirsttry.utils.requireActivity
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class CardsFragment : Fragment() {
     private val viewModel: CardsViewModel by viewModels()
-
     private lateinit var binding: CardsFragmentBinding
     private lateinit var adapter: CardAdapter
+
+    @Inject
+    lateinit var navigateOutsideHandler: NavigateOutsideHandler
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -74,7 +76,7 @@ class CardsFragment : Fragment() {
     private fun navigate(navigationIntention: CardsState.Navigation) {
         when (navigationIntention) {
             is CardsState.Navigation.NavigateToEditCard -> {
-                val direction = CardsFragmentDirections.actionCardsFragmentToAddCardFragment(navigationIntention.card)
+                val direction = CardsFragmentDirections.actionCardsFragmentToAddCardFragment(navigationIntention.card, AddCardFragment.CARDS_SCREEN)
                 requireActivity<GiftCardMainActivity>().getNavController().navigate(direction)
             }
             is CardsState.Navigation.NavigateToAddCard -> {
@@ -85,31 +87,17 @@ class CardsFragment : Fragment() {
                 val direction = CardsFragmentDirections.actionCardsFragmentToLandingFragment()
                 requireActivity<GiftCardMainActivity>().getNavController().navigate(direction)
             }
-            is CardsState.Navigation.NavigateOutsideToMax -> launchApplication(navigationIntention.applicationId)
-            is CardsState.Navigation.NavigateOutsideToIsracard -> launchSite(navigationIntention.siteAddress)
-            is CardsState.Navigation.NavigateOutsideToTavHaham -> launchApplication(navigationIntention.applicationId)
+            is CardsState.Navigation.NavigateToCardDetails -> {
+                val direction = CardsFragmentDirections.actionCardsFragmentToCardDetailsFragment(navigationIntention.card)
+                requireActivity<GiftCardMainActivity>().getNavController().navigate(direction)
+            }
+            is CardsState.Navigation.NavigateOutsideToMax -> navigateOutsideHandler.launchApplication(navigationIntention.applicationId)
+            is CardsState.Navigation.NavigateOutsideToIsracard -> navigateOutsideHandler.launchSite(navigationIntention.siteAddress)
+            is CardsState.Navigation.NavigateOutsideToTavHaham -> navigateOutsideHandler.launchApplication(navigationIntention.applicationId)
             else -> {
                 L.e("Unfamiliar navigation (intention: ${navigationIntention.javaClass.simpleName})")
             }
         }
-    }
-
-    private fun launchApplication(applicationId: String) {
-        var launchIntent = requireContext().packageManager.getLaunchIntentForPackage(applicationId)
-        L.i("launchMaxApplication: launchIntent = ${if (launchIntent != null) "valid" else "null"}")
-        if (launchIntent == null) {
-            launchIntent = Intent(Intent.ACTION_VIEW)
-            launchIntent.data = Uri.parse("market://details?id=$applicationId")
-        }
-        launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        requireContext().startActivity(launchIntent)
-    }
-
-    private fun launchSite(siteAddress: String) {
-        val launchIntent = Intent(Intent.ACTION_VIEW, Uri.parse(siteAddress))
-        L.i("launchMaxApplication: launchIntent = ${"valid"}")
-        launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        requireContext().startActivity(launchIntent)
     }
 
     private fun render(state: CardsState) {
@@ -126,10 +114,8 @@ class CardsFragment : Fragment() {
     }
 
     private fun openRemoveCardDialog(card: GiftCard) {
-        AlertDialog.Builder(requireActivity())
-            .setTitle(R.string.cards_remove_card_dialog_title)
-            .setNeutralButton(R.string.cards_dialog_remove_button_text) { _, _ -> viewModel.action(CardsIntention.RemoveCard(card)) }
-            .setNegativeButton(R.string.cards_dialog_cancel_button_text) { dialog, _ -> dialog.dismiss() }
+        UiUtils.getRemoveCardDialog(requireActivity()) { _, _ ->
+            viewModel.action(CardsIntention.RemoveCard(card)) }
             .show()
     }
 

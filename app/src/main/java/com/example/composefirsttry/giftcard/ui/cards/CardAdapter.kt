@@ -73,6 +73,9 @@ class CardAdapter(giftCards: List<GiftCard>): RecyclerView.Adapter<RecyclerView.
             binding.loadMoney.setOnClickListener {
                 mutableIntentionsListener.postValue(CardsIntention.NavigateOutsideToLoadMoney(card))
             }
+            binding.image.setOnClickListener {
+                mutableIntentionsListener.postValue(CardsIntention.NavigateToCardDetails(card))
+            }
         }
     }
     inner class CardHolderFooter(binding: CardRowFooterLayoutBinding): RecyclerView.ViewHolder(binding.root)

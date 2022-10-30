@@ -10,6 +10,7 @@ sealed class CardsState {
         data class NavigateToEditCard(val card: GiftCard) : CardsState.Navigation()
         object NavigateToAddCard : CardsState.Navigation()
         object NavigateToLandingScreen : CardsState.Navigation()
+        data class NavigateToCardDetails(val card: GiftCard) : Navigation()
         data class NavigateOutsideToMax(val applicationId: String) : CardsState.Navigation()
         data class NavigateOutsideToIsracard(val siteAddress: String) : CardsState.Navigation()
         data class NavigateOutsideToTavHaham(val applicationId: String) : CardsState.Navigation()
