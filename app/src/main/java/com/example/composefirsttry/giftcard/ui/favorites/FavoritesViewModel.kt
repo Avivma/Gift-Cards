@@ -3,6 +3,7 @@ package com.example.composefirsttry.giftcard.ui.favorites
 import androidx.lifecycle.*
 import com.example.composefirsttry.L
 import com.example.composefirsttry.giftcard.logic.cards.model.GiftCardType
+import com.example.composefirsttry.giftcard.logic.cards.repository.CardUtils
 import com.example.composefirsttry.giftcard.logic.stores.model.Store
 import com.example.composefirsttry.giftcard.logic.stores.repository.StoresRepo
 import com.example.composefirsttry.giftcard.ui.favorites.states.FavoritesIntention
@@ -16,7 +17,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class FavoritesViewModel @Inject constructor (
-    private val storesRepo: StoresRepo
+    private val storesRepo: StoresRepo,
+    private val cardUtils: CardUtils
 ) : ViewModel() {
 
     private var stateMutableLiveData = MutableLiveData<FavoritesState>()
@@ -95,7 +97,14 @@ class FavoritesViewModel @Inject constructor (
         stateMutableLiveData.postValue(FavoritesState.DisplayData(getStores()))
     }
 
-    private fun getStores(): List<Store> = storesLiveData.value?.filter { it.favorite } ?: emptyList()
+    private fun getStores(): List<Store> = storesLiveData.value?.filter { shouldStoreBeDisplayed(it) } ?: emptyList()
+
+    private fun shouldStoreBeDisplayed(store: Store): Boolean {
+        return ((cardUtils.hasCard(GiftCardType.MAX) && store.maxCard) ||
+            (cardUtils.hasCard(GiftCardType.ISRACARD) && store.corporateCard) ||
+            (cardUtils.hasCard(GiftCardType.TAV_HAHAM) && store.hotCard)) &&
+                store.favorite
+    }
 
     companion object {
         val CLASS_NAME: String = FavoritesViewModel::class.java.simpleName
