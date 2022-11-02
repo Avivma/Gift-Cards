@@ -1,14 +1,19 @@
 package com.example.composefirsttry.utils
 
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.Observer
+import androidx.lifecycle.*
 
 
 fun <T> Fragment.requireActivity() = requireActivity() as T
 fun <K> Fragment.getApplication() = requireActivity().application as K
 
+fun <T> LiveData<T>.toMutableLiveData(): MutableLiveData<T> {
+    val mediatorLiveData = MediatorLiveData<T>()
+    mediatorLiveData.addSource(this) {
+        mediatorLiveData.value = it
+    }
+    return mediatorLiveData
+}
 
 //try to fix sending last data before observing. Helpful link: https://stackoverflow.com/questions/49832787/livedata-prevent-receive-the-last-value-when-start-observing
 fun <T> LiveData<T>.observeFreshly(owner: LifecycleOwner, observer: Observer<in T>): Observer<T> {

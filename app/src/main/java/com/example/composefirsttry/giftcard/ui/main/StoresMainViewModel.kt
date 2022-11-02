@@ -8,10 +8,12 @@ import com.example.composefirsttry.giftcard.logic.cards.model.GiftCard
 import com.example.composefirsttry.giftcard.logic.cards.model.GiftCardType
 import com.example.composefirsttry.giftcard.logic.cards.repository.CardsRepo
 import com.example.composefirsttry.giftcard.logic.stores.model.Store
+import com.example.composefirsttry.giftcard.logic.stores.repository.StoresConsiderCardsRepo
 import com.example.composefirsttry.giftcard.logic.stores.repository.StoresRepo
 import com.example.composefirsttry.giftcard.ui.main.cardutils.CardModel
 import com.example.composefirsttry.giftcard.ui.main.states.StoreMainState
 import com.example.composefirsttry.giftcard.ui.main.states.StoresMainIntention
+import com.example.composefirsttry.giftcard.ui.utils.SelectedStoresCacheHandler
 import com.example.composefirsttry.giftcard.utils.CardUtils
 import com.example.composefirsttry.giftcard.utils.DbToModelConverter
 import com.example.composefirsttry.utils.SPKeys
@@ -26,6 +28,7 @@ import javax.inject.Inject
 class StoresMainViewModel @Inject constructor (
     private val sp: SharedPreferences,
     private val storesRepo: StoresRepo,
+    private val storesConsiderCardsRepo: StoresConsiderCardsRepo,
     private val cardsRepo: CardsRepo
 ) : ViewModel() {
 
@@ -41,15 +44,19 @@ class StoresMainViewModel @Inject constructor (
     private lateinit var cardsLiveData: LiveData<CardModel>
     private lateinit var cardsLiveDataObserver: Observer<CardModel>
 
+    private var storesCacheHandler = SelectedStoresCacheHandler()
+
     init {
         initListeners()
     }
 
     private fun initListeners() {
         //attach viewModel's stores to db
-        storesLiveData = Transformations.map(storesRepo.getAllStoresDb()) { storesEntities ->
+        storesLiveData = Transformations.map(storesConsiderCardsRepo.getAllStoresCache()) { storesEntities ->
             storesEntities.map { storeEntity ->
-                DbToModelConverter.fromEntityToStore(storeEntity)
+                val store = DbToModelConverter.fromEntityToStore(storeEntity)
+                storesCacheHandler.updateStoreWithCacheProperties(store)
+                store
             }
         }
         //notify when changes happens
@@ -149,51 +156,33 @@ class StoresMainViewModel @Inject constructor (
     }
 
     private fun clearStoresSelection() {
-        L.i("clearStoresSelection: storesHasBeenSelected= $storesHasBeenSelected")
-        if (storesHasBeenSelected == ACTIVE) { //deactivate
-            setStoresSelection(VISIBLE)
+        L.i("clearStoresSelection: storesHasBeenSelected= ${storesCacheHandler.storesHasBeenSelected}")
+        storesCacheHandler.clearStoresSelection()
+        if (storesCacheHandler.storesHasBeenSelected == SelectedStoresCacheHandler.VISIBLE) //deactivate
             stateMutableLiveData.postValue(StoreMainState.DisplayData(getCardModel(), getFilteredStores()))
-        } else { //make invisible
-            getStores().forEach { it.selected = false }
-            setStoresSelection(INVISIBLE)
+        else { //make invisible
+            getStores().forEach { storesCacheHandler.updateStoreWithCacheProperties(it) }
             stateMutableLiveData.postValue(StoreMainState.DisplayData(getCardModel(), getFilteredStores(), hideStoreSelectionFilter = true))
         }
     }
 
     private fun storeSelected(store: Store) {
         store.selected = getStoreNewState(store)
+        storesCacheHandler.updateCache(store)
 
-        when {
-            storesHasBeenSelected == INVISIBLE -> {
-                setStoresSelection(VISIBLE)
-                stateMutableLiveData.postValue(StoreMainState.StoreSelected(store, true))
-            }
-            getStores().any { it.selected } -> {
-                stateMutableLiveData.postValue(StoreMainState.StoreSelected(store, true))
-            }
-            storesHasBeenSelected == VISIBLE -> {
-                setStoresSelection(INVISIBLE)
-                stateMutableLiveData.postValue(StoreMainState.StoreSelected(store, false))
-            }
-            storesHasBeenSelected == ACTIVE -> {
-                setStoresSelection(INVISIBLE)
-                stateMutableLiveData.postValue(StoreMainState.DisplayData(getCardModel(), getFilteredStores(), hideStoreSelectionFilter = true))
-            }
+        when (storesCacheHandler.storesHasBeenSelected) {
+            SelectedStoresCacheHandler.VISIBLE, SelectedStoresCacheHandler.ACTIVE -> stateMutableLiveData.postValue(StoreMainState.StoreSelected(store, true))
+            SelectedStoresCacheHandler.INVISIBLE -> stateMutableLiveData.postValue(StoreMainState.DisplayData(getCardModel(), getFilteredStores(), hideStoreSelectionFilter = true))
         }
     }
 
     private fun getStoreNewState(store: Store): Boolean = !store.selected //get reverse store selection state
 
-    private fun setStoresSelection(selectionState: Int) {
-        L.i("setStoreSelection: selectionState= $selectionState")
-        storesHasBeenSelected = selectionState
-    }
-
     private fun getFilteredStores(): List<Store> = getStores().filter { store -> shouldStoreBeDisplayed(store, searchTextValue_static) }
 
     private fun filterBySelectedStores() {
         L.i("filterBySelectedStores")
-        setStoresSelection(ACTIVE)
+        storesCacheHandler.setStoresSelection(SelectedStoresCacheHandler.ACTIVE)
         stateMutableLiveData.postValue(StoreMainState.DisplayData(getCardModel(), getFilteredStores()))
     }
 
@@ -216,11 +205,10 @@ class StoresMainViewModel @Inject constructor (
     }
 
     private fun shouldStoreBeDisplayed(store: Store, prefix: String): Boolean {
-        val cardModel = getCardModel()
-        return if ((cardModel.hasCard(GiftCardType.MAX) && store.maxCard && maxCardChecked) ||
-            (cardModel.hasCard(GiftCardType.ISRACARD) && store.corporateCard && corporateCardChecked) ||
-            (cardModel.hasCard(GiftCardType.TAV_HAHAM) && store.hotCard && hotCardChecked)) {
-            (store.selected || storesHasBeenSelected != ACTIVE) //equivalent to: storesHasBeenSelected == ACTIVE -> store.selected
+        return if ((store.maxCard && maxCardChecked) ||
+            (store.corporateCard && corporateCardChecked) ||
+            (store.hotCard && hotCardChecked)) {
+            (storesCacheHandler.hasStoreIncludedInCache(store))
                     && doesStoreNameStartWithPrefix(store.storeName.lowercase(), prefix.lowercase())
         } else {
             false
@@ -248,12 +236,6 @@ class StoresMainViewModel @Inject constructor (
     companion object {
         private var firstTimeFetchData: AtomicBoolean = AtomicBoolean(true)
         var searchTextValue_static: String = ""
-
-        private const val INVISIBLE = 0
-        private const val VISIBLE = 1
-        private const val ACTIVE = 2
-
-        private var storesHasBeenSelected: Int = INVISIBLE
     }
 }
 
