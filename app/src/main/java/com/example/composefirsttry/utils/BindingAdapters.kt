@@ -7,12 +7,6 @@ import android.widget.TextView
 import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
 import androidx.databinding.BindingAdapter
-import com.example.composefirsttry.preferencescreens.widget.TriCheckBox
-
-@BindingAdapter("bindState")
-fun bindState(triCheckBox: TriCheckBox, state: Int) {
-    triCheckBox.setState(state)
-}
 
 @BindingAdapter("bindChecked")
 fun bindChecked(view: View, checked: Boolean) {

@@ -12,7 +12,7 @@ object SheetsUsingUrl {
     private const val API_KEY = "AIzaSyAcBl6JGeYybR4b_MlgwmEJWHR2TvNcO8o"
     private const val SHEET_ID = "1dHRbVnxrptTIfj66pqANw-2IRNAFH79VpquZtgQLrng"
     private const val SHEET_NAME = "Stores"
-    private const val RANGE_VALUES = "A2:D124"
+    private const val RANGE_VALUES = "A2:D500"
     private const val RANGE = "$SHEET_NAME!$RANGE_VALUES"
 
     //More info: https://proandroiddev.com/utilising-google-sheets-as-a-realtime-database-for-an-android-application-c56c1a56da2f

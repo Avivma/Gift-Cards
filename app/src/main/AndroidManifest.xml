@@ -20,11 +20,6 @@
             android:label="@string/app_name"
             android:theme="@style/Theme.ComposeFirstTry.NoActionBar"/>
         <activity
-            android:name=".preferencescreens.PreferenceActivity"
-            android:exported="false"
-            android:label="@string/title_activity_preference"
-            android:theme="@style/Theme.ComposeFirstTry.NoActionBar" />
-        <activity
             android:name=".MainActivity"
             android:exported="true"
             android:label="@string/app_name"
