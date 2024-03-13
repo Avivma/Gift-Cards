@@ -61,4 +61,8 @@
     <string name="cards_remove_card_dialog_title">Remove Card</string>
     <string name="cards_dialog_cancel_button_text">@string/cancel</string>
     <string name="cards_dialog_remove_button_text">@string/remove</string>
+    <string name="initializing_text">Initializing…</string>
+    <string name="initializing_dialog_title">Server Data Changed</string>
+    <string name="initializing_dialog_text">Current data isn\'t accurate due to server\'s data has changed. Please initialize the app</string>
+    <string name="initializing_dialog_button">Initialize</string>
 </resources>

@@ -124,6 +124,27 @@
             app:popUpToInclusive="true" />
     </fragment>
 
+    <fragment
+        android:id="@+id/initializeFragment"
+        android:name="com.example.composefirsttry.giftcard.ui.initializing.InitializeFragment"
+        android:label="InitializeFragment"
+        tools:layout="@layout/initialize_fragment">
+        <action
+            android:id="@+id/action_initializeFragment_to_giftCardsMainFragment"
+            app:destination="@id/giftCardsMainFragment"
+            app:popUpTo="@id/giftCardsMainFragment"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_initializeFragment_to_landingFragment"
+            app:destination="@id/landingFragment"
+            app:popUpTo="@id/landingFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+    <action
+        android:id="@+id/go_to_initializeFragment"
+        app:destination="@id/initializeFragment"
+        app:popUpTo="@id/initializeFragment"
+        app:popUpToInclusive="true" />
     <action
         android:id="@+id/go_to_mainFragment"
         app:destination="@id/giftCardsMainFragment"

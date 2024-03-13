@@ -15,8 +15,10 @@ sealed class StoreMainState(
     data class StoreSelected(val store: Store, val storeSelectionFilterVisible: Boolean): StoreMainState()
     data class StoreDialogOpened(val store: Store) : StoreMainState()
     data class DisplayToast(val cards: List<GiftCard>, val singleCard: Boolean) : StoreMainState()
+    object DisplayForceInitializeDialog: StoreMainState()
 
     sealed class Navigation: StoreMainState() {
         data class NavigateToCardsScreen(val giftCardType: GiftCardType): StoreMainState.Navigation()
+        object NavigateToInitializeScreen: StoreMainState.Navigation()
     }
 }

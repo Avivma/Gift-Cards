@@ -21,4 +21,5 @@ sealed class StoresMainIntention {
 
     data class CheckCardDiscount(val giftCardType: GiftCardType) : StoresMainIntention()
     object Refresh: StoresMainIntention()
+    object Initialize : StoresMainIntention()
 }

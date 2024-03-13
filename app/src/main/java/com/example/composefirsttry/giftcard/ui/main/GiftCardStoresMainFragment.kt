@@ -140,6 +140,17 @@ class GiftCardStoresMainFragment : Fragment() {
             is StoreMainState.DisplayToast -> {
                 Toast.makeText(requireContext(), cardToastMessage(state.cards, state.singleCard), Toast.LENGTH_SHORT).show()
             }
+            is StoreMainState.DisplayForceInitializeDialog -> {
+                AlertDialog.Builder(requireActivity())
+                    .setTitle(com.example.composefirsttry.R.string.initializing_dialog_title)
+                    .setMessage(com.example.composefirsttry.R.string.initializing_dialog_text)
+                    .setPositiveButton(com.example.composefirsttry.R.string.initializing_dialog_button) { dialog, _ ->
+                        viewModel.action(StoresMainIntention.Initialize)
+                        dialog.dismiss()
+                    }
+                    .setCancelable(false)
+                    .show()
+            }
         }
     }
 
@@ -147,6 +158,10 @@ class GiftCardStoresMainFragment : Fragment() {
         when (navigationIntention) {
             is StoreMainState.Navigation.NavigateToCardsScreen -> {
                 val direction = GiftCardStoresMainFragmentDirections.actionGiftCardsMainFragmentToCardsFragment(navigationIntention.giftCardType)
+                requireActivity<GiftCardMainActivity>().getNavController().navigate(direction)
+            }
+            StoreMainState.Navigation.NavigateToInitializeScreen -> {
+                val direction = GiftCardStoresMainFragmentDirections.goToInitializeFragment()
                 requireActivity<GiftCardMainActivity>().getNavController().navigate(direction)
             }
             else -> {

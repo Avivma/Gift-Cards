@@ -7,6 +7,7 @@ import com.example.composefirsttry.giftcard.logic.cards.db.entity.CardEntity
 import com.example.composefirsttry.giftcard.logic.cards.model.GiftCard
 import com.example.composefirsttry.giftcard.logic.cards.model.GiftCardType
 import com.example.composefirsttry.giftcard.logic.cards.repository.CardsRepo
+import com.example.composefirsttry.giftcard.logic.cardsmetadata.repository.MetadataCardsRepo
 import com.example.composefirsttry.giftcard.logic.stores.model.Store
 import com.example.composefirsttry.giftcard.logic.stores.repository.StoresConsiderCardsRepo
 import com.example.composefirsttry.giftcard.logic.stores.repository.StoresRepo
@@ -29,7 +30,8 @@ class StoresMainViewModel @Inject constructor (
     private val sp: SharedPreferences,
     private val storesRepo: StoresRepo,
     private val storesConsiderCardsRepo: StoresConsiderCardsRepo,
-    private val cardsRepo: CardsRepo
+    private val cardsRepo: CardsRepo,
+    private var metadataCardsRepo: MetadataCardsRepo
 ) : ViewModel() {
 
     var maxCardChecked: Boolean = sp.getBoolean(SPKeys.GIFT_CARD_MAX_CHECKBOX_STATE, true)
@@ -43,6 +45,9 @@ class StoresMainViewModel @Inject constructor (
 
     private lateinit var cardsLiveData: LiveData<CardModel>
     private lateinit var cardsLiveDataObserver: Observer<CardModel>
+
+    private lateinit var hasMetadataChangedLiveData: LiveData<Boolean>
+    private lateinit var hasMetadataChangedLiveDataObserver: Observer<Boolean>
 
     private var storesCacheHandler = SelectedStoresCacheHandler()
 
@@ -81,12 +86,22 @@ class StoresMainViewModel @Inject constructor (
         cardsLiveDataObserver = cardsLiveData.observeForeverFreshly(Observer { ignore ->
             sendFreshData()
         })
+
+        //attach viewModel's stores to db
+        hasMetadataChangedLiveData = metadataCardsRepo.serverDataChangedLiveData
+        //notify when changes happens
+        hasMetadataChangedLiveDataObserver = hasMetadataChangedLiveData.observeForeverFreshly(Observer { dataChanged ->
+            if (dataChanged) {
+                displayForceInitializeDialog()
+            }
+        })
     }
 
     override fun onCleared() {
         super.onCleared()
         storesLiveData.removeObserver(storesLiveDataObserver)
         cardsLiveData.removeObserver(cardsLiveDataObserver)
+        hasMetadataChangedLiveData.removeObserver(hasMetadataChangedLiveDataObserver)
     }
 
     //NOTE: Use this way, because LiveData stores events and triggers them once new LifecycleOwner is observe to them.
@@ -101,6 +116,11 @@ class StoresMainViewModel @Inject constructor (
         stateMutableLiveData.postValue(StoreMainState.DisplayData(getCardModel(), getFilteredStores()))
     }
 
+    private fun displayForceInitializeDialog() {
+        L.i("displayForceInitializeDialog")
+        stateMutableLiveData.postValue(StoreMainState.DisplayForceInitializeDialog)
+    }
+
     fun action(intention: StoresMainIntention){
         viewModelScope.launch(Dispatchers.IO) {
             when (intention) {
@@ -110,7 +130,7 @@ class StoresMainViewModel @Inject constructor (
                 StoresMainIntention.Refresh -> {
                     stateMutableLiveData.postValue(StoreMainState.Waiting)
                     if (isFirstTimeDataFetched()) {
-                        storesRepo.refresh()
+                        refresh()
                     } else {
                         filterByPrefix(searchTextValue_static)
                     }
@@ -123,9 +143,22 @@ class StoresMainViewModel @Inject constructor (
                 is StoresMainIntention.NavigateToCardsScreen -> navigateToCardsScreen(intention.giftCardType)
                 is StoresMainIntention.CheckCardDiscount -> checkCardDiscount(intention.giftCardType)
                 StoresMainIntention.AddSeparationMarkToSearch -> addSeparationMarkToSearch()
+                StoresMainIntention.Initialize -> initializingApp()
                 else -> L.e("Unfamiliar intention. Intention = ${intention.javaClass.simpleName}")
             }
         }
+    }
+
+    private fun refresh() {
+        viewModelScope.launch(Dispatchers.IO) {
+            launch { metadataCardsRepo.refresh() }
+            launch { storesRepo.refresh() }
+        }
+    }
+
+    private fun initializingApp() {
+        metadataCardsRepo.clear()
+        stateMutableLiveData.postValue(StoreMainState.Navigation.NavigateToInitializeScreen)
     }
 
     private fun addSeparationMarkToSearch() {

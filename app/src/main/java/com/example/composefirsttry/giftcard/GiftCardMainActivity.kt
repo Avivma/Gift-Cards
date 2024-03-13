@@ -3,6 +3,7 @@ package com.example.composefirsttry.giftcard
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.View
+import androidx.annotation.IdRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
 import androidx.navigation.NavOptions
@@ -15,6 +16,7 @@ import com.example.composefirsttry.L
 import com.example.composefirsttry.R
 import com.example.composefirsttry.databinding.ActivityGiftCardMainBinding
 import com.example.composefirsttry.giftcard.logic.cards.repository.CardUtils
+import com.example.composefirsttry.giftcard.logic.cardsmetadata.repository.MetadataCardsRepo
 import com.example.composefirsttry.giftcard.logic.stores.repository.StoresRepo
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -34,6 +36,9 @@ class GiftCardMainActivity : AppCompatActivity() {
     @Inject
     lateinit var cardUtils: CardUtils
 
+    @Inject
+    lateinit var metadataCardsRepo: MetadataCardsRepo
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         L.setup()
@@ -44,6 +49,11 @@ class GiftCardMainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         setupWithNavController(binding.activityMainBottomNavigationView, getNavController())
+
+        if (shouldNavigateToInitializeScreen()) {
+            navigateToInitializeScreen()
+            return
+        }
 
         if (shouldNavigateToLandingScreen()) {
             navigateToLandingScreen()
@@ -60,13 +70,22 @@ class GiftCardMainActivity : AppCompatActivity() {
         }*/
     }
 
+    private fun shouldNavigateToInitializeScreen(): Boolean = !metadataCardsRepo.isMetadataExist()
     private fun shouldNavigateToLandingScreen(): Boolean = !cardUtils.hasAnyCard()
 
+    private fun navigateToInitializeScreen() {
+        navigateToScreen(R.id.go_to_initializeFragment)
+    }
+
     private fun navigateToLandingScreen() {
+        navigateToScreen(R.id.go_to_landingFragment)
+    }
+
+    private fun navigateToScreen(@IdRes resId: Int) {
         val navOptions: NavOptions = NavOptions.Builder()
             .setPopUpTo(R.id.giftCardsMainFragment, true)
             .build()
-        getNavController().navigate(R.id.go_to_landingFragment, null, navOptions)
+        getNavController().navigate(resId, null, navOptions)
     }
 
     override fun onSupportNavigateUp(): Boolean {

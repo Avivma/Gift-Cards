@@ -2,9 +2,9 @@ package com.example.composefirsttry.giftcard.logic.stores.repository
 
 import androidx.annotation.WorkerThread
 import androidx.lifecycle.LiveData
+import com.example.composefirsttry.giftcard.logic.GiftCardDatabase
 import com.example.composefirsttry.giftcard.logic.stores.db.dao.StoresDao
 import com.example.composefirsttry.giftcard.logic.stores.db.entity.StoreEntity
-import com.example.composefirsttry.giftcard.logic.GiftCardDatabase
 import com.example.composefirsttry.giftcard.logic.stores.network.RestGiftCardService
 import com.example.composefirsttry.giftcard.logic.stores.network.sheet.SheetItem
 import java.util.*

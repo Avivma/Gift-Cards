@@ -3,9 +3,9 @@ package com.example.composefirsttry.utils
 object SPKeys {
     const val SHARED_PREFERENCES_NAME = "SharedPreferencesName"
     const val ENCRYPTED_SHARED_PREFERENCES_NAME = "encrypted_shared_preferences_name"
-    const val install_referrer_wrapper_data = "install_referrer_wrapper_data"
-    const val referrer_details_wrapper_start_time = "referrer_details_wrapper_start_time"
-    const val AUTO_COMPLETE_DATA = "auto_complete_data"
+
+    //Metadata Cards
+    const val METADATA_CARDS_DATA = "metadata_cards_data"
 
     //Gift Cards Stores
     const val GIFT_CARD_MAX_CHECKBOX_STATE = "gift_card_max_checkbox_state"
