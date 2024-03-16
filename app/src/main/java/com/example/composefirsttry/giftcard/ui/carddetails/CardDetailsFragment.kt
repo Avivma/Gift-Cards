@@ -80,7 +80,7 @@ class CardDetailsFragment : Fragment() {
     }
 
     private fun removeCardDialogOpened() {
-        UiUtils.getRemoveCardDialog(requireActivity()) { _, _ ->
+        UiUtils.getRemoveCardDialog(requireActivity()) {
             viewModel.action(CardDetailsIntention.RemoveCard) }
             .show()
     }

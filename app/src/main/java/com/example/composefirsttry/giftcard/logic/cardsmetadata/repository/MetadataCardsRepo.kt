@@ -24,6 +24,9 @@ class MetadataCardsRepo @Inject constructor(
     val serverDataChangedLiveData: LiveData<Boolean> = serverDataChangedMutableLiveData
 
     @WorkerThread
+    fun getMetadataCardsDb(): List<SheetItem> = metadataDbHandler.get().items
+
+    @WorkerThread
     suspend fun initializing() {
         withContext(Dispatchers.IO) {
             val metadataListServer: List<SheetItem> = restService.getCardsMetadata()

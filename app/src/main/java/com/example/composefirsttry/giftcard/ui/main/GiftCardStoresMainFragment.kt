@@ -1,6 +1,5 @@
 package com.example.composefirsttry.giftcard.ui.main
 
-import android.app.AlertDialog
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.text.Editable
@@ -23,6 +22,7 @@ import com.example.composefirsttry.giftcard.GiftCardMainActivity
 import com.example.composefirsttry.giftcard.logic.cards.model.GiftCard
 import com.example.composefirsttry.giftcard.logic.cards.model.GiftCardType
 import com.example.composefirsttry.giftcard.logic.cards.repository.CardUtils
+import com.example.composefirsttry.giftcard.ui.common.dialog.CustomDialog
 import com.example.composefirsttry.giftcard.ui.main.states.StoreMainState
 import com.example.composefirsttry.giftcard.ui.main.states.StoresMainIntention
 import com.example.composefirsttry.utils.bindChecked
@@ -129,26 +129,22 @@ class GiftCardStoresMainFragment : Fragment() {
                 adapter.storeSelected(state.store)
             }
             is StoreMainState.StoreDialogOpened -> {
-                AlertDialog.Builder(requireActivity())
+                CustomDialog(requireActivity())
                     .setTitle(com.example.composefirsttry.R.string.store_dialog_title)
                     .setMessage(resources.getString(com.example.composefirsttry.R.string.store_dialog_add_message, state.store.storeName))
-                    .setNeutralButton(com.example.composefirsttry.R.string.store_dialog_add_button_text) { _, _ -> viewModel.action(StoresMainIntention.AddStoreToFavorites(state.store)) }
-                    .setNegativeButton(com.example.composefirsttry.R.string.store_dialog_cancel_button_text) { dialog, _ -> dialog.dismiss() }
+                    .setPositiveButton(com.example.composefirsttry.R.string.store_dialog_add_button_text) { viewModel.action(StoresMainIntention.AddStoreToFavorites(state.store)) }
+                    .setNegativeButton(com.example.composefirsttry.R.string.store_dialog_cancel_button_text) { }
                     .show()
-
             }
             is StoreMainState.DisplayToast -> {
                 Toast.makeText(requireContext(), cardToastMessage(state.cards, state.singleCard), Toast.LENGTH_SHORT).show()
             }
             is StoreMainState.DisplayForceInitializeDialog -> {
-                AlertDialog.Builder(requireActivity())
+                CustomDialog(requireActivity())
                     .setTitle(com.example.composefirsttry.R.string.initializing_dialog_title)
                     .setMessage(com.example.composefirsttry.R.string.initializing_dialog_text)
-                    .setPositiveButton(com.example.composefirsttry.R.string.initializing_dialog_button) { dialog, _ ->
-                        viewModel.action(StoresMainIntention.Initialize)
-                        dialog.dismiss()
-                    }
-                    .setCancelable(false)
+                    .setPositiveButton(com.example.composefirsttry.R.string.initializing_dialog_button) { viewModel.action(StoresMainIntention.Initialize) }
+                    .setIsCancelable(false)
                     .show()
             }
         }
@@ -191,6 +187,11 @@ class GiftCardStoresMainFragment : Fragment() {
             override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
         })
+
+        //download data from google sheet - deal with image
+        binding.getGoogleSheetData.setOnClickListener {
+            viewModel.action(StoresMainIntention.OpenCardsSelectionDialog)
+        }
     }
 
     private fun setCheckBoxListener(checkBoxLayout: GiftCardWithFrameLayoutBinding, giftCardType: GiftCardType) {

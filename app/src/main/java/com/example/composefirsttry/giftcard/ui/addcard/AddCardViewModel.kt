@@ -7,9 +7,12 @@ import com.example.composefirsttry.giftcard.logic.cards.model.GiftCard
 import com.example.composefirsttry.giftcard.logic.cards.model.GiftCardExtended
 import com.example.composefirsttry.giftcard.logic.cards.model.GiftCardType
 import com.example.composefirsttry.giftcard.logic.cards.repository.CardsRepo
+import com.example.composefirsttry.giftcard.logic.cardsmetadata.network.sheet.SheetItem
+import com.example.composefirsttry.giftcard.logic.cardsmetadata.repository.MetadataCardsRepo
 import com.example.composefirsttry.giftcard.ui.addcard.states.AddCardIntention
 import com.example.composefirsttry.giftcard.ui.addcard.states.AddCardState
 import com.example.composefirsttry.giftcard.ui.addcard.utils.AddCardValidator
+import com.example.composefirsttry.giftcard.ui.common.dialog.advancedialog.CustomDialogAdapterItem
 import com.example.composefirsttry.giftcard.utils.CardUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -19,7 +22,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AddCardViewModel @Inject constructor(
-    private val cardsRepo: CardsRepo
+    private val cardsRepo: CardsRepo,
+    private val metadataCardsRepo: MetadataCardsRepo
 ) : ViewModel() {
 
     private val validator = AddCardValidator()
@@ -103,7 +107,10 @@ class AddCardViewModel @Inject constructor(
     }
 
     private fun openCardsDialog() {
-        stateMutableLiveData.postValue(AddCardState.CardsDialogOpened)
+        val listMetadataCardsDb: List<SheetItem> = metadataCardsRepo.getMetadataCardsDb()
+        //convert to CustomDialogAdapterItem:
+        val dialogAdapterItems = listMetadataCardsDb.map { metadata -> CustomDialogAdapterItem(metadata.type, metadata.imageUrl) }
+        stateMutableLiveData.postValue(AddCardState.CardsDialogOpened(dialogAdapterItems))
     }
 
     private fun focusCardField(fieldType: CardFieldType, hasFocus: Boolean) {

@@ -114,7 +114,7 @@ class CardsFragment : Fragment() {
     }
 
     private fun openRemoveCardDialog(card: GiftCard) {
-        UiUtils.getRemoveCardDialog(requireActivity()) { _, _ ->
+        UiUtils.getRemoveCardDialog(requireActivity()) {
             viewModel.action(CardsIntention.RemoveCard(card)) }
             .show()
     }

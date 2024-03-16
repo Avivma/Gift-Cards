@@ -1,6 +1,5 @@
 package com.example.composefirsttry.giftcard.ui.favorites
 
-import android.app.AlertDialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -14,6 +13,7 @@ import com.example.composefirsttry.R
 import com.example.composefirsttry.databinding.FragmentFavoritesBinding
 import com.example.composefirsttry.giftcard.GiftCardMainActivity
 import com.example.composefirsttry.giftcard.logic.cards.repository.CardUtils
+import com.example.composefirsttry.giftcard.ui.common.dialog.CustomDialog
 import com.example.composefirsttry.giftcard.ui.favorites.states.FavoritesIntention
 import com.example.composefirsttry.giftcard.ui.favorites.states.FavoritesState
 import com.example.composefirsttry.utils.requireActivity
@@ -72,21 +72,20 @@ class FavoritesFragment : Fragment() {
                 adapter.setStores(state.stores)
             }
             is FavoritesState.StoreDialogOpened -> {
-                AlertDialog.Builder(requireActivity())
+                CustomDialog(requireActivity())
                     .setTitle(R.string.store_dialog_title)
                     .setMessage(resources.getString(R.string.store_dialog_remove_message, state.store.storeName))
-                    .setNeutralButton(R.string.store_dialog_remove_button_text) { _, _ -> viewModel.action(FavoritesIntention.RemoveStore(state.store)) }
-                    .setNegativeButton(R.string.store_dialog_cancel_button_text) { dialog, _ -> dialog.dismiss() }
+                    .setPositiveButton(R.string.store_dialog_remove_button_text) { viewModel.action(FavoritesIntention.RemoveStore(state.store)) }
+                    .setNegativeButton(R.string.store_dialog_cancel_button_text) { }
                     .show()
             }
             is FavoritesState.RemoveAllDialogOpened -> {
-                AlertDialog.Builder(requireActivity())
+                CustomDialog(requireActivity())
                     .setTitle(R.string.store_dialog_title)
                     .setMessage(R.string.store_dialog_remove_all_message)
-                    .setNeutralButton(R.string.remove_all_favorites) { _, _ -> viewModel.action(FavoritesIntention.RemoveAllStores) }
-                    .setNegativeButton(R.string.store_dialog_cancel_button_text) { dialog, _ -> dialog.dismiss() }
+                    .setPositiveButton(R.string.remove_all_favorites) { viewModel.action(FavoritesIntention.RemoveAllStores) }
+                    .setNegativeButton(R.string.store_dialog_cancel_button_text) { }
                     .show()
-
             }
         }
     }

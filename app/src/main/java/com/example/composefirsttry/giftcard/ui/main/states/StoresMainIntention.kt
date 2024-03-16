@@ -10,6 +10,7 @@ sealed class StoresMainIntention {
     object FilterBySelectedStores: StoresMainIntention()
     object ClearSearchBox : StoresMainIntention()
     object AddSeparationMarkToSearch : StoresMainIntention()
+    object OpenCardsSelectionDialog : StoresMainIntention()
     //Store Selection
     data class SelectStore(val store: Store): StoresMainIntention()
     object ClearStoresSelection: StoresMainIntention()

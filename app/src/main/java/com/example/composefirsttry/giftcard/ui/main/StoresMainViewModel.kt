@@ -7,10 +7,12 @@ import com.example.composefirsttry.giftcard.logic.cards.db.entity.CardEntity
 import com.example.composefirsttry.giftcard.logic.cards.model.GiftCard
 import com.example.composefirsttry.giftcard.logic.cards.model.GiftCardType
 import com.example.composefirsttry.giftcard.logic.cards.repository.CardsRepo
+import com.example.composefirsttry.giftcard.logic.cardsmetadata.network.sheet.SheetItem
 import com.example.composefirsttry.giftcard.logic.cardsmetadata.repository.MetadataCardsRepo
 import com.example.composefirsttry.giftcard.logic.stores.model.Store
 import com.example.composefirsttry.giftcard.logic.stores.repository.StoresConsiderCardsRepo
 import com.example.composefirsttry.giftcard.logic.stores.repository.StoresRepo
+import com.example.composefirsttry.giftcard.ui.common.dialog.advancedialog.CustomDialogAdapterItem
 import com.example.composefirsttry.giftcard.ui.main.cardutils.CardModel
 import com.example.composefirsttry.giftcard.ui.main.states.StoreMainState
 import com.example.composefirsttry.giftcard.ui.main.states.StoresMainIntention
@@ -37,6 +39,8 @@ class StoresMainViewModel @Inject constructor (
     var maxCardChecked: Boolean = sp.getBoolean(SPKeys.GIFT_CARD_MAX_CHECKBOX_STATE, true)
     var corporateCardChecked: Boolean = sp.getBoolean(SPKeys.GIFT_CARD_CORPORATE_CHECKBOX_STATE, true)
     var hotCardChecked: Boolean = sp.getBoolean(SPKeys.GIFT_CARD_HOT_CHECKBOX_STATE, true)
+
+    var cardsChecked: List<Boolean> = listOf()
 
     private lateinit var storesLiveData: LiveData<List<Store>>
     private lateinit var storesLiveDataObserver: Observer<List<Store>>
@@ -144,9 +148,18 @@ class StoresMainViewModel @Inject constructor (
                 is StoresMainIntention.CheckCardDiscount -> checkCardDiscount(intention.giftCardType)
                 StoresMainIntention.AddSeparationMarkToSearch -> addSeparationMarkToSearch()
                 StoresMainIntention.Initialize -> initializingApp()
+                StoresMainIntention.OpenCardsSelectionDialog -> openCardsSelectionDialog()
                 else -> L.e("Unfamiliar intention. Intention = ${intention.javaClass.simpleName}")
             }
         }
+    }
+
+    private fun openCardsSelectionDialog() {
+        val listMetadataCardsDb: List<SheetItem> = metadataCardsRepo.getMetadataCardsDb()
+        //convert to CustomDialogAdapterItem:
+        val dialogAdapterItems = listMetadataCardsDb.map { metadata -> CustomDialogAdapterItem(metadata.type, metadata.imageUrl) }
+        // TODO: 16-Mar-24 to be continue - add "CardsDialogOpened"
+//        stateMutableLiveData.postValue(AddCardState.CardsDialogOpened(dialogAdapterItems))
     }
 
     private fun refresh() {

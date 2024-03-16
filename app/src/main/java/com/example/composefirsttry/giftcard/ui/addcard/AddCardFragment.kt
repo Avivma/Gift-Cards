@@ -1,12 +1,9 @@
 package com.example.composefirsttry.giftcard.ui.addcard
 
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
-import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -14,13 +11,15 @@ import androidx.lifecycle.Observer
 import com.example.composefirsttry.L
 import com.example.composefirsttry.R
 import com.example.composefirsttry.databinding.AddCardFragmentBinding
-import com.example.composefirsttry.databinding.CardDialogRowBinding
 import com.example.composefirsttry.giftcard.GiftCardMainActivity
 import com.example.composefirsttry.giftcard.logic.cards.model.CardFieldType
 import com.example.composefirsttry.giftcard.logic.cards.model.GiftCard
 import com.example.composefirsttry.giftcard.logic.cards.model.GiftCardType
 import com.example.composefirsttry.giftcard.ui.addcard.states.AddCardIntention
 import com.example.composefirsttry.giftcard.ui.addcard.states.AddCardState
+import com.example.composefirsttry.giftcard.ui.common.dialog.CustomDialog
+import com.example.composefirsttry.giftcard.ui.common.dialog.advancedialog.CustomDialogAdapterItem
+import com.example.composefirsttry.giftcard.ui.common.dialog.advancedialog.ListCustomDialog
 import com.example.composefirsttry.giftcard.utils.CardUtils
 import com.example.composefirsttry.utils.requireActivity
 import com.google.android.material.textfield.TextInputEditText
@@ -104,7 +103,7 @@ class AddCardFragment : Fragment() {
     private fun render(state: AddCardState) {
         when (state) {
             is AddCardState.DisplayData -> displayData(state)
-            AddCardState.CardsDialogOpened -> openCardsList()
+            is AddCardState.CardsDialogOpened -> openCardsList(state.dialogItems)
             is AddCardState.CardImageChanged -> changedCardImage(state.cardType)
             is AddCardState.FieldStatusChanged -> changeFieldStatus(state.fieldType, state.statusOk)
             is AddCardState.DisplayDataEditCard -> displayDataEditCard(state.fieldsValueMap, state.cardType)
@@ -147,11 +146,11 @@ class AddCardFragment : Fragment() {
     }
 
     private fun displayPartialErrorDialog() {
-        android.app.AlertDialog.Builder(requireActivity())
+        CustomDialog(requireActivity())
             .setTitle(R.string.add_card_save_card_dialog_title)
             .setMessage(R.string.add_card_save_card_dialog_message)
-            .setNeutralButton(R.string.add_card_save_card_dialog_yes_button_text) { _, _ -> viewModel.action(AddCardIntention.SaveCard(forceSave = true)) }
-            .setNegativeButton(R.string.add_card_save_card_dialog_cancel_button_text) { dialog, _ -> dialog.dismiss() }
+            .setPositiveButton(R.string.add_card_save_card_dialog_yes_button_text) { viewModel.action(AddCardIntention.SaveCard(forceSave = true)) }
+            .setNegativeButton(R.string.add_card_save_card_dialog_cancel_button_text) { }
             .show()
     }
 
@@ -161,33 +160,25 @@ class AddCardFragment : Fragment() {
         binding.imageRes = CardUtils.getCardImage(cardType)
     }
 
-    private fun openCardsList() {
-        val cardArray = getAllCards().toTypedArray()
-        AlertDialog.Builder(requireContext())
-            .setTitle(R.string.add_card_cards_dialog_title)
-            .setAdapter(CardsAdapter(requireContext(), cardArray)) { _, which ->
-                val selectedCard = cardArray[which]
+    private fun openCardsList(dialogItems: List<CustomDialogAdapterItem>) {
+        ListCustomDialog(requireActivity()).apply {
+            setTitle(R.string.add_card_cards_dialog_title)
+            setAdapter(dialogItems) { item ->
+                //currently, manually pick the type:
+                val selectedCard: GiftCardType = when (item.title) {
+                    "tav_haham" -> GiftCardType.TAV_HAHAM
+                    "isracard" -> GiftCardType.ISRACARD
+                    "max" -> GiftCardType.MAX
+                    else -> throw Exception("Unfamiliar card type!!")
+                }
                 viewModel.action(AddCardIntention.PickCardType(selectedCard))
             }
-            .show()
+        }.show()
     }
-
-    private fun getAllCards(): List<GiftCardType> = listOf(GiftCardType.MAX, GiftCardType.ISRACARD, GiftCardType.TAV_HAHAM)
 
     companion object {
         // TODO: 31/10/2022 move to some utils location
         const val CARDS_SCREEN = 1
         const val CARD_DETAILS_SCREEN = 2
-    }
-}
-
-
-class CardsAdapter(context: Context, private val cardsList: Array<out GiftCardType>) :
-    ArrayAdapter<GiftCardType>(context, R.layout.card_dialog_row, cardsList) {
-
-    override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-        val binding: CardDialogRowBinding = DataBindingUtil.inflate(LayoutInflater.from(parent.context), R.layout.card_dialog_row, parent, false)
-        binding.cardType = cardsList[position]
-        return binding.root
     }
 }

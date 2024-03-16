@@ -4,6 +4,7 @@ import com.example.composefirsttry.giftcard.logic.cards.model.CardFieldStatus
 import com.example.composefirsttry.giftcard.logic.cards.model.CardFieldType
 import com.example.composefirsttry.giftcard.logic.cards.model.GiftCardExtended
 import com.example.composefirsttry.giftcard.logic.cards.model.GiftCardType
+import com.example.composefirsttry.giftcard.ui.common.dialog.advancedialog.CustomDialogAdapterItem
 import java.util.*
 
 sealed class AddCardState {
@@ -20,7 +21,7 @@ sealed class AddCardState {
     data class FieldStatusChanged(val fieldType: CardFieldType, val statusOk: Boolean) : AddCardState()
     data class CardImageChanged(val cardType: GiftCardType) : AddCardState()
 
-    object CardsDialogOpened : AddCardState()
+    data class CardsDialogOpened(val dialogItems: List<CustomDialogAdapterItem>) : AddCardState()
 
     sealed class Navigation : AddCardState() {
         data class NavigateBackToCardDetails(val card: GiftCardExtended) : Navigation()

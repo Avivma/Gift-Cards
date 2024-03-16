@@ -7,6 +7,7 @@ import android.widget.TextView
 import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
 import androidx.databinding.BindingAdapter
+import com.example.composefirsttry.giftcard.common.fetchimages.GlideHandler
 
 @BindingAdapter("bindChecked")
 fun bindChecked(view: View, checked: Boolean) {
@@ -24,6 +25,13 @@ fun bindChecked(view: View, checked: Boolean) {
 fun loadImage(image: ImageView, @DrawableRes imageRes:  Int) {
     if (imageRes != 0) {
         image.setImageDrawable(ContextCompat.getDrawable(image.context, imageRes))
+    }
+}
+
+@BindingAdapter("loadImage")
+fun loadImage(image: ImageView, imageUrl: String? = null) {
+    if (imageUrl != null) {
+        GlideHandler.loadImage(image, imageUrl)
     }
 }
 

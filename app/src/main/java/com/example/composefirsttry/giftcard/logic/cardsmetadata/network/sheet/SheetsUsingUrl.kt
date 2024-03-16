@@ -78,7 +78,24 @@ class SheetsUsingUrl @Inject constructor() {
         val (ids, types, imageLinks) = lists
 
         return List(itemsAmount) { i ->
-            SheetItem(ids[i], types[i], imageLinks[i])
+            SheetItem(ids[i], types[i], manipulateDriveUrl(imageLinks[i]))
+        }
+    }
+
+    private fun manipulateDriveUrl(driveUrl: String): String {
+        // convert driveUrl: "https://drive.google.com/file/d/14Gfi4UGZiI-w79B-qlQi6lEt0cP9SBvm/view"
+        // to this:          "https://drive.usercontent.google.com/download?id=14Gfi4UGZiI-w79B-qlQi6lEt0cP9SBvm&export=view"
+        val baseUrl = "https://drive.google.com/file/d/"
+        val directDownloadBaseUrl = "https://drive.usercontent.google.com/download?id="
+        if (!driveUrl.startsWith(baseUrl)) {
+            return "Invalid URL" // Early return if the URL doesn't start with the expected base URL
+        }
+        val fileIdPart = driveUrl.substringAfter(baseUrl, "")
+        val fileId = fileIdPart.substringBefore("/view", "")
+        return if (fileId.isNotEmpty()) {
+            directDownloadBaseUrl + fileId
+        } else {
+            "Invalid URL" // Return an error message or handle as needed
         }
     }
 
