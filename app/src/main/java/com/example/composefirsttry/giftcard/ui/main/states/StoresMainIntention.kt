@@ -8,7 +8,6 @@ sealed class StoresMainIntention {
     data class FilterByPrefix(val prefix: String): StoresMainIntention()
     object FilterBySelectedStores: StoresMainIntention()
     object ClearSearchBox : StoresMainIntention()
-    object AddSeparationMarkToSearch : StoresMainIntention()
     object OpenCardsSelectionDialog : StoresMainIntention()
     //Store Selection
     data class SelectStore(val store: Store): StoresMainIntention()

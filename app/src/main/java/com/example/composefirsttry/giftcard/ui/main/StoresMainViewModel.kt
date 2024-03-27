@@ -128,7 +128,6 @@ class StoresMainViewModel @Inject constructor (
                 is StoresMainIntention.AddStoreToFavorites -> addStoreToFavorites(intention.store)
                 is StoresMainIntention.NavigateToCardsScreen -> navigateToCardsScreen(intention.shoppingClubId)
                 is StoresMainIntention.ShoppingClubChecked -> shoppingClubChecked(intention.clubDialogAdapterItem)
-                StoresMainIntention.AddSeparationMarkToSearch -> addSeparationMarkToSearch()
                 StoresMainIntention.Initialize -> initializingApp()
                 StoresMainIntention.OpenCardsSelectionDialog -> openCardsSelectionDialog()
                 else -> L.e("Unfamiliar intention. Intention = ${intention.javaClass.simpleName}")
@@ -151,11 +150,6 @@ class StoresMainViewModel @Inject constructor (
     private fun initializingApp() {
         metadataRepo.clear()
         stateMutableLiveData.postValue(StoreMainState.Navigation.NavigateToInitializeScreen)
-    }
-
-    private fun addSeparationMarkToSearch() {
-        searchTextValue_static += " || " //separation mark = "||"
-        stateMutableLiveData.postValue(StoreMainState.SearchBoxTextChanged(searchTextValue_static, searchTextValue_static.length))
     }
 
     private fun clearSearchBox() {
@@ -244,12 +238,11 @@ class StoresMainViewModel @Inject constructor (
         val storeRelatedCardExist = store.hasValidClubs(getCheckedShoppingClubs())
         return storeRelatedCardExist
                 && storesCacheHandler.hasStoreIncludedInCache(store)
-                && doesStoreNameStartWithPrefix(store.storeName.lowercase(), prefix.lowercase())
+                && doesStoreNameStartWithPrefix(store.storeName, prefix)
     }
 
-    private fun doesStoreNameStartWithPrefix(storeName: String, complexPrefix: String): Boolean {
-        val acceptablePrefixes: List<String> = complexPrefix.split("||").map { it.trim() }
-        return acceptablePrefixes.any { storeName.startsWith(it) }
+    private fun doesStoreNameStartWithPrefix(storeName: String, prefix: String): Boolean {
+        return storeName.lowercase().startsWith(prefix.lowercase())
     }
 
     private fun getStores(): List<Store> = storesLiveData.value ?: emptyList()

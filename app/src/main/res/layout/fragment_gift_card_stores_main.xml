@@ -45,21 +45,6 @@
             />
 
         <Button
-            android:id="@+id/separation_search_mark_button"
-            android:layout_width="60dp"
-            android:layout_height="48dp"
-            android:background="@color/transparent"
-            android:text="@string/separation_button_text"
-            android:textAllCaps="false"
-            android:textSize="12sp"
-            android:textColor="@color/very_dark_accent"
-            app:layout_constraintTop_toTopOf="@+id/stores_title"
-            app:layout_constraintBottom_toBottomOf="@+id/stores_title"
-            app:layout_constraintStart_toStartOf="parent"
-            android:visibility="gone"
-            />
-
-        <Button
             android:id="@+id/stores_selection"
             android:layout_width="72dp"
             android:layout_height="48dp"
@@ -72,7 +57,6 @@
             app:layout_constraintBottom_toBottomOf="@+id/stores_title"
             app:layout_constraintEnd_toEndOf="parent"
             android:visibility="@{storeSelectionState == StoreSelection.INVISIBLE ? View.GONE : View.VISIBLE, default=gone}"
-            tools:visibility="visible"
             />
 
         <Button
@@ -88,7 +72,6 @@
             app:layout_constraintBottom_toBottomOf="@+id/stores_selection"
             app:layout_constraintEnd_toStartOf="@+id/stores_selection"
             android:visibility="@{storeSelectionState == StoreSelection.INVISIBLE ? View.GONE : View.VISIBLE, default=gone}"
-            tools:visibility="visible"
             />
 
         <EditText

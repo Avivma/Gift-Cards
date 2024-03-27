@@ -165,7 +165,6 @@ class GiftCardStoresMainFragment : Fragment() {
     private fun setListeners() {
         binding.storesSelection.setOnClickListener { viewModel.action(StoresMainIntention.FilterBySelectedStores) }
         binding.storesClearSelection.setOnClickListener { viewModel.action(StoresMainIntention.ClearStoresSelection) }
-        binding.separationSearchMarkButton.setOnClickListener { viewModel.action(StoresMainIntention.AddSeparationMarkToSearch) }
         binding.clearTextIcon.setOnClickListener { viewModel.action(StoresMainIntention.ClearSearchBox) }
         binding.searchStore.addTextChangedListener(object : TextWatcher {
             //I use this way (not MVI) because, there is a problem with the livedata 2-way databinding. Updating this "searchTextMutableLiveData" doesn't reflect on the UI
