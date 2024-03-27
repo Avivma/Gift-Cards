@@ -26,8 +26,8 @@ object SheetsUsingUrl {
           .
         ]*/
         val column = SheetsServiceUrl.calcColumn('B', amountOfCards)
-        val row = SheetsServiceUrl.calcRow(11, amountOfStores)
-        val rangeValues = "A11:${column}${row}"
+        val row = SheetsServiceUrl.calcRow(13, amountOfStores)
+        val rangeValues = "A13:${column}${row}"
         val jsonArray = SheetsServiceUrl.getDataFromWeb(SheetsServiceUrl.createUrl(rangeValues))
         val gsonBuilder = GsonBuilder()
         val deserializer = SheetJsonDeserializer(amountOfCards)

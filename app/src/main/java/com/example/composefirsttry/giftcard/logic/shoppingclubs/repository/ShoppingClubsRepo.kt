@@ -39,6 +39,8 @@ class ShoppingClubsRepo @Inject constructor(
                 index = club.index.toInt()-1,
                 type = club.type,
                 imageUrl = club.imageUrl,
+                loadMoneyAddress = club.loadMoneyAddress,
+                loadThroughApp = club.loadMoneyThroughAppOrWeb == "app",
             )
         })
         return shoppingClubsDb

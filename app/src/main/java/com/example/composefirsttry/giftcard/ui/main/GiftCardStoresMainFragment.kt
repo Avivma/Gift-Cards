@@ -98,11 +98,8 @@ class GiftCardStoresMainFragment : Fragment() {
                 binding.progressCircular.visibility = if (state.progressBarVisible) View.VISIBLE else View.GONE
                 binding.storeRecyclerView.alpha = if (state.storesListFaded) 0.5f else 1f
                 binding.openCardsDialog.cardSelectedLayout.alpha = if (state.storesListFaded) 0.5f else 1f
-                if (state.hideStoreSelectionFilter) {
-                    binding.storesSelection.visibility = View.GONE
-                    binding.storesClearSelection.visibility = View.GONE
-                }
                 adapter.setStores(state.storesAndClubs)
+                binding.storeSelectionState = state.storeSelectionState
                 binding.searchIconVisible = state.searchIconVisible
                 binding.cardsTextModel = state.cardsTextModel
             }

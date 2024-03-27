@@ -15,13 +15,17 @@ data class ShoppingClubEntity constructor(
     var type: String,
     @ColumnInfo(name = "image_url")
     var imageUrl: String,
+    @ColumnInfo(name = "load_money_address")
+    var loadMoneyAddress: String,
+    @ColumnInfo(name = "money_loaded_through_app_or_web")
+    var loadThroughApp: Boolean,
     @ColumnInfo(name = "checked")
     var checked: Boolean = true,
     @ColumnInfo(name = "count")
     var count: Int = 0,
 ) {
     override fun toString(): String {
-        return "ShoppingClubTypeEntity(clubId=${clubId}, index=${index}, type=${type}, imageUrl=${imageUrl}, checked=${checked}, count=${count})"
+        return "ShoppingClubTypeEntity(clubId=${clubId}, index=${index}, type=${type}, imageUrl=${imageUrl}, loadMoneyAddress=${loadMoneyAddress}, loadThroughApp=${loadThroughApp}, checked=${checked}, count=${count})"
     }
 
     companion object {

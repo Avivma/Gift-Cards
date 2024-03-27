@@ -2,6 +2,7 @@ package com.example.composefirsttry.giftcard.logic.metadata.network.sheet
 
 import androidx.annotation.WorkerThread
 import com.example.composefirsttry.giftcard.logic.common.googlesheet.SheetsServiceUrl
+import com.example.composefirsttry.utils.component6
 import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.reflect.TypeToken
@@ -70,13 +71,25 @@ class SheetsUsingUrl @Inject constructor() {
                 "https://drive.google.com/file/d/1eH5g-ARj-8mboy0JBDyOVMhyIUfulz7z/view?usp=drive_link",
                 "https://drive.google.com/file/d/1uXgvNSanXKyClbFd7ooG4vEevEw4vU20/view?usp=drive_link",
                 "https://drive.google.com/file/d/14Gfi4UGZiI-w79B-qlQi6lEt0cP9SBvm/view?usp=drive_link"
+            ],
+            [
+                "com.hot.benefits",
+                "https://service.isracard.co.il/isracard/externals?reqName=GiftCardCharging_934",
+                "com.ideomobile.leumicard",
+                ""
+            ],
+            [
+                "app",
+                "web",
+                "app",
+                ""
             ]
             ]
         }
         //note: getDataFromWeb() return the JsonArray after "values"
         */
         val column = SheetsServiceUrl.calcColumn('B', amountOfCards)
-        val rangeValues = "B4:${column}7"
+        val rangeValues = "B4:${column}9"
         val jsonArray = SheetsServiceUrl.getDataFromWeb(SheetsServiceUrl.createUrl(rangeValues))
         val items: List<SheetItem> = parseJsonArray(jsonArray, amountOfCards)
         return items
@@ -86,10 +99,17 @@ class SheetsUsingUrl @Inject constructor() {
         val gson = Gson()
         val type = object : TypeToken<List<List<String>>>() {}.type
         val lists: List<List<String>> = gson.fromJson(jsonArray, type)
-        val (ids, indexes, types, imageLinks) = lists
+        val (ids, indexes, types, imageLinks, loadMoneyAddresses, loadMoneyThroughAppOrWeb) = lists
 
         return List(itemsAmount) { i ->
-            SheetItem(ids[i], indexes[i], types[i], manipulateDriveUrl(imageLinks[i]))
+            SheetItem(
+                getOrEmpty(ids, i),
+                getOrEmpty(indexes, i),
+                getOrEmpty(types, i),
+                manipulateDriveUrl(getOrEmpty(imageLinks, i)),
+                getOrEmpty(loadMoneyAddresses, i),
+                getOrEmpty(loadMoneyThroughAppOrWeb, i)
+            )
         }
     }
 
@@ -107,6 +127,14 @@ class SheetsUsingUrl @Inject constructor() {
             directDownloadBaseUrl + fileId
         } else {
             "Invalid URL" // Return an error message or handle as needed
+        }
+    }
+
+    private fun getOrEmpty(list: List<String>, index: Int): String {
+        return try {
+            list[index]
+        } catch (e: Exception) {
+            ""
         }
     }
 }

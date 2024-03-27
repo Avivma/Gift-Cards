@@ -4,6 +4,7 @@
 
     <data>
         <import type="android.view.View" />
+        <import type="com.example.composefirsttry.giftcard.ui.main.states.StoreMainState.StoreSelection" />
         <variable
             name="model"
             type="com.example.composefirsttry.giftcard.ui.main.StoresMainViewModel"
@@ -13,6 +14,10 @@
             type="com.example.composefirsttry.giftcard.ui.main.StoreMainTextModel"
             />
         <variable name="searchIconVisible" type="java.lang.Boolean"/>
+        <variable name="storeSelectionState" type="java.lang.Integer"/>
+<!--        INVISIBLE-->
+<!--        VISIBLE-->
+<!--        ACTIVE-->
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout xmlns:tools="http://schemas.android.com/tools"
@@ -56,32 +61,34 @@
 
         <Button
             android:id="@+id/stores_selection"
-            android:layout_width="76dp"
+            android:layout_width="72dp"
             android:layout_height="48dp"
             android:background="@color/transparent"
             android:text="@string/stores_selection_text"
             android:textAllCaps="false"
-            android:textSize="12sp"
+            android:textSize="11sp"
             android:textColor="@color/selected_store_text_color"
             app:layout_constraintTop_toTopOf="@+id/stores_title"
             app:layout_constraintBottom_toBottomOf="@+id/stores_title"
             app:layout_constraintEnd_toEndOf="parent"
-            android:visibility="gone"
+            android:visibility="@{storeSelectionState == StoreSelection.INVISIBLE ? View.GONE : View.VISIBLE, default=gone}"
+            tools:visibility="visible"
             />
 
         <Button
             android:id="@+id/stores_clear_selection"
-            android:layout_width="76dp"
+            android:layout_width="88dp"
             android:layout_height="48dp"
             android:background="@color/transparent"
-            android:text="@string/stores_clear_selection_text"
+            android:text="@{storeSelectionState == StoreSelection.ACTIVE ? @string/stores_reselect_selection_text : @string/stores_clear_selection_text, default=@string/stores_clear_selection_text}"
             android:textAllCaps="false"
-            android:textSize="12sp"
+            android:textSize="11sp"
             android:textColor="@color/very_dark_accent"
             app:layout_constraintTop_toTopOf="@+id/stores_selection"
             app:layout_constraintBottom_toBottomOf="@+id/stores_selection"
             app:layout_constraintEnd_toStartOf="@+id/stores_selection"
-            android:visibility="gone"
+            android:visibility="@{storeSelectionState == StoreSelection.INVISIBLE ? View.GONE : View.VISIBLE, default=gone}"
+            tools:visibility="visible"
             />
 
         <EditText

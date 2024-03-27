@@ -20,6 +20,8 @@ fun Store.hasValidClubs(shoppingClubs: List<ShoppingClub>): Boolean {
     return this.getValidClubs(shoppingClubs).isNotEmpty()
 }
 
+operator fun <T> List<T>.component6(): T = get(5)
+
 fun <T> LiveData<T>.toMutableLiveData(): MutableLiveData<T> {
     val mediatorLiveData = MediatorLiveData<T>()
     mediatorLiveData.addSource(this) {

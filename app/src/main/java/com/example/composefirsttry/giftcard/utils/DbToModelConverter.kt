@@ -71,6 +71,8 @@ object DbToModelConverter {
             index = clubEntity.index,
             type = clubEntity.type,
             imageUrl = clubEntity.imageUrl,
+            loadMoneyAddress = clubEntity.loadMoneyAddress,
+            loadThroughApp = clubEntity.loadThroughApp,
             checked = clubEntity.checked,
             hasAnyCards = clubEntity.count > 0,
         )

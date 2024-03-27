@@ -64,9 +64,8 @@ class CardDetailsFragment : Fragment() {
                 val direction = CardDetailsFragmentDirections.actionCardDetailsFragmentToAddCardFragment(navigationIntention.card, AddCardFragment.CARD_DETAILS_SCREEN)
                 requireActivity<GiftCardMainActivity>().getNavController().navigate(direction)
             }
-            is CardDetailsState.Navigation.NavigateOutsideToMax -> navigateOutsideHandler.launchApplication(navigationIntention.applicationId)
-            is CardDetailsState.Navigation.NavigateOutsideToIsracard -> navigateOutsideHandler.launchSite(navigationIntention.siteAddress)
-            is CardDetailsState.Navigation.NavigateOutsideToTavHaham -> navigateOutsideHandler.launchApplication(navigationIntention.applicationId)
+            is CardDetailsState.Navigation.NavigateOutsideToApplication -> navigateOutsideHandler.launchApplication(navigationIntention.applicationId)
+            is CardDetailsState.Navigation.NavigateOutsideToWebsite -> navigateOutsideHandler.launchSite(navigationIntention.siteAddress)
         }
     }
 

@@ -182,11 +182,11 @@ class StoresMainViewModel @Inject constructor (
     private fun clearStoresSelection() {
         L.i("clearStoresSelection: storesHasBeenSelected= ${storesCacheHandler.storesHasBeenSelected}")
         storesCacheHandler.clearStoresSelection()
-        if (storesCacheHandler.storesHasBeenSelected == SelectedStoresCacheHandler.VISIBLE) //deactivate
-            sendStateDisplayData()
+        if (storesCacheHandler.storesHasBeenSelected == StoreMainState.StoreSelection.VISIBLE) //deactivate
+            sendStateDisplayData(storeSelectionState = StoreMainState.StoreSelection.VISIBLE)
         else { //make invisible
             getStores().forEach { storesCacheHandler.updateStoreWithCacheProperties(it) }
-            sendStateDisplayData(hideStoreSelectionFilter = true)
+            sendStateDisplayData(storeSelectionState = StoreMainState.StoreSelection.INVISIBLE)
         }
     }
 
@@ -195,8 +195,8 @@ class StoresMainViewModel @Inject constructor (
         storesCacheHandler.updateCache(store)
 
         when (storesCacheHandler.storesHasBeenSelected) {
-            SelectedStoresCacheHandler.VISIBLE, SelectedStoresCacheHandler.ACTIVE -> stateMutableLiveData.postValue(StoreMainState.StoreSelected(store, true))
-            SelectedStoresCacheHandler.INVISIBLE -> sendStateDisplayData(hideStoreSelectionFilter = true)
+            StoreMainState.StoreSelection.VISIBLE, StoreMainState.StoreSelection.ACTIVE -> stateMutableLiveData.postValue(StoreMainState.StoreSelected(store, true))
+            StoreMainState.StoreSelection.INVISIBLE -> sendStateDisplayData(storeSelectionState = StoreMainState.StoreSelection.INVISIBLE)
         }
     }
 
@@ -206,8 +206,8 @@ class StoresMainViewModel @Inject constructor (
 
     private fun filterBySelectedStores() {
         L.i("filterBySelectedStores")
-        storesCacheHandler.setStoresSelection(SelectedStoresCacheHandler.ACTIVE)
-        sendStateDisplayData()
+        storesCacheHandler.setStoresSelection(StoreMainState.StoreSelection.ACTIVE)
+        sendStateDisplayData(storeSelectionState = StoreMainState.StoreSelection.ACTIVE)
     }
 
     private fun filterByPrefix(prefix: String) {
@@ -215,13 +215,13 @@ class StoresMainViewModel @Inject constructor (
         sendStateDisplayData(searchIconVisible = prefix.isEmpty())
     }
 
-    private fun sendStateDisplayData(hideStoreSelectionFilter: Boolean = false, searchIconVisible: Boolean = true) {
+    private fun sendStateDisplayData(storeSelectionState: Int = StoreMainState.StoreSelection.INVISIBLE, searchIconVisible: Boolean = true) {
         val shoppingClubs = getShoppingClubs()
         val shoppingClubsAmount = shoppingClubs.size
         val shoppingClubsChecked = shoppingClubs.filter { club -> club.checked }.size
         val allCardsChecked = shoppingClubsAmount == shoppingClubsChecked
         val cardsTextModel = StoreMainTextModel(shoppingClubsChecked, shoppingClubsAmount, allCardsChecked)
-        stateMutableLiveData.postValue(StoreMainState.DisplayData(getDisplayedData(), cardsTextModel = cardsTextModel, hideStoreSelectionFilter = hideStoreSelectionFilter, searchIconVisible = searchIconVisible))
+        stateMutableLiveData.postValue(StoreMainState.DisplayData(getDisplayedData(), cardsTextModel = cardsTextModel, storeSelectionState = storeSelectionState, searchIconVisible = searchIconVisible))
     }
 
     /**

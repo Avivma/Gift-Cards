@@ -5,6 +5,8 @@ import com.example.composefirsttry.L
 import com.example.composefirsttry.giftcard.logic.cards.model.GiftCard
 import com.example.composefirsttry.giftcard.logic.cards.model.GiftCardExtended
 import com.example.composefirsttry.giftcard.logic.cards.repository.CardsRepo
+import com.example.composefirsttry.giftcard.logic.shoppingclubs.model.ShoppingClub
+import com.example.composefirsttry.giftcard.logic.shoppingclubs.repository.ShoppingClubsRepo
 import com.example.composefirsttry.giftcard.ui.carddetails.state.CardDetailsIntention
 import com.example.composefirsttry.giftcard.ui.carddetails.state.CardDetailsState
 import com.example.composefirsttry.giftcard.utils.DbToModelConverter
@@ -17,6 +19,7 @@ import javax.inject.Inject
 @HiltViewModel
 class CardDetailsViewModel @Inject constructor(
     private val cardsRepo: CardsRepo,
+    private val shoppingClubRepo: ShoppingClubsRepo
 ) : ViewModel() {
 
     private var stateMutableLiveData = MutableLiveData<CardDetailsState>()
@@ -76,11 +79,9 @@ class CardDetailsViewModel @Inject constructor(
     }
 
     private fun navigateOutsideToLoadMoney(card: GiftCard) {
-//        when (card.type) {
-//            GiftCardType.MAX -> stateMutableLiveData.postValue(CardDetailsState.Navigation.NavigateOutsideToMax(NavigateOutsideHandler.MAX_APPLICATION_ID))
-//            GiftCardType.ISRACARD -> stateMutableLiveData.postValue(CardDetailsState.Navigation.NavigateOutsideToIsracard(NavigateOutsideHandler.ISRACARD_SITE_ADDRESS))
-//            GiftCardType.TAV_HAHAM -> stateMutableLiveData.postValue(CardDetailsState.Navigation.NavigateOutsideToTavHaham(NavigateOutsideHandler.TAV_HAHAM_APPLICATION_ID))
-//        }
+        val club = getShoppingClubs().find { shoppingClub -> shoppingClub.clubId == card.cardClubId}!!
+        if (club.loadThroughApp) stateMutableLiveData.postValue(CardDetailsState.Navigation.NavigateOutsideToApplication(club.loadMoneyAddress))
+        else stateMutableLiveData.postValue(CardDetailsState.Navigation.NavigateOutsideToWebsite(club.loadMoneyAddress))
     }
 
     override fun onCleared() {
@@ -90,5 +91,10 @@ class CardDetailsViewModel @Inject constructor(
 
     private fun removeCard(card: GiftCard) {
         cardsRepo.removeCard(card.id)
+    }
+
+    private fun getShoppingClubs(): List<ShoppingClub> = shoppingClubRepo.getAllExistingShoppingClubs().value!!.map { clubEntity ->
+        val shoppingClub = DbToModelConverter.fromEntityToShoppingClub(clubEntity)
+        shoppingClub
     }
 }

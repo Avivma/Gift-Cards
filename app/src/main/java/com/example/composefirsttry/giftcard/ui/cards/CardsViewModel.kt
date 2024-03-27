@@ -4,6 +4,8 @@ import androidx.lifecycle.*
 import com.example.composefirsttry.L
 import com.example.composefirsttry.giftcard.logic.cards.model.GiftCard
 import com.example.composefirsttry.giftcard.logic.cards.repository.CardsRepo
+import com.example.composefirsttry.giftcard.logic.shoppingclubs.model.ShoppingClub
+import com.example.composefirsttry.giftcard.logic.shoppingclubs.repository.ShoppingClubsRepo
 import com.example.composefirsttry.giftcard.ui.cards.states.CardsIntention
 import com.example.composefirsttry.giftcard.ui.cards.states.CardsState
 import com.example.composefirsttry.giftcard.utils.DbToModelConverter
@@ -15,6 +17,7 @@ import javax.inject.Inject
 @HiltViewModel
 class CardsViewModel @Inject constructor(
     private val cardsRepo: CardsRepo,
+    private val shoppingClubRepo: ShoppingClubsRepo
 ) : ViewModel() {
 
     private var stateMutableLiveData = MutableLiveData<CardsState>()
@@ -73,11 +76,9 @@ class CardsViewModel @Inject constructor(
     }
 
     private fun navigateOutsideToLoadMoney(card: GiftCard) {
-//        when (card.type) {
-//            GiftCardType.MAX -> stateMutableLiveData.postValue(CardsState.Navigation.NavigateOutsideToMax(NavigateOutsideHandler.MAX_APPLICATION_ID))
-//            GiftCardType.ISRACARD -> stateMutableLiveData.postValue(CardsState.Navigation.NavigateOutsideToIsracard(NavigateOutsideHandler.ISRACARD_SITE_ADDRESS))
-//            GiftCardType.TAV_HAHAM -> stateMutableLiveData.postValue(CardsState.Navigation.NavigateOutsideToTavHaham(NavigateOutsideHandler.TAV_HAHAM_APPLICATION_ID))
-//        }
+        val club = getShoppingClubs().find { shoppingClub -> shoppingClub.clubId == card.cardClubId}!!
+        if (club.loadThroughApp) stateMutableLiveData.postValue(CardsState.Navigation.NavigateOutsideToApplication(club.loadMoneyAddress))
+        else stateMutableLiveData.postValue(CardsState.Navigation.NavigateOutsideToWebsite(club.loadMoneyAddress))
     }
 
     private fun refreshData() {
@@ -110,4 +111,9 @@ class CardsViewModel @Inject constructor(
     }
 
     private fun getAllCards(): List<GiftCard> = cardsLiveData.value ?: listOf()
+
+    private fun getShoppingClubs(): List<ShoppingClub> = shoppingClubRepo.getAllExistingShoppingClubs().value!!.map { clubEntity ->
+        val shoppingClub = DbToModelConverter.fromEntityToShoppingClub(clubEntity)
+        shoppingClub
+    }
 }

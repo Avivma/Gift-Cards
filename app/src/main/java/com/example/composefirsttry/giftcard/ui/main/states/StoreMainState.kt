@@ -10,7 +10,7 @@ sealed class StoreMainState(
     val storesListFaded: Boolean = false) {
 
     object Waiting: StoreMainState(progressBarVisible = true, storesListFaded = true)
-    data class DisplayData(val storesAndClubs: Map<Store, List<ClubIdAndUrl>>, val cardsTextModel: StoreMainTextModel, val hideStoreSelectionFilter: Boolean = false, val searchIconVisible: Boolean = true): StoreMainState()
+    data class DisplayData(val storesAndClubs: Map<Store, List<ClubIdAndUrl>>, val cardsTextModel: StoreMainTextModel, val storeSelectionState: Int, val searchIconVisible: Boolean = true): StoreMainState()
     data class SearchBoxTextChanged(val searchText: String, val cursorPosition: Int) : StoreMainState()
     data class StoreSelected(val store: Store, val storeSelectionFilterVisible: Boolean): StoreMainState()
     data class StoreDialogOpened(val store: Store) : StoreMainState()
@@ -20,5 +20,12 @@ sealed class StoreMainState(
     sealed class Navigation: StoreMainState() {
         data class NavigateToCardsScreen(val shoppingClubId: String): StoreMainState.Navigation()
         object NavigateToInitializeScreen: StoreMainState.Navigation()
+    }
+
+    //State's Constants:
+    object StoreSelection  {
+        const val INVISIBLE = 0
+        const val VISIBLE = 1
+        const val ACTIVE = 2
     }
 }

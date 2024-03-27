@@ -90,9 +90,8 @@ class CardsFragment : Fragment() {
                 val direction = CardsFragmentDirections.actionCardsFragmentToCardDetailsFragment(navigationIntention.card)
                 requireActivity<GiftCardMainActivity>().getNavController().navigate(direction)
             }
-            is CardsState.Navigation.NavigateOutsideToMax -> navigateOutsideHandler.launchApplication(navigationIntention.applicationId)
-            is CardsState.Navigation.NavigateOutsideToIsracard -> navigateOutsideHandler.launchSite(navigationIntention.siteAddress)
-            is CardsState.Navigation.NavigateOutsideToTavHaham -> navigateOutsideHandler.launchApplication(navigationIntention.applicationId)
+            is CardsState.Navigation.NavigateOutsideToApplication -> navigateOutsideHandler.launchApplication(navigationIntention.applicationId)
+            is CardsState.Navigation.NavigateOutsideToWebsite -> navigateOutsideHandler.launchSite(navigationIntention.siteAddress)
             else -> {
                 L.e("Unfamiliar navigation (intention: ${navigationIntention.javaClass.simpleName})")
             }

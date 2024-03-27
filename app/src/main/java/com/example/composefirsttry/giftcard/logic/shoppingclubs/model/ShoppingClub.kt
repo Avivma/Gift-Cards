@@ -6,6 +6,8 @@ data class ShoppingClub constructor(
     var index: Int,
     var type: String,
     var imageUrl: String,
+    var loadMoneyAddress: String,
+    var loadThroughApp: Boolean,
     var checked: Boolean,
     var hasAnyCards: Boolean,
 )

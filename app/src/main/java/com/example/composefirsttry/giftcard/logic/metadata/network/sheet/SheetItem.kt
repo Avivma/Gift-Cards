@@ -7,4 +7,6 @@ data class SheetItem(
     val index: String,
     val type: String,
     val imageUrl: String,
+    val loadMoneyAddress: String,
+    val loadMoneyThroughAppOrWeb: String,
 ): Serializable

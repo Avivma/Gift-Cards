@@ -29,6 +29,7 @@
     <string name="navigation_menu_cards">Cards</string>
     <string name="navigation_menu_favorites">Favorites</string>
     <string name="stores_selection_text">Select</string>
+    <string name="stores_reselect_selection_text">Reselect</string>
     <string name="stores_clear_selection_text">Clear</string>
     <string name="separation_button_text">OR</string>
 
@@ -69,5 +70,5 @@
     <string name="main_select_cards_dialog_button_text">Close</string>
     <string name="all_cards_selected_text">All cards are selected</string>
     <string name="cards_not_selected_text">Some cards aren\'t selected</string>
-    <string name="cards_not_selected_text_exe">Only %1$s/%2$s cards are selected</string>
+    <string name="cards_not_selected_text_exe">%1$s/%2$s cards are selected</string>
 </resources>

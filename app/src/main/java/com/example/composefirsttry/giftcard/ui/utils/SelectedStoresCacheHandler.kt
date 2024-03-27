@@ -2,6 +2,7 @@ package com.example.composefirsttry.giftcard.ui.utils
 
 import com.example.composefirsttry.L
 import com.example.composefirsttry.giftcard.logic.stores.model.Store
+import com.example.composefirsttry.giftcard.ui.main.states.StoreMainState
 
 class SelectedStoresCacheHandler {
     private val selectedStoredCache: MutableSet<Store> = mutableSetOf()
@@ -39,8 +40,8 @@ class SelectedStoresCacheHandler {
     }
 
     companion object {
-        const val INVISIBLE = 0
-        const val VISIBLE = 1
-        const val ACTIVE = 2
+        private const val INVISIBLE = StoreMainState.StoreSelection.INVISIBLE
+        private const val VISIBLE = StoreMainState.StoreSelection.VISIBLE
+        private const val ACTIVE = StoreMainState.StoreSelection.ACTIVE
     }
 }
