@@ -29,7 +29,7 @@
             android:padding="4dp"
             android:elevation="8dp"
             android:background="@color/cards_card_frame_color"
-            app:loadImage="@{card.imageRes}"
+            app:loadImage="@{card.imageUrl}"
             />
 
         <ImageButton

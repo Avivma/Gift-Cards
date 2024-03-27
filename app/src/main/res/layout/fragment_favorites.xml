@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
-        <import type="com.example.composefirsttry.giftcard.logic.cards.model.GiftCard" />
+        <import type="android.view.View" />
+        <variable name="showDeleteAll" type="java.lang.Boolean"/>
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout xmlns:tools="http://schemas.android.com/tools"
@@ -44,6 +45,8 @@
             android:src="@drawable/ic_remove_all_favorites"
             android:background="@color/transparent"
             android:scaleType="fitXY"
+            android:visibility="@{showDeleteAll ? View.VISIBLE : View.GONE, default=gone}"
+            tools:visibility="visible"
             />
 
         <androidx.recyclerview.widget.RecyclerView

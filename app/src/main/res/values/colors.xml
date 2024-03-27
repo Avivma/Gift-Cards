@@ -35,7 +35,12 @@
     <color name="store_solid_color">@color/light_accent_transparent</color>
     <color name="cards_card_frame_color">@color/top_background_color</color>
 
-<!--    <color name="temp">#9965C2</color>-->
+    <!-- cards selected -->
+    <color name="show_card_icon_color">@color/dark_accent</color>
+    <color name="cards_selected_color">@color/very_dark_accent</color>
+    <color name="cards_not_selected_color">#B10000</color>
+
+    <!--    <color name="temp">#9965C2</color>-->
 
 <!-- Orange -->
 <!--    <color name="very_dark_accent">#925504</color>-->

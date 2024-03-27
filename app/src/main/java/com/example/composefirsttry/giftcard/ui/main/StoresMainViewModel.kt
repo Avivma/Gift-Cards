@@ -1,25 +1,21 @@
 package com.example.composefirsttry.giftcard.ui.main
 
-import android.content.SharedPreferences
 import androidx.lifecycle.*
 import com.example.composefirsttry.L
-import com.example.composefirsttry.giftcard.logic.cards.db.entity.CardEntity
-import com.example.composefirsttry.giftcard.logic.cards.model.GiftCard
-import com.example.composefirsttry.giftcard.logic.cards.model.GiftCardType
-import com.example.composefirsttry.giftcard.logic.cards.repository.CardsRepo
-import com.example.composefirsttry.giftcard.logic.cardsmetadata.network.sheet.SheetItem
-import com.example.composefirsttry.giftcard.logic.cardsmetadata.repository.MetadataCardsRepo
+import com.example.composefirsttry.giftcard.logic.metadata.repository.MetadataRepo
+import com.example.composefirsttry.giftcard.logic.shoppingclubs.model.ShoppingClub
+import com.example.composefirsttry.giftcard.logic.shoppingclubs.repository.ShoppingClubsRepo
 import com.example.composefirsttry.giftcard.logic.stores.model.Store
 import com.example.composefirsttry.giftcard.logic.stores.repository.StoresConsiderCardsRepo
 import com.example.composefirsttry.giftcard.logic.stores.repository.StoresRepo
-import com.example.composefirsttry.giftcard.ui.common.dialog.advancedialog.CustomDialogAdapterItem
-import com.example.composefirsttry.giftcard.ui.main.cardutils.CardModel
+import com.example.composefirsttry.giftcard.ui.common.dialog.common.CustomDialogAdapterItem
+import com.example.composefirsttry.giftcard.ui.common.model.ClubIdAndUrl
 import com.example.composefirsttry.giftcard.ui.main.states.StoreMainState
 import com.example.composefirsttry.giftcard.ui.main.states.StoresMainIntention
 import com.example.composefirsttry.giftcard.ui.utils.SelectedStoresCacheHandler
-import com.example.composefirsttry.giftcard.utils.CardUtils
 import com.example.composefirsttry.giftcard.utils.DbToModelConverter
-import com.example.composefirsttry.utils.SPKeys
+import com.example.composefirsttry.utils.getValidClubs
+import com.example.composefirsttry.utils.hasValidClubs
 import com.example.composefirsttry.utils.observeForeverFreshly
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -29,29 +25,22 @@ import javax.inject.Inject
 
 @HiltViewModel
 class StoresMainViewModel @Inject constructor (
-    private val sp: SharedPreferences,
     private val storesRepo: StoresRepo,
     private val storesConsiderCardsRepo: StoresConsiderCardsRepo,
-    private val cardsRepo: CardsRepo,
-    private var metadataCardsRepo: MetadataCardsRepo
+    private var shoppingClubsRepo: ShoppingClubsRepo,
+    private val metadataRepo: MetadataRepo,
 ) : ViewModel() {
-
-    var maxCardChecked: Boolean = sp.getBoolean(SPKeys.GIFT_CARD_MAX_CHECKBOX_STATE, true)
-    var corporateCardChecked: Boolean = sp.getBoolean(SPKeys.GIFT_CARD_CORPORATE_CHECKBOX_STATE, true)
-    var hotCardChecked: Boolean = sp.getBoolean(SPKeys.GIFT_CARD_HOT_CHECKBOX_STATE, true)
-
-    var cardsChecked: List<Boolean> = listOf()
 
     private lateinit var storesLiveData: LiveData<List<Store>>
     private lateinit var storesLiveDataObserver: Observer<List<Store>>
 
     private var stateMutableLiveData = MutableLiveData<StoreMainState>()
 
-    private lateinit var cardsLiveData: LiveData<CardModel>
-    private lateinit var cardsLiveDataObserver: Observer<CardModel>
-
     private lateinit var hasMetadataChangedLiveData: LiveData<Boolean>
     private lateinit var hasMetadataChangedLiveDataObserver: Observer<Boolean>
+
+    private lateinit var shoppingClubLiveData: LiveData<List<ShoppingClub>>
+    private lateinit var shoppingClubLiveDataObserver: Observer<List<ShoppingClub>>
 
     private var storesCacheHandler = SelectedStoresCacheHandler()
 
@@ -73,26 +62,20 @@ class StoresMainViewModel @Inject constructor (
             sendFreshData()
         })
 
-        //attach viewModel's cards to db
-        cardsLiveData = Transformations.map(cardsRepo.getAllCardsDb()) { cardsEntities ->
-            fun transformEntitiesToGiftCards(entities: List<CardEntity>): List<GiftCard> {
-                return entities.map { cardEntity -> DbToModelConverter.getGiftCard(cardEntity) }
+        //attach viewModel's shoppingClubs to db
+        shoppingClubLiveData = Transformations.map(shoppingClubsRepo.getAllExistingShoppingClubs()) { clubEntities ->
+            clubEntities.map { clubEntity ->
+                val shoppingClub = DbToModelConverter.fromEntityToShoppingClub(clubEntity)
+                shoppingClub
             }
-            fun fromGiftCardsToCardModel(giftCards: List<GiftCard>): CardModel {
-                val cardModel = CardModel()
-                giftCards.forEach { giftCard -> cardModel.addCard(giftCard)}
-                return cardModel
-            }
-            val giftCards = transformEntitiesToGiftCards(cardsEntities)
-            return@map fromGiftCardsToCardModel(giftCards)
         }
         //notify when changes happens
-        cardsLiveDataObserver = cardsLiveData.observeForeverFreshly(Observer { ignore ->
+        shoppingClubLiveDataObserver = shoppingClubLiveData.observeForeverFreshly(Observer { ignore ->
             sendFreshData()
         })
 
-        //attach viewModel's stores to db
-        hasMetadataChangedLiveData = metadataCardsRepo.serverDataChangedLiveData
+        //attach viewModel's hasMetadataChanged to db
+        hasMetadataChangedLiveData = metadataRepo.serverDataChangedLiveData
         //notify when changes happens
         hasMetadataChangedLiveDataObserver = hasMetadataChangedLiveData.observeForeverFreshly(Observer { dataChanged ->
             if (dataChanged) {
@@ -104,7 +87,7 @@ class StoresMainViewModel @Inject constructor (
     override fun onCleared() {
         super.onCleared()
         storesLiveData.removeObserver(storesLiveDataObserver)
-        cardsLiveData.removeObserver(cardsLiveDataObserver)
+        shoppingClubLiveData.removeObserver(shoppingClubLiveDataObserver)
         hasMetadataChangedLiveData.removeObserver(hasMetadataChangedLiveDataObserver)
     }
 
@@ -117,7 +100,7 @@ class StoresMainViewModel @Inject constructor (
 
     private fun sendFreshData() {
         L.i("sendFreshData")
-        stateMutableLiveData.postValue(StoreMainState.DisplayData(getCardModel(), getFilteredStores()))
+        sendStateDisplayData()
     }
 
     private fun displayForceInitializeDialog() {
@@ -129,7 +112,6 @@ class StoresMainViewModel @Inject constructor (
         viewModelScope.launch(Dispatchers.IO) {
             when (intention) {
                 is StoresMainIntention.FilterByPrefix -> filterByPrefix(intention.prefix)
-                is StoresMainIntention.FilterByCard -> filterByCard(intention.giftCardType, intention.isChecked)
                 StoresMainIntention.ClearSearchBox -> clearSearchBox()
                 StoresMainIntention.Refresh -> {
                     stateMutableLiveData.postValue(StoreMainState.Waiting)
@@ -144,8 +126,8 @@ class StoresMainViewModel @Inject constructor (
                 is StoresMainIntention.SelectStore -> storeSelected(intention.store)
                 is StoresMainIntention.OpenStoreDialog -> openStoreDialog(intention.store)
                 is StoresMainIntention.AddStoreToFavorites -> addStoreToFavorites(intention.store)
-                is StoresMainIntention.NavigateToCardsScreen -> navigateToCardsScreen(intention.giftCardType)
-                is StoresMainIntention.CheckCardDiscount -> checkCardDiscount(intention.giftCardType)
+                is StoresMainIntention.NavigateToCardsScreen -> navigateToCardsScreen(intention.shoppingClubId)
+                is StoresMainIntention.ShoppingClubChecked -> shoppingClubChecked(intention.clubDialogAdapterItem)
                 StoresMainIntention.AddSeparationMarkToSearch -> addSeparationMarkToSearch()
                 StoresMainIntention.Initialize -> initializingApp()
                 StoresMainIntention.OpenCardsSelectionDialog -> openCardsSelectionDialog()
@@ -155,22 +137,19 @@ class StoresMainViewModel @Inject constructor (
     }
 
     private fun openCardsSelectionDialog() {
-        val listMetadataCardsDb: List<SheetItem> = metadataCardsRepo.getMetadataCardsDb()
-        //convert to CustomDialogAdapterItem:
-        val dialogAdapterItems = listMetadataCardsDb.map { metadata -> CustomDialogAdapterItem(metadata.type, metadata.imageUrl) }
-        // TODO: 16-Mar-24 to be continue - add "CardsDialogOpened"
-//        stateMutableLiveData.postValue(AddCardState.CardsDialogOpened(dialogAdapterItems))
+        val dialogAdapterItems = getShoppingClubs().map { shoppingClub -> CustomDialogAdapterItem.Selectable(shoppingClub.clubId, shoppingClub.type, shoppingClub.imageUrl, shoppingClub.checked) }
+        stateMutableLiveData.postValue(StoreMainState.CardsDialogOpened(dialogAdapterItems))
     }
 
     private fun refresh() {
         viewModelScope.launch(Dispatchers.IO) {
-            launch { metadataCardsRepo.refresh() }
+            launch { metadataRepo.refresh() }
             launch { storesRepo.refresh() }
         }
     }
 
     private fun initializingApp() {
-        metadataCardsRepo.clear()
+        metadataRepo.clear()
         stateMutableLiveData.postValue(StoreMainState.Navigation.NavigateToInitializeScreen)
     }
 
@@ -184,13 +163,12 @@ class StoresMainViewModel @Inject constructor (
         stateMutableLiveData.postValue(StoreMainState.SearchBoxTextChanged("", 0))
     }
 
-    private fun checkCardDiscount(giftCardType: GiftCardType) {
-        val cards = getCardModel().getCards(giftCardType)
-        stateMutableLiveData.postValue(StoreMainState.DisplayToast(cards, cards.size == 1))
+    private fun shoppingClubChecked(clubDialogAdapterItem: CustomDialogAdapterItem.Selectable) {
+        shoppingClubsRepo.updateShoppingClubChecked(clubDialogAdapterItem.id, clubDialogAdapterItem.selected)
     }
 
-    private fun navigateToCardsScreen(giftCardType: GiftCardType) {
-        stateMutableLiveData.postValue(StoreMainState.Navigation.NavigateToCardsScreen(giftCardType))
+    private fun navigateToCardsScreen(shoppingClubId: String) {
+        stateMutableLiveData.postValue(StoreMainState.Navigation.NavigateToCardsScreen(shoppingClubId))
     }
 
     private fun addStoreToFavorites(store: Store) {
@@ -205,10 +183,10 @@ class StoresMainViewModel @Inject constructor (
         L.i("clearStoresSelection: storesHasBeenSelected= ${storesCacheHandler.storesHasBeenSelected}")
         storesCacheHandler.clearStoresSelection()
         if (storesCacheHandler.storesHasBeenSelected == SelectedStoresCacheHandler.VISIBLE) //deactivate
-            stateMutableLiveData.postValue(StoreMainState.DisplayData(getCardModel(), getFilteredStores()))
+            sendStateDisplayData()
         else { //make invisible
             getStores().forEach { storesCacheHandler.updateStoreWithCacheProperties(it) }
-            stateMutableLiveData.postValue(StoreMainState.DisplayData(getCardModel(), getFilteredStores(), hideStoreSelectionFilter = true))
+            sendStateDisplayData(hideStoreSelectionFilter = true)
         }
     }
 
@@ -218,7 +196,7 @@ class StoresMainViewModel @Inject constructor (
 
         when (storesCacheHandler.storesHasBeenSelected) {
             SelectedStoresCacheHandler.VISIBLE, SelectedStoresCacheHandler.ACTIVE -> stateMutableLiveData.postValue(StoreMainState.StoreSelected(store, true))
-            SelectedStoresCacheHandler.INVISIBLE -> stateMutableLiveData.postValue(StoreMainState.DisplayData(getCardModel(), getFilteredStores(), hideStoreSelectionFilter = true))
+            SelectedStoresCacheHandler.INVISIBLE -> sendStateDisplayData(hideStoreSelectionFilter = true)
         }
     }
 
@@ -229,36 +207,44 @@ class StoresMainViewModel @Inject constructor (
     private fun filterBySelectedStores() {
         L.i("filterBySelectedStores")
         storesCacheHandler.setStoresSelection(SelectedStoresCacheHandler.ACTIVE)
-        stateMutableLiveData.postValue(StoreMainState.DisplayData(getCardModel(), getFilteredStores()))
-    }
-
-    private fun filterByCard(giftCardType: GiftCardType, isChecked: Boolean) {
-        L.i("filterByCard: card= ${CardUtils.getCardName(giftCardType)}, isChecked= $isChecked")
-        sp.edit().putBoolean(getCardSp(giftCardType), isChecked).commit()
-        when (giftCardType) {
-            GiftCardType.MAX -> maxCardChecked = isChecked
-            GiftCardType.ISRACARD -> corporateCardChecked = isChecked
-            GiftCardType.TAV_HAHAM -> hotCardChecked = isChecked
-        }
-
-        stateMutableLiveData.postValue(StoreMainState.DisplayData(getCardModel(), getFilteredStores()))
+        sendStateDisplayData()
     }
 
     private fun filterByPrefix(prefix: String) {
         searchTextValue_static = prefix
-        val filteredStores: List<Store> = getStores().filter { store -> shouldStoreBeDisplayed(store, prefix) }
-        stateMutableLiveData.postValue(StoreMainState.DisplayData(getCardModel(), filteredStores, searchIconVisible = prefix.isEmpty()))
+        sendStateDisplayData(searchIconVisible = prefix.isEmpty())
+    }
+
+    private fun sendStateDisplayData(hideStoreSelectionFilter: Boolean = false, searchIconVisible: Boolean = true) {
+        val shoppingClubs = getShoppingClubs()
+        val shoppingClubsAmount = shoppingClubs.size
+        val shoppingClubsChecked = shoppingClubs.filter { club -> club.checked }.size
+        val allCardsChecked = shoppingClubsAmount == shoppingClubsChecked
+        val cardsTextModel = StoreMainTextModel(shoppingClubsChecked, shoppingClubsAmount, allCardsChecked)
+        stateMutableLiveData.postValue(StoreMainState.DisplayData(getDisplayedData(), cardsTextModel = cardsTextModel, hideStoreSelectionFilter = hideStoreSelectionFilter, searchIconVisible = searchIconVisible))
+    }
+
+    /**
+     * FilteredStores and AvailableClubs
+     */
+    private fun getDisplayedData(): Map<Store, List<ClubIdAndUrl>> {
+        val filteredStores: List<Store> = getFilteredStores()
+        val storesAndClubs = mapAvailableClubs(filteredStores)
+        return storesAndClubs
+    }
+
+    private fun mapAvailableClubs(filteredStores: List<Store>): Map<Store, List<ClubIdAndUrl>> {
+        return filteredStores.associateWith { store ->
+            return@associateWith store.getValidClubs(getCheckedShoppingClubs())
+                .map { club -> ClubIdAndUrl(club.clubId, club.imageUrl) }
+        }
     }
 
     private fun shouldStoreBeDisplayed(store: Store, prefix: String): Boolean {
-        return if ((store.maxCard && maxCardChecked) ||
-            (store.corporateCard && corporateCardChecked) ||
-            (store.hotCard && hotCardChecked)) {
-            (storesCacheHandler.hasStoreIncludedInCache(store))
-                    && doesStoreNameStartWithPrefix(store.storeName.lowercase(), prefix.lowercase())
-        } else {
-            false
-        }
+        val storeRelatedCardExist = store.hasValidClubs(getCheckedShoppingClubs())
+        return storeRelatedCardExist
+                && storesCacheHandler.hasStoreIncludedInCache(store)
+                && doesStoreNameStartWithPrefix(store.storeName.lowercase(), prefix.lowercase())
     }
 
     private fun doesStoreNameStartWithPrefix(storeName: String, complexPrefix: String): Boolean {
@@ -266,16 +252,10 @@ class StoresMainViewModel @Inject constructor (
         return acceptablePrefixes.any { storeName.startsWith(it) }
     }
 
-    private fun getCardSp(giftCardType: GiftCardType): String = when (giftCardType) {
-            GiftCardType.MAX -> SPKeys.GIFT_CARD_MAX_CHECKBOX_STATE
-            GiftCardType.ISRACARD -> SPKeys.GIFT_CARD_CORPORATE_CHECKBOX_STATE
-            GiftCardType.TAV_HAHAM -> SPKeys.GIFT_CARD_HOT_CHECKBOX_STATE
-            else -> throw Exception("Unfamiliar GiftCard type!! (${CardUtils.getCardName(giftCardType)})")
-    }
-
     private fun getStores(): List<Store> = storesLiveData.value ?: emptyList()
 
-    private fun getCardModel(): CardModel = cardsLiveData.value ?: CardModel()
+    private fun getShoppingClubs(): List<ShoppingClub> = shoppingClubLiveData.value ?: emptyList()
+    private fun getCheckedShoppingClubs(): List<ShoppingClub> = shoppingClubLiveData.value?.filter { it.checked } ?: emptyList()
 
     private fun isFirstTimeDataFetched(): Boolean = firstTimeFetchData.getAndSet(false)
 

@@ -1,7 +1,6 @@
 package com.example.composefirsttry.giftcard.ui.cards.states
 
 import com.example.composefirsttry.giftcard.logic.cards.model.GiftCard
-import com.example.composefirsttry.giftcard.logic.cards.model.GiftCardType
 
 sealed class CardsIntention {
     data class OpenRemoveCardDialog(val card: GiftCard) : CardsIntention()
@@ -14,6 +13,6 @@ sealed class CardsIntention {
 
     sealed class NavigatedType : CardsIntention() {
         object ShowAll : NavigatedType()
-        data class SingleCardType(val argCardType: GiftCardType) : NavigatedType()
+        data class SingleCardType(val argClubId: String) : NavigatedType()
     }
 }

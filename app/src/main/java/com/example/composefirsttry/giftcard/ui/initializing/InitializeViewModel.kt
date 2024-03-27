@@ -2,8 +2,8 @@ package com.example.composefirsttry.giftcard.ui.initializing
 
 import androidx.lifecycle.*
 import com.example.composefirsttry.L
-import com.example.composefirsttry.giftcard.logic.cards.repository.CardUtils
-import com.example.composefirsttry.giftcard.logic.cardsmetadata.repository.MetadataCardsRepo
+import com.example.composefirsttry.giftcard.logic.cards.repository.CardsRepo
+import com.example.composefirsttry.giftcard.logic.metadata.repository.MetadataRepo
 import com.example.composefirsttry.giftcard.ui.initializing.state.InitializeIntention
 import com.example.composefirsttry.giftcard.ui.initializing.state.InitializeState
 import com.example.composefirsttry.utils.observeForeverFreshly
@@ -14,8 +14,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class InitializeViewModel @Inject constructor (
-    private val metadataCardsRepo: MetadataCardsRepo,
-    private val cardUtils: CardUtils
+    private val metadataRepo: MetadataRepo,
+    private val cardsRepo: CardsRepo,
 ) : ViewModel() {
 
     private lateinit var hasMetadataFinishedLiveData: LiveData<Boolean>
@@ -29,7 +29,7 @@ class InitializeViewModel @Inject constructor (
 
     private fun initListeners() {
         //attach viewModel's stores to db
-        hasMetadataFinishedLiveData = metadataCardsRepo.initFinishedLiveData
+        hasMetadataFinishedLiveData = metadataRepo.initFinishedLiveData
         //notify when changes happens
         hasMetadataFinishedLiveDataObserver = hasMetadataFinishedLiveData.observeForeverFreshly(Observer { ignore ->
             navigateToDestination()
@@ -69,9 +69,9 @@ class InitializeViewModel @Inject constructor (
 
     private fun initializing() {
         viewModelScope.launch(Dispatchers.IO) {
-            metadataCardsRepo.initializing()
+            metadataRepo.initializing()
         }
     }
 
-    private fun shouldNavigateToLandingScreen(): Boolean = !cardUtils.hasAnyCard()
+    private fun shouldNavigateToLandingScreen(): Boolean = !cardsRepo.hasAnyCard()
 }

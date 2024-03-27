@@ -12,13 +12,11 @@ import com.example.composefirsttry.L
 import com.example.composefirsttry.R
 import com.example.composefirsttry.databinding.FragmentFavoritesBinding
 import com.example.composefirsttry.giftcard.GiftCardMainActivity
-import com.example.composefirsttry.giftcard.logic.cards.repository.CardUtils
 import com.example.composefirsttry.giftcard.ui.common.dialog.CustomDialog
 import com.example.composefirsttry.giftcard.ui.favorites.states.FavoritesIntention
 import com.example.composefirsttry.giftcard.ui.favorites.states.FavoritesState
 import com.example.composefirsttry.utils.requireActivity
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class FavoritesFragment : Fragment() {
@@ -26,16 +24,13 @@ class FavoritesFragment : Fragment() {
     private lateinit var binding: FragmentFavoritesBinding
     private lateinit var adapter: FavoritesAdapter
 
-    @Inject
-    lateinit var cardUtils: CardUtils
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         //More info: https://stackoverflow.com/questions/59826066/databindingutil-inflates-layout-as-null
         binding = FragmentFavoritesBinding.inflate(inflater, container, false)
-        adapter = FavoritesAdapter(emptyList(), cardUtils)
+        adapter = FavoritesAdapter(mutableMapOf())
         adapter.setHasStableIds(true)
         binding.recyclerView.adapter = adapter
         binding.recyclerView.layoutManager = LinearLayoutManager(requireActivity())
@@ -69,7 +64,8 @@ class FavoritesFragment : Fragment() {
                 L.i("FavoritesState.DisplayData")
                 binding.progressCircular.visibility = View.GONE
                 binding.recyclerView.alpha = 1f
-                adapter.setStores(state.stores)
+                binding.removeFavoritesButton.visibility = if (state.showDeleteAll) View.VISIBLE else View.GONE
+                adapter.setData(state.storesAndClubs)
             }
             is FavoritesState.StoreDialogOpened -> {
                 CustomDialog(requireActivity())
@@ -93,7 +89,7 @@ class FavoritesFragment : Fragment() {
     private fun navigate(navigationIntention: FavoritesState.Navigation) {
         when (navigationIntention) {
             is FavoritesState.Navigation.NavigateToCardsScreen -> {
-                val direction = FavoritesFragmentDirections.actionFavoritesFragmentToCardsFragment(navigationIntention.giftCardType)
+                val direction = FavoritesFragmentDirections.actionFavoritesFragmentToCardsFragment(navigationIntention.shoppingClubId)
                 requireActivity<GiftCardMainActivity>().getNavController().navigate(direction)
             }
             else -> {

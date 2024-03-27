@@ -7,10 +7,6 @@
         <import type="android.view.View" />
         <variable name="storeName" type="java.lang.String"/>
         <variable name="storeSelected" type="java.lang.Boolean"/>
-
-        <variable name="maxCardVisible" type="java.lang.Boolean"/>
-        <variable name="corporateCardVisible" type="java.lang.Boolean"/>
-        <variable name="hotCardVisible" type="java.lang.Boolean"/>
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -53,43 +49,19 @@
             app:layout_constraintGuide_percent="0.24"
             />
 
-        <include
-            android:id="@+id/card_max"
-            android:layout_width="wrap_content"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_view"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="6dp"
             app:layout_constraintTop_toTopOf="@id/guideline"
             app:layout_constraintStart_toEndOf="@id/store_name_tv"
-            android:layout_marginStart="6dp"
-            layout="@layout/gift_card_small_layout"
-            app:cardImageSmallLayout="@{@drawable/max}"
-            android:visibility="@{maxCardVisible ? View.VISIBLE : View.GONE, default=invisible}"
-            tools:visibility="visible"
-            />
-
-        <include
-            android:id="@+id/card_corporate"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintStart_toEndOf="@id/card_max"
-            app:layout_constraintTop_toTopOf="@id/guideline"
-            android:layout_marginStart="6dp"
-            layout="@layout/gift_card_small_layout"
-            app:cardImageSmallLayout="@{@drawable/corporate}"
-            android:visibility="@{corporateCardVisible ? View.VISIBLE : View.GONE, default=invisible}"
-            tools:visibility="visible"
-            />
-
-        <include
-            android:id="@+id/card_hot"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintStart_toEndOf="@id/card_corporate"
-            app:layout_constraintTop_toTopOf="@id/guideline"
-            android:layout_marginStart="6dp"
-            android:layout_marginEnd="6dp"
-            layout="@layout/gift_card_small_layout"
-            app:cardImageSmallLayout="@{@drawable/hot}"
-            android:visibility="@{hotCardVisible ? View.VISIBLE : View.GONE, default=invisible}"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:orientation="horizontal"
+            tools:itemCount="3"
+            tools:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            tools:listitem="@layout/gift_card_small_layout"
+            tools:orientation="horizontal"
             tools:visibility="visible"
             />
     </androidx.constraintlayout.widget.ConstraintLayout>

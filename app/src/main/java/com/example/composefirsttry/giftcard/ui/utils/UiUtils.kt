@@ -9,7 +9,7 @@ object UiUtils {
     fun getRemoveCardDialog(activity: FragmentActivity, removeListener: View.OnClickListener): CustomDialog {
         return CustomDialog(activity)
             .setTitle(R.string.cards_remove_card_dialog_title)
-            .setPositiveButton(R.string.cards_dialog_remove_button_text) { removeListener }
+            .setPositiveButton(R.string.cards_dialog_remove_button_text, removeListener)
             .setNegativeButton(R.string.cards_dialog_cancel_button_text) { }
     }
 }

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable name="cardsTextModel" type="com.example.composefirsttry.giftcard.ui.main.StoreMainTextModel"/>
+    </data>
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:id="@+id/card_selected_layout"
+        >
+        <View
+            android:id="@+id/cards_checked_icon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:gravity="center"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/cards_checked_list_button"
+            app:layout_constraintBottom_toBottomOf="@id/cards_checked_list_button"
+            android:background="@{cardsTextModel != null &amp;&amp; cardsTextModel.allCardsSelected ? @drawable/all_cards_checked_icon : @drawable/cards_not_checked_icon, default=@drawable/all_cards_checked_icon}"
+            tools:background="@drawable/cards_not_checked_icon"
+            />
+
+        <TextView
+            android:id="@+id/cards_presented_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_marginStart="4dp"
+            android:textSize="17sp"
+            android:textStyle="italic|bold"
+            android:textColor="@color/store_text_color"
+            app:setCardSelectedText="@{cardsTextModel}"
+            app:layout_constraintStart_toEndOf="@id/cards_checked_icon"
+            app:layout_constraintTop_toTopOf="@id/cards_checked_list_button"
+            app:layout_constraintBottom_toBottomOf="@id/cards_checked_list_button"
+            tools:text="@string/cards_not_selected_text"
+            />
+
+        <ImageButton
+            android:id="@+id/cards_checked_list_button"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toEndOf="@id/cards_presented_tv"
+            android:layout_marginStart="12dp"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@drawable/show_cards_icon"
+            android:elevation="8dp"
+            android:background="@drawable/store_frame"
+            android:clickable="false"
+            android:focusable="false"
+            />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

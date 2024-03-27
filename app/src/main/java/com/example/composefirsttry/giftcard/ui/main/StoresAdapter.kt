@@ -1,23 +1,22 @@
 package com.example.composefirsttry.giftcard.ui.main
 
-import android.content.Context
-import android.content.SharedPreferences
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.composefirsttry.R
 import com.example.composefirsttry.databinding.StoreRowLayoutBinding
-import com.example.composefirsttry.giftcard.logic.cards.model.GiftCardType
-import com.example.composefirsttry.giftcard.logic.cards.repository.CardUtils
 import com.example.composefirsttry.giftcard.logic.stores.model.Store
+import com.example.composefirsttry.giftcard.ui.common.adapter.StoreCardsAdapter
+import com.example.composefirsttry.giftcard.ui.common.model.ClubIdAndUrl
 import com.example.composefirsttry.giftcard.ui.main.states.StoresMainIntention
-import com.example.composefirsttry.utils.SPKeys
 
-class StoresAdapter(giftCards: List<Store>, var context: Context, var sp: SharedPreferences, private val cardUtils: CardUtils): RecyclerView.Adapter<StoresAdapter.StoreRowHolder>() {
-    private val stores: MutableList<Store> = ArrayList(giftCards)
+class StoresAdapter(availableClubsPerStore: MutableMap<Store, List<ClubIdAndUrl>>): RecyclerView.Adapter<StoresAdapter.StoreRowHolder>() {
+    private val stores: MutableList<Store> = ArrayList(availableClubsPerStore.keys)
+        private val availableClubsPerStore: MutableMap<Store, List<ClubIdAndUrl>> = HashMap(availableClubsPerStore)
 
     var intentionsListener: LiveData<StoresMainIntention> = MutableLiveData()
     private var mutableIntentionsListener: MutableLiveData<StoresMainIntention> = intentionsListener as MutableLiveData<StoresMainIntention>
@@ -36,32 +35,21 @@ class StoresAdapter(giftCards: List<Store>, var context: Context, var sp: Shared
         return stores.size
     }
 
-    private var maxCardChecked: Boolean = true
-    private var corporateCardChecked: Boolean = true
-    private var hotCardChecked: Boolean = true
-
-    private var maxCardExist: Boolean = false
-    private var corporateCardExist: Boolean = false
-    private var hotCardExist: Boolean = false
 
     override fun getItemId(position: Int): Long {
         return stores[position].storeName.hashCode().toLong()
     }
 
-    fun setStores(giftCards: List<Store>) {
-        maxCardChecked = sp.getBoolean(SPKeys.GIFT_CARD_MAX_CHECKBOX_STATE, true)
-        corporateCardChecked = sp.getBoolean(SPKeys.GIFT_CARD_CORPORATE_CHECKBOX_STATE, true)
-        hotCardChecked = sp.getBoolean(SPKeys.GIFT_CARD_HOT_CHECKBOX_STATE, true)
-        maxCardExist = cardUtils.hasCard(GiftCardType.MAX)
-        corporateCardExist = cardUtils.hasCard(GiftCardType.ISRACARD)
-        hotCardExist = cardUtils.hasCard(GiftCardType.TAV_HAHAM)
+    fun setStores(storesAndClubs: Map<Store, List<ClubIdAndUrl>>) {
         this.stores.clear()
-        this.stores.addAll(giftCards)
+        this.stores.addAll(storesAndClubs.keys)
+        this.availableClubsPerStore.clear()
+        this.availableClubsPerStore.putAll(storesAndClubs)
         this.notifyDataSetChanged()
     }
 
     fun clear() {
-        setStores(mutableListOf())
+        setStores(mutableMapOf())
     }
 
     fun storeSelected(store: Store) {
@@ -70,18 +58,19 @@ class StoresAdapter(giftCards: List<Store>, var context: Context, var sp: Shared
 
     //View Holder
     inner class StoreRowHolder(private val binding: StoreRowLayoutBinding): RecyclerView.ViewHolder(binding.root) {
+        private fun createAdapter(store: Store, cardOnClick: (String) -> Unit): StoreCardsAdapter {
+            val availableClubs: List<ClubIdAndUrl> = availableClubsPerStore[store]!!
+            val adapter = StoreCardsAdapter(availableClubs, cardOnClick)
+            adapter.setHasStableIds(true)
+            return adapter
+        }
+
         fun binding(store: Store) {
             //set binding variables
-            binding.maxCardVisible = store.maxCard && maxCardExist && maxCardChecked
-            binding.corporateCardVisible = store.corporateCard && corporateCardExist && corporateCardChecked
-            binding.hotCardVisible = store.hotCard && hotCardExist && hotCardChecked
             binding.storeName = store.storeName
             binding.storeSelected = store.selected
 
             //set listeners
-            binding.cardMax.cardLayout.setOnClickListener { mutableIntentionsListener.postValue(StoresMainIntention.NavigateToCardsScreen(GiftCardType.MAX)) }
-            binding.cardCorporate.cardLayout.setOnClickListener { mutableIntentionsListener.postValue(StoresMainIntention.NavigateToCardsScreen(GiftCardType.ISRACARD)) }
-            binding.cardHot.cardLayout.setOnClickListener { mutableIntentionsListener.postValue(StoresMainIntention.NavigateToCardsScreen(GiftCardType.TAV_HAHAM)) }
             binding.storeNameTv.setOnClickListener {
                 mutableIntentionsListener.postValue(StoresMainIntention.SelectStore(store))
             }
@@ -89,6 +78,12 @@ class StoresAdapter(giftCards: List<Store>, var context: Context, var sp: Shared
                 mutableIntentionsListener.postValue(StoresMainIntention.OpenStoreDialog(store))
                 true
             }
+            val cardOnClick = { id: String ->
+                mutableIntentionsListener.postValue(StoresMainIntention.NavigateToCardsScreen(id))
+            }
+
+            binding.recyclerView.adapter = createAdapter(store, cardOnClick)
+            binding.recyclerView.layoutManager = LinearLayoutManager(binding.root.context, LinearLayoutManager.HORIZONTAL, false)
         }
     }
 }

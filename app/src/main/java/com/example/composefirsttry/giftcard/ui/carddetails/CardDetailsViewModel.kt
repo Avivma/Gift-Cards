@@ -4,11 +4,9 @@ import androidx.lifecycle.*
 import com.example.composefirsttry.L
 import com.example.composefirsttry.giftcard.logic.cards.model.GiftCard
 import com.example.composefirsttry.giftcard.logic.cards.model.GiftCardExtended
-import com.example.composefirsttry.giftcard.logic.cards.model.GiftCardType
 import com.example.composefirsttry.giftcard.logic.cards.repository.CardsRepo
 import com.example.composefirsttry.giftcard.ui.carddetails.state.CardDetailsIntention
 import com.example.composefirsttry.giftcard.ui.carddetails.state.CardDetailsState
-import com.example.composefirsttry.giftcard.ui.utils.NavigateOutsideHandler
 import com.example.composefirsttry.giftcard.utils.DbToModelConverter
 import com.example.composefirsttry.utils.observeForeverFreshly
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -78,11 +76,11 @@ class CardDetailsViewModel @Inject constructor(
     }
 
     private fun navigateOutsideToLoadMoney(card: GiftCard) {
-        when (card.type) {
-            GiftCardType.MAX -> stateMutableLiveData.postValue(CardDetailsState.Navigation.NavigateOutsideToMax(NavigateOutsideHandler.MAX_APPLICATION_ID))
-            GiftCardType.ISRACARD -> stateMutableLiveData.postValue(CardDetailsState.Navigation.NavigateOutsideToIsracard(NavigateOutsideHandler.ISRACARD_SITE_ADDRESS))
-            GiftCardType.TAV_HAHAM -> stateMutableLiveData.postValue(CardDetailsState.Navigation.NavigateOutsideToTavHaham(NavigateOutsideHandler.TAV_HAHAM_APPLICATION_ID))
-        }
+//        when (card.type) {
+//            GiftCardType.MAX -> stateMutableLiveData.postValue(CardDetailsState.Navigation.NavigateOutsideToMax(NavigateOutsideHandler.MAX_APPLICATION_ID))
+//            GiftCardType.ISRACARD -> stateMutableLiveData.postValue(CardDetailsState.Navigation.NavigateOutsideToIsracard(NavigateOutsideHandler.ISRACARD_SITE_ADDRESS))
+//            GiftCardType.TAV_HAHAM -> stateMutableLiveData.postValue(CardDetailsState.Navigation.NavigateOutsideToTavHaham(NavigateOutsideHandler.TAV_HAHAM_APPLICATION_ID))
+//        }
     }
 
     override fun onCleared() {

@@ -14,13 +14,12 @@ import com.example.composefirsttry.databinding.AddCardFragmentBinding
 import com.example.composefirsttry.giftcard.GiftCardMainActivity
 import com.example.composefirsttry.giftcard.logic.cards.model.CardFieldType
 import com.example.composefirsttry.giftcard.logic.cards.model.GiftCard
-import com.example.composefirsttry.giftcard.logic.cards.model.GiftCardType
 import com.example.composefirsttry.giftcard.ui.addcard.states.AddCardIntention
 import com.example.composefirsttry.giftcard.ui.addcard.states.AddCardState
 import com.example.composefirsttry.giftcard.ui.common.dialog.CustomDialog
-import com.example.composefirsttry.giftcard.ui.common.dialog.advancedialog.CustomDialogAdapterItem
-import com.example.composefirsttry.giftcard.ui.common.dialog.advancedialog.ListCustomDialog
-import com.example.composefirsttry.giftcard.utils.CardUtils
+import com.example.composefirsttry.giftcard.ui.common.dialog.common.CustomDialogAdapterItem
+import com.example.composefirsttry.giftcard.ui.common.dialog.listdialog.ListCustomDialog
+import com.example.composefirsttry.giftcard.ui.common.model.ClubIdAndUrl
 import com.example.composefirsttry.utils.requireActivity
 import com.google.android.material.textfield.TextInputEditText
 import dagger.hilt.android.AndroidEntryPoint
@@ -104,19 +103,19 @@ class AddCardFragment : Fragment() {
         when (state) {
             is AddCardState.DisplayData -> displayData(state)
             is AddCardState.CardsDialogOpened -> openCardsList(state.dialogItems)
-            is AddCardState.CardImageChanged -> changedCardImage(state.cardType)
+            is AddCardState.CardImageChanged -> changedCardImage(state.clubDetails)
             is AddCardState.FieldStatusChanged -> changeFieldStatus(state.fieldType, state.statusOk)
-            is AddCardState.DisplayDataEditCard -> displayDataEditCard(state.fieldsValueMap, state.cardType)
+            is AddCardState.DisplayDataEditCard -> displayDataEditCard(state.fieldsValueMap, state.clubDetails)
         }
     }
 
-    private fun displayDataEditCard(fieldsValueMap: HashMap<CardFieldType, String>, cardType: GiftCardType) {
+    private fun displayDataEditCard(fieldsValueMap: HashMap<CardFieldType, String>, clubDetails: ClubIdAndUrl) {
         binding.cardNameEditText.setText(fieldsValueMap.getValue(CardFieldType.Name))
         binding.cardDiscountEditText.setText(fieldsValueMap.getValue(CardFieldType.Discount))
         binding.cardNumberEditText.setText(fieldsValueMap.getValue(CardFieldType.Number))
         binding.cardCvvEditText.setText(fieldsValueMap.getValue(CardFieldType.Cvv))
         binding.cardExpirationEditText.setText(fieldsValueMap.getValue(CardFieldType.ExpirationDate))
-        changedCardImage(cardType = cardType)
+        changedCardImage(clubDetails)
         binding.saveCard.setText(R.string.cards_edit_card_dialog_edit_button_text)
     }
 
@@ -154,24 +153,17 @@ class AddCardFragment : Fragment() {
             .show()
     }
 
-    private fun changedCardImage(cardType: GiftCardType) {
+    private fun changedCardImage(clubDetails: ClubIdAndUrl) {
         binding.showConcreteCard = true
         binding.showCardErrorSign = false
-        binding.imageRes = CardUtils.getCardImage(cardType)
+        binding.imageUrl = clubDetails.url
     }
 
     private fun openCardsList(dialogItems: List<CustomDialogAdapterItem>) {
         ListCustomDialog(requireActivity()).apply {
             setTitle(R.string.add_card_cards_dialog_title)
             setAdapter(dialogItems) { item ->
-                //currently, manually pick the type:
-                val selectedCard: GiftCardType = when (item.title) {
-                    "tav_haham" -> GiftCardType.TAV_HAHAM
-                    "isracard" -> GiftCardType.ISRACARD
-                    "max" -> GiftCardType.MAX
-                    else -> throw Exception("Unfamiliar card type!!")
-                }
-                viewModel.action(AddCardIntention.PickCardType(selectedCard))
+                viewModel.action(AddCardIntention.PickCardType(item))
             }
         }.show()
     }

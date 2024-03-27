@@ -49,7 +49,8 @@ class StoresRepo @Inject constructor(
                 storeNameHebrew = "",
                 maxCard = store.maxAvailability == "V",
                 corporateCard = store.corporateAvailability == "V",
-                hotCard = store.hotAvailability == "V"
+                hotCard = store.hotAvailability == "V",
+                clubsAvailability = store.cardsAvailability.map { availability -> availability == "V"}
             )
         })
         return storesDb

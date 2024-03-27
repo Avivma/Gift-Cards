@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
     <data>
-        <variable name="item" type="com.example.composefirsttry.giftcard.ui.common.dialog.advancedialog.CustomDialogAdapterItem"/>
+        <variable name="item" type="com.example.composefirsttry.giftcard.ui.common.dialog.common.CustomDialogAdapterItem"/>
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/row_layout"

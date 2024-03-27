@@ -10,14 +10,14 @@ data class CardEntity constructor(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id")
     var cardId: Int = 0,
-    @ColumnInfo(name = "type")
-    var type: Int,
+    @ColumnInfo(name = "card_club_id")
+    var cardClubId: String,
     @ColumnInfo(name = "name")
     var name: String,
     @ColumnInfo(name = "discount")
     var discount: Float,
     @ColumnInfo(name = "image")
-    var imageRes: Int,
+    var imageUrl: String,
     @ColumnInfo(name = "longName")
     var longName: String = "",
 

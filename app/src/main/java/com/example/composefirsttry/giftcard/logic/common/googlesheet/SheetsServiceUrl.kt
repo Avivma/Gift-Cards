@@ -41,4 +41,21 @@ object SheetsServiceUrl {
             L.i(line)
         }
     }
+
+    fun calcColumn(startColumnLetter: Char, amountOfCards: Int): Char {
+        val offsetAddition: Int = amountOfCards - 1
+        val endColumn = calcAsciiCapital(startColumnLetter, offsetAddition)
+        return endColumn
+    }
+
+    private fun calcAsciiCapital(letter: Char, offset: Int): Char {
+        val asciiValueOfA = letter.code // ASCII value of 'B' is 66
+        return (asciiValueOfA + offset).toChar()
+    }
+
+    fun calcRow(startRowNumber: Int, amountOfStore: Int): String {
+        val offsetAddition: Int = amountOfStore - 1
+        val endRow = startRowNumber + offsetAddition
+        return endRow.toString()
+    }
 }

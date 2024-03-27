@@ -1,13 +1,14 @@
 package com.example.composefirsttry.giftcard.logic.stores.network
 
+import com.example.composefirsttry.giftcard.logic.metadata.MetadataDbHelper
 import com.example.composefirsttry.giftcard.logic.stores.network.sheet.SheetItem
 import com.example.composefirsttry.giftcard.logic.stores.network.sheet.SheetsUsingUrl
 import javax.inject.Inject
 
-class RestGiftCardService @Inject constructor() {
+class RestGiftCardService @Inject constructor(private var metadataDbHelper: MetadataDbHelper) {
     fun getStores(): List<SheetItem> {
 //        printAllFirebaseDB()
-        val sheetItems = SheetsUsingUrl.dataFromWeb()
+        val sheetItems = SheetsUsingUrl.dataFromWeb(metadataDbHelper.getCardsAmount(), metadataDbHelper.getStoresAmount())
         return orderItemsAlphabetically(sheetItems)
 //        return mockDbValues()
     }

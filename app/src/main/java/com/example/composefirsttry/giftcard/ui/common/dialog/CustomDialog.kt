@@ -27,6 +27,7 @@ open class CustomDialog(protected val mActivity: FragmentActivity) : DialogFragm
 
     private fun setListeners() {
         binding.positiveButton.setOnClickListener {
+            val x = model.positiveButtonClickListener
             model.positiveButtonClickListener?.onClick(it)
             this.dismiss()
         }

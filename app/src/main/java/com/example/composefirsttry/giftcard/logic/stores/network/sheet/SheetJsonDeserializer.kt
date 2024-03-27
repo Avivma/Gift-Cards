@@ -4,13 +4,16 @@ import com.google.gson.*
 import java.lang.reflect.Type
 
 
-class SheetJsonDeserializer : JsonDeserializer<SheetItem?> {
+class SheetJsonDeserializer(private val amountOfCards: Int) : JsonDeserializer<SheetItem?> {
     //Example:
 //    [
 //      "ACE",
 //      "",
 //      "V",
 //      "V"
+//      .
+//      .
+//      .
 //    ]
     @Throws(JsonParseException::class)
     override fun deserialize(
@@ -19,12 +22,11 @@ class SheetJsonDeserializer : JsonDeserializer<SheetItem?> {
         context: JsonDeserializationContext
     ): SheetItem {
         val jsonArray = json.asJsonArray
-
         val storeName: String = getOrNull(jsonArray, 0)!!
-        val hotAvailability: String = getOrNull(jsonArray, 1) ?: ""
-        val corporateAvailability: String = getOrNull(jsonArray, 2) ?: ""
-        val maxAvailability: String =  getOrNull(jsonArray, 3) ?: ""
-        return SheetItem(storeName, hotAvailability, corporateAvailability, maxAvailability)
+        val cardsAvailability: List<String> = (1 .. amountOfCards).map { i ->
+            getOrNull(jsonArray, i) ?: ""
+        }
+        return SheetItem(storeName = storeName, cardsAvailability = cardsAvailability)
     }
 
     private fun getOrNull(jsonArray: JsonArray, index: Int): String? {

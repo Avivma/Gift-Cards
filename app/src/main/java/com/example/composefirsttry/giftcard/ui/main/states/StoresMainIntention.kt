@@ -1,12 +1,11 @@
 package com.example.composefirsttry.giftcard.ui.main.states
 
-import com.example.composefirsttry.giftcard.logic.cards.model.GiftCardType
 import com.example.composefirsttry.giftcard.logic.stores.model.Store
+import com.example.composefirsttry.giftcard.ui.common.dialog.common.CustomDialogAdapterItem
 
 sealed class StoresMainIntention {
     //Filters
     data class FilterByPrefix(val prefix: String): StoresMainIntention()
-    data class FilterByCard(val giftCardType: GiftCardType, val isChecked: Boolean): StoresMainIntention()
     object FilterBySelectedStores: StoresMainIntention()
     object ClearSearchBox : StoresMainIntention()
     object AddSeparationMarkToSearch : StoresMainIntention()
@@ -18,9 +17,10 @@ sealed class StoresMainIntention {
     data class OpenStoreDialog(val store: Store) : StoresMainIntention()
     data class AddStoreToFavorites(val store: Store) : StoresMainIntention()
     //Navigation
-    data class NavigateToCardsScreen(val giftCardType: GiftCardType): StoresMainIntention()
+    data class NavigateToCardsScreen(val shoppingClubId: String): StoresMainIntention()
 
-    data class CheckCardDiscount(val giftCardType: GiftCardType) : StoresMainIntention()
+    class ShoppingClubChecked(val clubDialogAdapterItem: CustomDialogAdapterItem.Selectable) : StoresMainIntention()
+
     object Refresh: StoresMainIntention()
     object Initialize : StoresMainIntention()
 }

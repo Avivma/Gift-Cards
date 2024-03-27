@@ -65,4 +65,9 @@
     <string name="initializing_dialog_title">Server Data Changed</string>
     <string name="initializing_dialog_text">Current data isn\'t accurate due to server\'s data has changed. Please initialize the app</string>
     <string name="initializing_dialog_button">Initialize</string>
+    <string name="main_select_cards_dialog_title">Select Cards</string>
+    <string name="main_select_cards_dialog_button_text">Close</string>
+    <string name="all_cards_selected_text">All cards are selected</string>
+    <string name="cards_not_selected_text">Some cards aren\'t selected</string>
+    <string name="cards_not_selected_text_exe">Only %1$s/%2$s cards are selected</string>
 </resources>

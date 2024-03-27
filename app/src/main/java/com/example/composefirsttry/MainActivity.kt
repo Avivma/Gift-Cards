@@ -3,21 +3,11 @@ package com.example.composefirsttry
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.tooling.preview.Preview
 import com.example.composefirsttry.giftcard.GiftCardMainActivity
-import com.example.composefirsttry.ui.theme.ComposeFirstTryTheme
 import com.google.gson.GsonBuilder
-import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import com.google.gson.reflect.TypeToken
-import org.json.JSONArray
-import org.json.JSONObject
 import java.lang.reflect.Type
 
 

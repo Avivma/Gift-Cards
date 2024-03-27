@@ -16,10 +16,12 @@ data class StoreEntity constructor(
     var corporateCard: Boolean = false,
     @ColumnInfo(name = "hot_card")
     var hotCard: Boolean = false,
+    @ColumnInfo(name = "clubs_availability")
+    var clubsAvailability: List<Boolean> = listOf(),
     @ColumnInfo(name = "favorite")
     var favorite: Boolean = false
 ) {
     override fun toString(): String {
-        return "StoreEntity(storeName='$storeName', storeNameHebrew='$storeNameHebrew', maxCard=$maxCard, corporateCard=$corporateCard, hotCard=$hotCard, favorite=$favorite)"
+        return "StoreEntity(storeName='$storeName', storeNameHebrew='$storeNameHebrew', maxCard=$maxCard, corporateCard=$corporateCard, hotCard=$hotCard, clubsAvailability=$clubsAvailability, favorite=$favorite)"
     }
 }

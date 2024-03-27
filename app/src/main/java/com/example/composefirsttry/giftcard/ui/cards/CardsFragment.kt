@@ -11,7 +11,6 @@ import com.example.composefirsttry.L
 import com.example.composefirsttry.databinding.CardsFragmentBinding
 import com.example.composefirsttry.giftcard.GiftCardMainActivity
 import com.example.composefirsttry.giftcard.logic.cards.model.GiftCard
-import com.example.composefirsttry.giftcard.logic.cards.model.GiftCardType
 import com.example.composefirsttry.giftcard.ui.addcard.AddCardFragment
 import com.example.composefirsttry.giftcard.ui.cards.states.CardsIntention
 import com.example.composefirsttry.giftcard.ui.cards.states.CardsState
@@ -47,7 +46,7 @@ class CardsFragment : Fragment() {
     private fun sendArgsToViewModel() {
         val args = arguments?.get("cardType")
         if (args != null) {
-            viewModel.setArgCardType(args as GiftCardType)
+            viewModel.setArgCardClubId(args as String)
             arguments?.clear()
         }
     }

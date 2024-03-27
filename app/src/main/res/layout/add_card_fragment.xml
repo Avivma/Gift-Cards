@@ -11,7 +11,7 @@
         <variable name="showConcreteCard" type="java.lang.Boolean"/>
         <variable name="showCardErrorSign" type="java.lang.Boolean"/>
 <!--        <variable name="cardImage" type="android.graphics.drawable.Drawable" />-->
-        <variable name="imageRes" type="java.lang.Integer" />
+        <variable name="imageUrl" type="java.lang.String" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -61,7 +61,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:padding="4dp"
-                        app:loadImage="@{imageRes}"
+                        app:loadImage="@{imageUrl}"
                         android:scaleType="fitXY"
                         tools:src="@drawable/max"
                         android:visibility="@{showConcreteCard ? View.VISIBLE : View.GONE, default=gone}"

@@ -3,8 +3,8 @@ package com.example.composefirsttry.giftcard.ui.addcard.states
 import com.example.composefirsttry.giftcard.logic.cards.model.CardFieldStatus
 import com.example.composefirsttry.giftcard.logic.cards.model.CardFieldType
 import com.example.composefirsttry.giftcard.logic.cards.model.GiftCardExtended
-import com.example.composefirsttry.giftcard.logic.cards.model.GiftCardType
-import com.example.composefirsttry.giftcard.ui.common.dialog.advancedialog.CustomDialogAdapterItem
+import com.example.composefirsttry.giftcard.ui.common.dialog.common.CustomDialogAdapterItem
+import com.example.composefirsttry.giftcard.ui.common.model.ClubIdAndUrl
 import java.util.*
 
 sealed class AddCardState {
@@ -15,11 +15,11 @@ sealed class AddCardState {
 
     data class DisplayDataEditCard(
         val fieldsValueMap: HashMap<CardFieldType, String>,
-        val cardType: GiftCardType
+        val clubDetails: ClubIdAndUrl
     ) : AddCardState()
 
     data class FieldStatusChanged(val fieldType: CardFieldType, val statusOk: Boolean) : AddCardState()
-    data class CardImageChanged(val cardType: GiftCardType) : AddCardState()
+    data class CardImageChanged(val clubDetails: ClubIdAndUrl) : AddCardState()
 
     data class CardsDialogOpened(val dialogItems: List<CustomDialogAdapterItem>) : AddCardState()
 

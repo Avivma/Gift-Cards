@@ -15,8 +15,8 @@ import androidx.navigation.ui.navigateUp
 import com.example.composefirsttry.L
 import com.example.composefirsttry.R
 import com.example.composefirsttry.databinding.ActivityGiftCardMainBinding
-import com.example.composefirsttry.giftcard.logic.cards.repository.CardUtils
-import com.example.composefirsttry.giftcard.logic.cardsmetadata.repository.MetadataCardsRepo
+import com.example.composefirsttry.giftcard.logic.cards.repository.CardsRepo
+import com.example.composefirsttry.giftcard.logic.metadata.repository.MetadataRepo
 import com.example.composefirsttry.giftcard.logic.stores.repository.StoresRepo
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -34,10 +34,10 @@ class GiftCardMainActivity : AppCompatActivity() {
     lateinit var sp: SharedPreferences
 
     @Inject
-    lateinit var cardUtils: CardUtils
+    lateinit var cardsRepo: CardsRepo
 
     @Inject
-    lateinit var metadataCardsRepo: MetadataCardsRepo
+    lateinit var metadataRepo: MetadataRepo
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -70,8 +70,8 @@ class GiftCardMainActivity : AppCompatActivity() {
         }*/
     }
 
-    private fun shouldNavigateToInitializeScreen(): Boolean = !metadataCardsRepo.isMetadataExist()
-    private fun shouldNavigateToLandingScreen(): Boolean = !cardUtils.hasAnyCard()
+    private fun shouldNavigateToInitializeScreen(): Boolean = !metadataRepo.isMetadataExist()
+    private fun shouldNavigateToLandingScreen(): Boolean = !cardsRepo.hasAnyCard()
 
     private fun navigateToInitializeScreen() {
         navigateToScreen(R.id.go_to_initializeFragment)

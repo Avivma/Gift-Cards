@@ -3,13 +3,10 @@ package com.example.composefirsttry.giftcard.ui.cards
 import androidx.lifecycle.*
 import com.example.composefirsttry.L
 import com.example.composefirsttry.giftcard.logic.cards.model.GiftCard
-import com.example.composefirsttry.giftcard.logic.cards.model.GiftCardType
 import com.example.composefirsttry.giftcard.logic.cards.repository.CardsRepo
 import com.example.composefirsttry.giftcard.ui.cards.states.CardsIntention
 import com.example.composefirsttry.giftcard.ui.cards.states.CardsState
-import com.example.composefirsttry.giftcard.ui.utils.NavigateOutsideHandler
 import com.example.composefirsttry.giftcard.utils.DbToModelConverter
-import com.example.composefirsttry.utils.observeForeverFreshly
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -37,15 +34,18 @@ class CardsViewModel @Inject constructor(
             cardsEntities.map { cardEntity -> DbToModelConverter.getGiftCard(cardEntity) }
         }
         //notify when changes happens
-        cardsLiveDataObserver = cardsLiveData.observeForeverFreshly(Observer { cards ->
+        cardsLiveDataObserver = Observer { cards ->
+            L.i("CardsViewModel - cardsLiveDataObserver - timestamp = ${System.currentTimeMillis()}")
             if (cards.isEmpty())
                 stateMutableLiveData.postValue(CardsState.Navigation.NavigateToLandingScreen)
             else
                 stateMutableLiveData.postValue(CardsState.DisplayData(getAllCards(), shouldShowClearAll()))
-        })
+        }
+        cardsLiveData.observeForever(cardsLiveDataObserver)
     }
 
     override fun onCleared() {
+        L.i("CardsViewModel - onCleared")
         super.onCleared()
         cardsLiveData.removeObserver(cardsLiveDataObserver)
     }
@@ -73,17 +73,17 @@ class CardsViewModel @Inject constructor(
     }
 
     private fun navigateOutsideToLoadMoney(card: GiftCard) {
-        when (card.type) {
-            GiftCardType.MAX -> stateMutableLiveData.postValue(CardsState.Navigation.NavigateOutsideToMax(NavigateOutsideHandler.MAX_APPLICATION_ID))
-            GiftCardType.ISRACARD -> stateMutableLiveData.postValue(CardsState.Navigation.NavigateOutsideToIsracard(NavigateOutsideHandler.ISRACARD_SITE_ADDRESS))
-            GiftCardType.TAV_HAHAM -> stateMutableLiveData.postValue(CardsState.Navigation.NavigateOutsideToTavHaham(NavigateOutsideHandler.TAV_HAHAM_APPLICATION_ID))
-        }
+//        when (card.type) {
+//            GiftCardType.MAX -> stateMutableLiveData.postValue(CardsState.Navigation.NavigateOutsideToMax(NavigateOutsideHandler.MAX_APPLICATION_ID))
+//            GiftCardType.ISRACARD -> stateMutableLiveData.postValue(CardsState.Navigation.NavigateOutsideToIsracard(NavigateOutsideHandler.ISRACARD_SITE_ADDRESS))
+//            GiftCardType.TAV_HAHAM -> stateMutableLiveData.postValue(CardsState.Navigation.NavigateOutsideToTavHaham(NavigateOutsideHandler.TAV_HAHAM_APPLICATION_ID))
+//        }
     }
 
     private fun refreshData() {
         when (val event = navigatedEvent) {
             is CardsIntention.NavigatedType.SingleCardType -> {
-                val cards = getAllCards().filter { it.type == event.argCardType }
+                val cards = getAllCards().filter { it.cardClubId == event.argClubId }
                 stateMutableLiveData.postValue(CardsState.DisplayData(cards, showClearAll = true))
             }
             CardsIntention.NavigatedType.ShowAll -> stateMutableLiveData.postValue(CardsState.DisplayData(getAllCards(), showClearAll = false))
@@ -95,9 +95,9 @@ class CardsViewModel @Inject constructor(
         is CardsIntention.NavigatedType.SingleCardType -> true
     }
 
-    fun setArgCardType(argCardType: GiftCardType?) {
-        if (argCardType == null) this.navigatedEvent = CardsIntention.NavigatedType.ShowAll
-        else this.navigatedEvent = CardsIntention.NavigatedType.SingleCardType(argCardType = argCardType)
+    fun setArgCardClubId(argClubId: String?) {
+        if (argClubId == null) this.navigatedEvent = CardsIntention.NavigatedType.ShowAll
+        else this.navigatedEvent = CardsIntention.NavigatedType.SingleCardType(argClubId)
     }
 
     private fun clearAll() {

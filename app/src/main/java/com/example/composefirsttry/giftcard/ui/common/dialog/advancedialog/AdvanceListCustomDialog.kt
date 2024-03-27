@@ -5,11 +5,11 @@ import android.os.Bundle
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.composefirsttry.R
 import com.example.composefirsttry.giftcard.ui.common.dialog.CustomDialog
+import com.example.composefirsttry.giftcard.ui.common.dialog.common.CustomDialogAdapterItem
 
 class AdvanceListCustomDialog(mActivity: FragmentActivity): CustomDialog(mActivity){
-    private lateinit var adapter: CustomDialogAdapter
+    private lateinit var adapter: AdvanceCustomDialogAdapter
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog = super.onCreateDialog(savedInstanceState)
@@ -20,7 +20,7 @@ class AdvanceListCustomDialog(mActivity: FragmentActivity): CustomDialog(mActivi
     }
 
     private fun setRecyclerView() {
-        adapter = CustomDialogAdapter(model.items, R.layout.card_selectable_custom_dialog_row)
+        adapter = AdvanceCustomDialogAdapter(model.items)
         adapter.setHasStableIds(true)
         binding.recyclerView.adapter = adapter
         binding.recyclerView.layoutManager = LinearLayoutManager(mActivity)
@@ -28,10 +28,7 @@ class AdvanceListCustomDialog(mActivity: FragmentActivity): CustomDialog(mActivi
 
     private fun observeAdapterLiveData() {
         adapter.itemClickedLivedata.observe(this, Observer { item ->
-            val selectableItem = item as CustomDialogAdapterItem.Selectable
-            selectableItem.selected = !selectableItem.selected
             model.itemsListener!!.invoke(item)
-            this.dismiss()
         })
     }
 

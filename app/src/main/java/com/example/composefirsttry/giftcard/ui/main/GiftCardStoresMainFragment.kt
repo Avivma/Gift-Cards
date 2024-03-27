@@ -7,8 +7,6 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.CheckedTextView
-import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -16,16 +14,14 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.composefirsttry.L
+import com.example.composefirsttry.R
 import com.example.composefirsttry.databinding.FragmentGiftCardStoresMainBinding
-import com.example.composefirsttry.databinding.GiftCardWithFrameLayoutBinding
 import com.example.composefirsttry.giftcard.GiftCardMainActivity
-import com.example.composefirsttry.giftcard.logic.cards.model.GiftCard
-import com.example.composefirsttry.giftcard.logic.cards.model.GiftCardType
-import com.example.composefirsttry.giftcard.logic.cards.repository.CardUtils
 import com.example.composefirsttry.giftcard.ui.common.dialog.CustomDialog
+import com.example.composefirsttry.giftcard.ui.common.dialog.advancedialog.AdvanceListCustomDialog
+import com.example.composefirsttry.giftcard.ui.common.dialog.common.CustomDialogAdapterItem
 import com.example.composefirsttry.giftcard.ui.main.states.StoreMainState
 import com.example.composefirsttry.giftcard.ui.main.states.StoresMainIntention
-import com.example.composefirsttry.utils.bindChecked
 import com.example.composefirsttry.utils.requireActivity
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -40,9 +36,6 @@ class GiftCardStoresMainFragment : Fragment() {
     @Inject
     lateinit var sp: SharedPreferences
 
-    @Inject
-    lateinit var cardUtils: CardUtils
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -54,15 +47,13 @@ class GiftCardStoresMainFragment : Fragment() {
         viewModel = ViewModelProvider(this, StoresMainViewModelFactory(viewLifecycleOwner))
             .get(StoresMainViewModel::class.java)*/
 
-        adapter = StoresAdapter(emptyList(), requireContext(), sp, cardUtils)
+        adapter = StoresAdapter(mutableMapOf())
         adapter.setHasStableIds(true)
         binding.storeRecyclerView.adapter = adapter
         binding.storeRecyclerView.layoutManager = LinearLayoutManager(requireActivity())
 
-        L.i("Checkboxes state BEFORE attach model: binding.maxCheckBox= ${binding.maxCheckBox.checkBoxCross.visibility == View.VISIBLE}, binding.corporateCheckBox= ${binding.corporateCheckBox.checkBoxCross.visibility == View.VISIBLE}, binding.hotCheckBox= ${binding.hotCheckBox.checkBoxCross.visibility == View.VISIBLE}")
         binding.model = viewModel
         binding.searchIconVisible = true
-        L.i("Checkboxes state AFTER attach model: binding.maxCheckBox= ${binding.maxCheckBox.checkBoxCross.visibility == View.VISIBLE}, binding.corporateCheckBox= ${binding.corporateCheckBox.checkBoxCross.visibility == View.VISIBLE}, binding.hotCheckBox= ${binding.hotCheckBox.checkBoxCross.visibility == View.VISIBLE}")
 
         handleOnBackPressed()
         return binding.root
@@ -100,23 +91,20 @@ class GiftCardStoresMainFragment : Fragment() {
                 L.i("StoreMainState.Waiting")
                 binding.progressCircular.visibility = if (state.progressBarVisible) View.VISIBLE else View.GONE
                 binding.storeRecyclerView.alpha = if (state.storesListFaded) 0.5f else 1f
+                binding.openCardsDialog.cardSelectedLayout.alpha = if (state.storesListFaded) 0.5f else 1f
             }
             is StoreMainState.DisplayData -> {
                 L.i("StoreMainState.DisplayData")
                 binding.progressCircular.visibility = if (state.progressBarVisible) View.VISIBLE else View.GONE
                 binding.storeRecyclerView.alpha = if (state.storesListFaded) 0.5f else 1f
+                binding.openCardsDialog.cardSelectedLayout.alpha = if (state.storesListFaded) 0.5f else 1f
                 if (state.hideStoreSelectionFilter) {
                     binding.storesSelection.visibility = View.GONE
                     binding.storesClearSelection.visibility = View.GONE
                 }
-                adapter.setStores(state.stores)
-                binding.maxCardVisible = state.cardModel.hasCard(GiftCardType.MAX)
-                binding.corporateCardVisible = state.cardModel.hasCard(GiftCardType.ISRACARD)
-                binding.hotCardVisible= state.cardModel.hasCard(GiftCardType.TAV_HAHAM)
-                binding.maxCheckBox.cardNameLayoutWithFrame = state.cardModel.getName(GiftCardType.MAX)
-                binding.corporateCheckBox.cardNameLayoutWithFrame = state.cardModel.getName(GiftCardType.ISRACARD)
-                binding.hotCheckBox.cardNameLayoutWithFrame = state.cardModel.getName(GiftCardType.TAV_HAHAM)
+                adapter.setStores(state.storesAndClubs)
                 binding.searchIconVisible = state.searchIconVisible
+                binding.cardsTextModel = state.cardsTextModel
             }
             is StoreMainState.SearchBoxTextChanged -> {
                 binding.searchStore.setText(state.searchText)
@@ -136,9 +124,6 @@ class GiftCardStoresMainFragment : Fragment() {
                     .setNegativeButton(com.example.composefirsttry.R.string.store_dialog_cancel_button_text) { }
                     .show()
             }
-            is StoreMainState.DisplayToast -> {
-                Toast.makeText(requireContext(), cardToastMessage(state.cards, state.singleCard), Toast.LENGTH_SHORT).show()
-            }
             is StoreMainState.DisplayForceInitializeDialog -> {
                 CustomDialog(requireActivity())
                     .setTitle(com.example.composefirsttry.R.string.initializing_dialog_title)
@@ -147,13 +132,22 @@ class GiftCardStoresMainFragment : Fragment() {
                     .setIsCancelable(false)
                     .show()
             }
+            is StoreMainState.CardsDialogOpened -> {
+                AdvanceListCustomDialog(requireActivity()).apply {
+                    setTitle(R.string.main_select_cards_dialog_title)
+                    setAdapter(state.dialogAdapterItems) { item ->
+                        viewModel.action(StoresMainIntention.ShoppingClubChecked(item as CustomDialogAdapterItem.Selectable))
+                    }
+                    setPositiveButton(R.string.main_select_cards_dialog_button_text) { }
+                }.show()
+            }
         }
     }
 
     private fun navigate(navigationIntention: StoreMainState.Navigation) {
         when (navigationIntention) {
             is StoreMainState.Navigation.NavigateToCardsScreen -> {
-                val direction = GiftCardStoresMainFragmentDirections.actionGiftCardsMainFragmentToCardsFragment(navigationIntention.giftCardType)
+                val direction = GiftCardStoresMainFragmentDirections.actionGiftCardsMainFragmentToCardsFragment(navigationIntention.shoppingClubId)
                 requireActivity<GiftCardMainActivity>().getNavController().navigate(direction)
             }
             StoreMainState.Navigation.NavigateToInitializeScreen -> {
@@ -172,9 +166,6 @@ class GiftCardStoresMainFragment : Fragment() {
     }
 
     private fun setListeners() {
-        setCheckBoxListener(binding.maxCheckBox, GiftCardType.MAX)
-        setCheckBoxListener(binding.corporateCheckBox, GiftCardType.ISRACARD)
-        setCheckBoxListener(binding.hotCheckBox, GiftCardType.TAV_HAHAM)
         binding.storesSelection.setOnClickListener { viewModel.action(StoresMainIntention.FilterBySelectedStores) }
         binding.storesClearSelection.setOnClickListener { viewModel.action(StoresMainIntention.ClearStoresSelection) }
         binding.separationSearchMarkButton.setOnClickListener { viewModel.action(StoresMainIntention.AddSeparationMarkToSearch) }
@@ -187,36 +178,10 @@ class GiftCardStoresMainFragment : Fragment() {
             override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
         })
-
-        //download data from google sheet - deal with image
-        binding.getGoogleSheetData.setOnClickListener {
+        binding.openCardsDialog.cardSelectedLayout.setOnClickListener {
             viewModel.action(StoresMainIntention.OpenCardsSelectionDialog)
         }
     }
-
-    private fun setCheckBoxListener(checkBoxLayout: GiftCardWithFrameLayoutBinding, giftCardType: GiftCardType) {
-        checkBoxLayout.checkBox.setOnClickListener { view ->
-            if (view is CheckedTextView) {
-                view.toggle()
-                bindChecked(checkBoxLayout.checkBox, view.isChecked)
-                bindChecked(checkBoxLayout.checkBoxCross, view.isChecked)
-                viewModel.action(StoresMainIntention.FilterByCard(giftCardType, view.isChecked))
-            }
-        }
-
-        checkBoxLayout.checkBox.setOnLongClickListener {
-            viewModel.action(StoresMainIntention.CheckCardDiscount(giftCardType))
-            true
-        }
-    }
-
-    private fun cardToastMessage(giftCards: List<GiftCard>, singleCard: Boolean) =
-        if (singleCard) {
-            val giftCard = giftCards[0]
-            "${giftCard.name} card has ${giftCard.discount.toString().removeSuffix(".0")}% discount"
-        } else {
-            "${giftCards.size} Cards' discount: ${giftCards.joinToString { "${it.discount.toString().removeSuffix(".0")}%" }}"
-        }
 
 //    fun refresh() {
 //        viewModel.action(StoresMainIntention.Refresh)

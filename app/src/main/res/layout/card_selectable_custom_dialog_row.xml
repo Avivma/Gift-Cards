@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
     <data>
-        <variable name="item" type="com.example.composefirsttry.giftcard.ui.common.dialog.advancedialog.CustomDialogAdapterItem.Selectable"/>
+        <variable name="item" type="com.example.composefirsttry.giftcard.ui.common.dialog.common.CustomDialogAdapterItem.Selectable"/>
         <variable name="imageRes" type="java.lang.Float" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -33,6 +33,8 @@
             app:layout_constraintTop_toTopOf="@id/frame"
             app:layout_constraintBottom_toBottomOf="@id/frame"
             app:layout_constraintStart_toStartOf="parent"
+            android:clickable="false"
+            android:focusable="false"
             android:checked="@{item.selected}"
             tools:checked="true"
             />
@@ -44,10 +46,11 @@
             app:layout_constraintTop_toTopOf="@id/frame"
             app:layout_constraintBottom_toBottomOf="@id/frame"
             app:layout_constraintStart_toEndOf="@id/check_box"
-            android:alpha="@{item.selected ? 1.0f : 0.5f, default=1.0f}"
+            app:setAlpha="@{item.selected}"
             app:loadImage="@{item.imageUrl}"
             tools:src="@drawable/max"
             />
+<!--        android:alpha="@{item.selected ? 1.0 : 0.5, default=1.0}"-->
 
         <TextView
             android:id="@+id/name"
@@ -60,8 +63,10 @@
             android:textSize="@dimen/small_main_text_size"
             android:textColor="@color/dark_accent"
             android:text="@{item.title}"
+            app:setAlpha="@{item.selected}"
             tools:text="Max"
             />
+<!--        tools:alpha="0.5"-->
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

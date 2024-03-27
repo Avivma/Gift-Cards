@@ -6,9 +6,7 @@ import androidx.room.Room
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKeys
 import com.example.composefirsttry.giftcard.logic.GiftCardDatabase
-import com.example.composefirsttry.giftcard.logic.cardsmetadata.db.MetadataCardsDbHandler
 import com.example.composefirsttry.utils.SPKeys
-import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -58,13 +56,5 @@ class AppModule {
             .fallbackToDestructiveMigration()
             .build()
 
-    }
-
-    @Singleton
-    @Provides
-    fun provideMetadataCardsHandler(sp: SharedPreferences): MetadataCardsDbHandler {
-        val handler = MetadataCardsDbHandler(sp, Gson())
-        handler.buildFromSp()
-        return handler
     }
 }

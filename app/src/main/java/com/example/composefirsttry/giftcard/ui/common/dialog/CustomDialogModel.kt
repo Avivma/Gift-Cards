@@ -1,7 +1,7 @@
 package com.example.composefirsttry.giftcard.ui.common.dialog
 
 import android.view.View
-import com.example.composefirsttry.giftcard.ui.common.dialog.advancedialog.CustomDialogAdapterItem
+import com.example.composefirsttry.giftcard.ui.common.dialog.common.CustomDialogAdapterItem
 
 class CustomDialogModel {
     var title: String = ""

@@ -1,4 +1,4 @@
-package com.example.composefirsttry.giftcard.logic.cardsmetadata.network.sheet
+package com.example.composefirsttry.giftcard.logic.metadata.network.sheet
 
 import androidx.annotation.WorkerThread
 import com.example.composefirsttry.giftcard.logic.common.googlesheet.SheetsServiceUrl
@@ -11,12 +11,15 @@ import javax.inject.Singleton
 @Singleton
 class SheetsUsingUrl @Inject constructor() {
     @WorkerThread
-    fun getAmountOfCards(): Int {
+    fun getAmounts(): Pair<Int, Int> {
         /*//response data:
         {
             "range": "Stores!C2",
             "majorDimension": "ROWS",
             "values": [
+              [
+                  "124"
+              ],
               [
                   "4"
               ]
@@ -24,15 +27,17 @@ class SheetsUsingUrl @Inject constructor() {
         }
         //note: getDataFromWeb() return the JsonArray after "values"
         */
-        val rangeValues = "C2:C2"
+        val rangeValues = "C2:C3"
         val jsonArray = SheetsServiceUrl.getDataFromWeb(SheetsServiceUrl.createUrl(rangeValues))
-        val cardsAmount: Int = getIntFromJsonArray(jsonArray)
-        return cardsAmount
+        val storesAmount: Int = getIntFromJsonArray(jsonArray, 0)
+        val cardsAmount: Int = getIntFromJsonArray(jsonArray, 1)
+        return Pair(storesAmount, cardsAmount)
     }
 
-    private fun getIntFromJsonArray(jsonArray: JsonArray): Int {
+    private fun getIntFromJsonArray(jsonArray: JsonArray, itemIndex: Int): Int {
+//    [["124"]]
 //    [["4"]]
-        return jsonArray[0].asJsonArray[0].asInt
+        return jsonArray[itemIndex].asJsonArray[0].asInt
     }
 
     @WorkerThread
@@ -42,6 +47,12 @@ class SheetsUsingUrl @Inject constructor() {
             "range": "Stores!B3:E5",
             "majorDimension": "ROWS",
             "values": [
+            [
+                "id1",
+                "id2",
+                "id3",
+                "id4"
+            ],
             [
                 "1",
                 "2",
@@ -64,8 +75,8 @@ class SheetsUsingUrl @Inject constructor() {
         }
         //note: getDataFromWeb() return the JsonArray after "values"
         */
-        val column = calcColumn(amountOfCards)
-        val rangeValues = "B3:${column}5"
+        val column = SheetsServiceUrl.calcColumn('B', amountOfCards)
+        val rangeValues = "B4:${column}7"
         val jsonArray = SheetsServiceUrl.getDataFromWeb(SheetsServiceUrl.createUrl(rangeValues))
         val items: List<SheetItem> = parseJsonArray(jsonArray, amountOfCards)
         return items
@@ -75,10 +86,10 @@ class SheetsUsingUrl @Inject constructor() {
         val gson = Gson()
         val type = object : TypeToken<List<List<String>>>() {}.type
         val lists: List<List<String>> = gson.fromJson(jsonArray, type)
-        val (ids, types, imageLinks) = lists
+        val (ids, indexes, types, imageLinks) = lists
 
         return List(itemsAmount) { i ->
-            SheetItem(ids[i], types[i], manipulateDriveUrl(imageLinks[i]))
+            SheetItem(ids[i], indexes[i], types[i], manipulateDriveUrl(imageLinks[i]))
         }
     }
 
@@ -97,17 +108,5 @@ class SheetsUsingUrl @Inject constructor() {
         } else {
             "Invalid URL" // Return an error message or handle as needed
         }
-    }
-
-    private fun calcColumn(amountOfCards: Int): Char {
-        val offsetAddition: Int = amountOfCards - 1
-        val startColumnLetter: Char = 'B'
-        val endColumn = calcAsciiCapital(startColumnLetter, offsetAddition)
-        return endColumn
-    }
-
-    private fun calcAsciiCapital(letter: Char, offset: Int): Char {
-        val asciiValueOfA = letter.code // ASCII value of 'B' is 66
-        return (asciiValueOfA + offset).toChar()
     }
 }

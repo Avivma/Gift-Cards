@@ -3,16 +3,19 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
-        <variable
-            name="cardImageSmallLayout"
-            type="android.graphics.drawable.Drawable" />
+        <import type="android.view.View" />
+        <variable name="cardVisible" type="java.lang.Boolean"/>
+        <variable name="imageUrl" type="java.lang.String"/>
     </data>
 
     <FrameLayout xmlns:tools="http://schemas.android.com/tools"
         android:id="@+id/card_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:paddingStart="6dp"
         android:background="@color/transparent"
+        android:visibility="@{cardVisible ? View.VISIBLE : View.GONE, default=gone}"
+        tools:visibility="visible"
         >
         <ImageView
             android:id="@+id/card_image"
@@ -20,11 +23,9 @@
             android:layout_height="@dimen/store_cards_size_height"
             android:layout_gravity="center"
             android:scaleType="centerInside"
-            android:src="@{cardImageSmallLayout}"
-            tools:src="@drawable/corporate" />
-            <!-- corporate -->
-            <!-- max -->
-            <!-- hot -->
+            app:loadImage="@{imageUrl}"
+            tools:src="@drawable/corporate"
+            />
 
         <View
             android:id="@+id/card_circle_frame"

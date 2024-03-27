@@ -4,5 +4,6 @@ data class SheetItem(
     val storeName: String,
     val hotAvailability: String = "",
     val corporateAvailability: String = "",
-    val maxAvailability: String = ""
+    val maxAvailability: String = "",
+    val cardsAvailability: List<String> = listOf()
 )

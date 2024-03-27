@@ -5,10 +5,10 @@ data class Store constructor(
     var maxCard: Boolean = false,
     var corporateCard: Boolean = false,
     var hotCard: Boolean = false,
+    var clubsAvailability: List<Boolean> = listOf(),
     var favorite: Boolean = false,
     var selected: Boolean = false
 ) {
-
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false

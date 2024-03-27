@@ -8,7 +8,7 @@ import com.example.composefirsttry.giftcard.logic.GiftCardDatabase
 import com.example.composefirsttry.giftcard.logic.cards.db.dao.CardsDao
 import com.example.composefirsttry.giftcard.logic.cards.db.entity.CardEntity
 import com.example.composefirsttry.giftcard.logic.cards.model.GiftCardExtended
-import com.example.composefirsttry.giftcard.logic.cards.model.GiftCardType
+import com.example.composefirsttry.giftcard.logic.shoppingclubs.repository.ShoppingClubsRepo
 import com.example.composefirsttry.giftcard.utils.DbToModelConverter
 import com.example.composefirsttry.utils.SPKeys
 import javax.inject.Inject
@@ -17,6 +17,7 @@ import javax.inject.Singleton
 @Singleton
 class CardsRepo @Inject constructor(
     db: GiftCardDatabase,
+    private var shoppingClubsRepo: ShoppingClubsRepo,
     private val sp: SharedPreferences,
     @EncryptedSp private val encryptedSP: SharedPreferences,
     private val encryptionHandler: CardEncryptionHandler
@@ -25,6 +26,8 @@ class CardsRepo @Inject constructor(
     private val allCards: LiveData<List<CardEntity>> = cardsDao.getAll()
 
     fun getAllCardsDb(): LiveData<List<CardEntity>> = allCards
+
+    fun hasAnyCard(): Boolean = sp.getInt(SPKeys.GIFT_CARDS_TOTAL_AMOUNT, 0) > 0
 
     @WorkerThread
     fun addCard(giftCard: GiftCardExtended) {
@@ -38,13 +41,13 @@ class CardsRepo @Inject constructor(
             .putString(keys.expirationDate, giftCard.expirationDate)
             .commit()
         //update whether there is inserted card (this update is only for condition in Activity)
-        updateCardsAmount(giftCard.type, 1)
+        updateCardsAmount(giftCard.cardClubId, 1)
     }
 
     @WorkerThread
     fun editCard(giftCard: GiftCardExtended) {
         val keys = encryptionHandler.getEncryptedKeys(giftCard)
-        val cardEntityPreviousType = cardsDao.getCardDetails(giftCard.id).type
+        val cardEntityPreviousClubId = cardsDao.getCardDetails(giftCard.id).cardClubId
         //add card plain data
         val cardEntity = DbToModelConverter.getCardEntity(giftCard, keys).apply { cardId = giftCard.id }
         cardsDao.update(cardEntity)
@@ -55,9 +58,9 @@ class CardsRepo @Inject constructor(
             .putString(keys.expirationDate, giftCard.expirationDate)
             .commit()
         //update whether there is card change (this update is only for condition in Activity)
-        if (cardEntity.type != cardEntityPreviousType) {
-            updateCardsAmount(cardEntity.type, 1)
-            updateCardsAmount(cardEntityPreviousType , -1)
+        if (cardEntity.cardClubId != cardEntityPreviousClubId) {
+            updateCardsAmount(cardEntity.cardClubId, 1)
+            updateCardsAmount(cardEntityPreviousClubId , -1)
         }
     }
 
@@ -74,7 +77,7 @@ class CardsRepo @Inject constructor(
             .remove(keys.expirationDate)
             .commit()
         //update whether there is inserted card (this update is only for condition in Activity)
-        updateCardsAmount(giftCard.type, -1)
+        updateCardsAmount(giftCard.cardClubId, -1)
     }
 
     @WorkerThread
@@ -84,30 +87,13 @@ class CardsRepo @Inject constructor(
         return DbToModelConverter.getGiftCardExtended(cardEntity, values)
     }
 
-    private fun updateCardsAmount(cardTypeValue: Int, addition: Int) {
-        val cardType = com.example.composefirsttry.giftcard.utils.CardUtils.getCardType(cardTypeValue)
-        return updateCardsAmount(cardType, addition)
+    private fun updateCardsAmount(cardClubId: String, addition: Int) {
+        shoppingClubsRepo.updateShoppingClubCounter(cardClubId, addition)
+        updateCardsTotalAmount(addition)
     }
 
-    private fun updateCardsAmount(cardType: GiftCardType, addition: Int) {
-        val (cardSpKey, specificCardAmount) = updateSpecificCardsAmount(cardType, addition)
-        sp.edit().putInt(cardSpKey, specificCardAmount).commit()
-    }
-
-    private fun updateSpecificCardsAmount(type: GiftCardType, addition: Int): Pair<String, Int> {
-        return when (type) {
-            GiftCardType.MAX -> Pair(
-                SPKeys.GIFT_CARD_AMOUNT_MAX_CARDS,
-                sp.getInt(SPKeys.GIFT_CARD_AMOUNT_MAX_CARDS, 0) + addition
-            )
-            GiftCardType.ISRACARD -> Pair(
-                SPKeys.GIFT_CARD_AMOUNT_ISRACARD_CARDS,
-                sp.getInt(SPKeys.GIFT_CARD_AMOUNT_ISRACARD_CARDS, 0) + addition
-            )
-            GiftCardType.TAV_HAHAM -> Pair(
-                SPKeys.GIFT_CARD_AMOUNT_TAV_HAHAM_CARDS,
-                sp.getInt(SPKeys.GIFT_CARD_AMOUNT_TAV_HAHAM_CARDS, 0) + addition
-            )
-        }
+    private fun updateCardsTotalAmount(addition: Int) {
+        val currentTotalAmount = sp.getInt(SPKeys.GIFT_CARDS_TOTAL_AMOUNT, 0)
+        sp.edit().putInt(SPKeys.GIFT_CARDS_TOTAL_AMOUNT, currentTotalAmount + addition).commit()
     }
 }

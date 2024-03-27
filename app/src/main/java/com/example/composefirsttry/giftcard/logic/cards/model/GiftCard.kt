@@ -1,27 +1,26 @@
 package com.example.composefirsttry.giftcard.logic.cards.model
 
-import androidx.annotation.DrawableRes
 import java.io.Serializable
 
 open class GiftCard(
     open var id: Int = -1,
-    open val type: GiftCardType,
+    open val cardClubId: String,
     open val name: String,
-    @DrawableRes open val imageRes: Int,
+    open val imageUrl: String,
     open var discount: Float
 ): Serializable
 
 class GiftCardExtended(
     override var id: Int = -1,
-    override val type: GiftCardType,
+    override val cardClubId: String,
     override val name: String,
-    @DrawableRes override val imageRes: Int,
+    override val imageUrl: String,
     override var discount: Float,
     var longName: String = "",
     var number: String = "",
     var cvv: String = "",
     var expirationDate: String = "",
-    var operator: String = "") : GiftCard(id, type, name, imageRes, discount)
+    var operator: String = "") : GiftCard(id, cardClubId, name, imageUrl, discount)
 
 // card id
 // card image

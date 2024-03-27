@@ -6,6 +6,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.RecyclerView
+import com.example.composefirsttry.L
 import com.example.composefirsttry.R
 import com.example.composefirsttry.databinding.CardRowFooterLayoutBinding
 import com.example.composefirsttry.databinding.CardRowLayoutBinding
@@ -48,11 +49,12 @@ class CardAdapter(giftCards: List<GiftCard>): RecyclerView.Adapter<RecyclerView.
 
     override fun getItemId(position: Int): Long {
         return if (position < cards.size)
-            (cards[position].type.value.toString() + cards[position].name).hashCode().toLong()
+            (cards[position].cardClubId + cards[position].name).hashCode().toLong()
         else -1L
     }
 
     fun setCards(cards: List<GiftCard>) {
+        L.i("CardAdapter.setCards - cards = $cards")
         this.cards.clear()
         this.cards.addAll(cards)
         notifyDataSetChanged()

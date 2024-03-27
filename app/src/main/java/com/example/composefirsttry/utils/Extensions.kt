@@ -2,10 +2,23 @@ package com.example.composefirsttry.utils
 
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.*
+import com.example.composefirsttry.giftcard.logic.shoppingclubs.model.ShoppingClub
+import com.example.composefirsttry.giftcard.logic.stores.model.Store
 
 
 fun <T> Fragment.requireActivity() = requireActivity() as T
 fun <K> Fragment.getApplication() = requireActivity().application as K
+
+fun Store.getValidClubs(shoppingClubs: List<ShoppingClub>): List<ShoppingClub> {
+    val storeClubsAvailable = this.clubsAvailability
+    return shoppingClubs.filter { shoppingClub ->
+        storeClubsAvailable[shoppingClub.index]
+    }
+}
+
+fun Store.hasValidClubs(shoppingClubs: List<ShoppingClub>): Boolean {
+    return this.getValidClubs(shoppingClubs).isNotEmpty()
+}
 
 fun <T> LiveData<T>.toMutableLiveData(): MutableLiveData<T> {
     val mediatorLiveData = MediatorLiveData<T>()

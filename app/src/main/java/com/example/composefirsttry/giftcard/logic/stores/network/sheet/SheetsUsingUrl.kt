@@ -6,14 +6,31 @@ import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 
 object SheetsUsingUrl {
-    private const val RANGE_VALUES = "A8:H500"
     private val itemType = object : TypeToken<List<SheetItem?>?>() {}.type
 
     @WorkerThread
-    fun dataFromWeb(): List<SheetItem> {
-        val jsonArray = SheetsServiceUrl.getDataFromWeb(SheetsServiceUrl.createUrl(RANGE_VALUES))
+    fun dataFromWeb(amountOfCards: Int, amountOfStores: Int): List<SheetItem> {
+        /*//response data:
+        [
+          [
+            "ACE",
+            "",
+            "V",
+            "V"
+            .
+            .
+            .
+          ],
+          .
+          .
+          .
+        ]*/
+        val column = SheetsServiceUrl.calcColumn('B', amountOfCards)
+        val row = SheetsServiceUrl.calcRow(11, amountOfStores)
+        val rangeValues = "A11:${column}${row}"
+        val jsonArray = SheetsServiceUrl.getDataFromWeb(SheetsServiceUrl.createUrl(rangeValues))
         val gsonBuilder = GsonBuilder()
-        val deserializer = SheetJsonDeserializer()
+        val deserializer = SheetJsonDeserializer(amountOfCards)
         gsonBuilder.registerTypeAdapter(SheetItem::class.java, deserializer)
         val gson = gsonBuilder.create()
         val itemList = gson.fromJson<List<SheetItem>>(jsonArray, itemType)
