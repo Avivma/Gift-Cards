@@ -58,8 +58,6 @@ class CardsFragment : Fragment() {
             if (state is CardsState.Navigation) navigate(state)
             else render(state)
         })
-
-        viewModel.action(CardsIntention.Refresh)
     }
 
     private fun navigate(navigationIntention: CardsState.Navigation) {
@@ -116,5 +114,11 @@ class CardsFragment : Fragment() {
         binding.addCard.setOnClickListener {
             navigate(CardsState.Navigation.NavigateToAddCard)
         }
+        viewModel.startObservingDb(viewLifecycleOwner)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        viewModel.stopObservingDb(viewLifecycleOwner)
     }
 }

@@ -22,35 +22,36 @@ class CardsViewModel @Inject constructor(
 
     private var stateMutableLiveData = MutableLiveData<CardsState>()
 
-    private lateinit var cardsLiveData: LiveData<List<GiftCard>>
-    private lateinit var cardsLiveDataObserver: Observer<List<GiftCard>>
+    private var cardsLiveData: LiveData<List<GiftCard>>? = MutableLiveData<List<GiftCard>>()
+
+    private var _cardsMediatorDb: MediatorLiveData<List<GiftCard>>? = null
+    private val cardsMediatorDb get() = _cardsMediatorDb!!
 
     private var navigatedEvent: CardsIntention.NavigatedType = CardsIntention.NavigatedType.ShowAll
 
-    init {
-        initListeners()
-    }
-
-    private fun initListeners() {
+    fun startObservingDb(owner: LifecycleOwner) {
         //attach viewModel's cards to db
         cardsLiveData = cardsRepo.getAllCardsDb().map { cardsEntities ->
             cardsEntities.map { cardEntity -> DbToModelConverter.getGiftCard(cardEntity) }
         }
         //notify when changes happens
-        cardsLiveDataObserver = Observer { cards ->
+        _cardsMediatorDb = MediatorLiveData<List<GiftCard>>()
+        cardsMediatorDb.addSource(cardsLiveData!!) { cards ->
             L.i("CardsViewModel - cardsLiveDataObserver - timestamp = ${System.currentTimeMillis()}")
             if (cards.isEmpty())
                 stateMutableLiveData.postValue(CardsState.Navigation.NavigateToLandingScreen)
-            else
-                stateMutableLiveData.postValue(CardsState.DisplayData(getAllCards(), shouldShowClearAll()))
+            else {
+                refreshData()
+            }
         }
-        cardsLiveData.observeForever(cardsLiveDataObserver)
+
+        cardsMediatorDb.observe(owner) {}
     }
 
-    override fun onCleared() {
-        L.i("CardsViewModel - onCleared")
-        super.onCleared()
-        cardsLiveData.removeObserver(cardsLiveDataObserver)
+    fun stopObservingDb(owner: LifecycleOwner) {
+        cardsMediatorDb.removeObservers(owner)
+        _cardsMediatorDb = null
+        cardsLiveData = null
     }
 
     //NOTE: Use this way, because LiveData stores events and triggers them once new LifecycleOwner is observe to them.
@@ -91,11 +92,6 @@ class CardsViewModel @Inject constructor(
         }
     }
 
-    private fun shouldShowClearAll(): Boolean = when (navigatedEvent) {
-        CardsIntention.NavigatedType.ShowAll -> false
-        is CardsIntention.NavigatedType.SingleCardType -> true
-    }
-
     fun setArgCardClubId(argClubId: String?) {
         if (argClubId == null) this.navigatedEvent = CardsIntention.NavigatedType.ShowAll
         else this.navigatedEvent = CardsIntention.NavigatedType.SingleCardType(argClubId)
@@ -110,7 +106,7 @@ class CardsViewModel @Inject constructor(
         cardsRepo.removeCard(card.id)
     }
 
-    private fun getAllCards(): List<GiftCard> = cardsLiveData.value ?: listOf()
+    private fun getAllCards(): List<GiftCard> = cardsLiveData?.value ?: listOf()
 
     private fun getShoppingClubs(): List<ShoppingClub> = shoppingClubRepo.getAllExistingShoppingClubs().value!!.map { clubEntity ->
         val shoppingClub = DbToModelConverter.fromEntityToShoppingClub(clubEntity)
