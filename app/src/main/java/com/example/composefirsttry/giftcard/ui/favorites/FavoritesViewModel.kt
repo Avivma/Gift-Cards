@@ -39,7 +39,7 @@ class FavoritesViewModel @Inject constructor (
 
     private fun initListeners() {
         //attach viewModel's stores to db
-        storesLiveData = Transformations.map(storesConsiderCardsRepo.getAllStoresCache()) { storesEntities ->
+        storesLiveData = storesConsiderCardsRepo.getAllStoresCache().map { storesEntities ->
             storesEntities.map { storeEntity ->
                 DbToModelConverter.fromEntityToStore(storeEntity)
             }
@@ -50,7 +50,7 @@ class FavoritesViewModel @Inject constructor (
         })
 
         //attach viewModel's shoppingClubs to db
-        shoppingClubLiveData = Transformations.map(shoppingClubsRepo.getAllExistingShoppingClubs()) { clubEntities ->
+        shoppingClubLiveData = shoppingClubsRepo.getAllExistingShoppingClubs().map { clubEntities ->
             clubEntities.map { clubEntity ->
                 val shoppingClub = DbToModelConverter.fromEntityToShoppingClub(clubEntity)
                 shoppingClub
@@ -86,7 +86,7 @@ class FavoritesViewModel @Inject constructor (
                 is FavoritesIntention.RemoveAllStores -> removeAllStoresFromFavorites()
                 is FavoritesIntention.OpenRemoveAllDialog -> removeAllDialog()
                 is FavoritesIntention.NavigateToCardsScreen -> retrieveDataForNavigationToCardsScreen(intention.shoppingClubId)
-                else -> L.e("Unfamiliar intention. Intention = ${intention.javaClass.simpleName}")
+                else -> throw Exception("Unfamiliar intention. Intention = ${intention.javaClass.simpleName}")
             }
         }
     }

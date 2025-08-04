@@ -33,7 +33,7 @@ class CardsViewModel @Inject constructor(
 
     private fun initListeners() {
         //attach viewModel's cards to db
-        cardsLiveData = Transformations.map(cardsRepo.getAllCardsDb()) { cardsEntities ->
+        cardsLiveData = cardsRepo.getAllCardsDb().map { cardsEntities ->
             cardsEntities.map { cardEntity -> DbToModelConverter.getGiftCard(cardEntity) }
         }
         //notify when changes happens
@@ -70,7 +70,7 @@ class CardsViewModel @Inject constructor(
                 is CardsIntention.NavigateToEditCard -> stateMutableLiveData.postValue(CardsState.Navigation.NavigateToEditCard(intention.card))
                 is CardsIntention.NavigateToCardDetails -> stateMutableLiveData.postValue(CardsState.Navigation.NavigateToCardDetails(intention.card))
                 is CardsIntention.NavigateOutsideToLoadMoney -> navigateOutsideToLoadMoney(intention.card)
-                else -> L.e("Unfamiliar CardsIntention (${intention.javaClass.simpleName})")
+                else -> throw Exception("Unfamiliar CardsIntention (${intention.javaClass.simpleName})")
             }
         }
     }

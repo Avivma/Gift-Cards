@@ -17,6 +17,7 @@ import com.example.composefirsttry.giftcard.ui.favorites.states.FavoritesIntenti
 import com.example.composefirsttry.giftcard.ui.favorites.states.FavoritesState
 import com.example.composefirsttry.utils.requireActivity
 import dagger.hilt.android.AndroidEntryPoint
+import java.lang.Exception
 
 @AndroidEntryPoint
 class FavoritesFragment : Fragment() {
@@ -83,6 +84,7 @@ class FavoritesFragment : Fragment() {
                     .setNegativeButton(R.string.store_dialog_cancel_button_text) { }
                     .show()
             }
+            else -> throw Exception("Unfamiliar FavoritesState (${state.javaClass.simpleName})")
         }
     }
 

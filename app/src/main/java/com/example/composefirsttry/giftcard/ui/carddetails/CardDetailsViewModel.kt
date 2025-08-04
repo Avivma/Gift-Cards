@@ -35,7 +35,7 @@ class CardDetailsViewModel @Inject constructor(
 
     private fun initListeners() {
         //attach viewModel's cards to db
-        cardsLiveData = Transformations.map(cardsRepo.getAllCardsDb()) { cardsEntities ->
+        cardsLiveData = cardsRepo.getAllCardsDb().map { cardsEntities ->
             cardsEntities.map { cardEntity -> DbToModelConverter.getGiftCard(cardEntity) }
         }
         //notify when changes happens
@@ -60,7 +60,7 @@ class CardDetailsViewModel @Inject constructor(
                 CardDetailsIntention.OpenRemoveCardDialog -> stateMutableLiveData.postValue(CardDetailsState.RemoveCardDialogOpened)
                 CardDetailsIntention.RemoveCard -> removeCard(cardArg)
                 CardDetailsIntention.NavigateOutsideToLoadMoney -> navigateOutsideToLoadMoney(cardArg)
-                else -> L.e("Unfamiliar CardDetailsIntention (${intention.javaClass.simpleName})")
+                else -> throw Exception("Unfamiliar CardDetailsIntention (${intention.javaClass.simpleName})")
             }
         }
     }

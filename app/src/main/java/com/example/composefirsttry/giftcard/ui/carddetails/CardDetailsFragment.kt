@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.navArgs
+import com.example.composefirsttry.L
 import com.example.composefirsttry.databinding.FragmentCardDetailsBinding
 import com.example.composefirsttry.giftcard.GiftCardMainActivity
 import com.example.composefirsttry.giftcard.ui.addcard.AddCardFragment
@@ -75,6 +76,7 @@ class CardDetailsFragment : Fragment() {
             is CardDetailsState.DisplayData -> {
                 binding.card = state.cardDetailsExtended
             }
+            else -> throw Exception("Unfamiliar CardDetailsState (${state.javaClass.simpleName})")
         }
     }
 

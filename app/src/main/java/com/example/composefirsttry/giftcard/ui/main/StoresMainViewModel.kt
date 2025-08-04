@@ -50,7 +50,7 @@ class StoresMainViewModel @Inject constructor (
 
     private fun initListeners() {
         //attach viewModel's stores to db
-        storesLiveData = Transformations.map(storesConsiderCardsRepo.getAllStoresCache()) { storesEntities ->
+        storesLiveData = storesConsiderCardsRepo.getAllStoresCache().map { storesEntities ->
             storesEntities.map { storeEntity ->
                 val store = DbToModelConverter.fromEntityToStore(storeEntity)
                 storesCacheHandler.updateStoreWithCacheProperties(store)
@@ -63,7 +63,7 @@ class StoresMainViewModel @Inject constructor (
         })
 
         //attach viewModel's shoppingClubs to db
-        shoppingClubLiveData = Transformations.map(shoppingClubsRepo.getAllExistingShoppingClubs()) { clubEntities ->
+        shoppingClubLiveData = shoppingClubsRepo.getAllExistingShoppingClubs().map { clubEntities ->
             clubEntities.map { clubEntity ->
                 val shoppingClub = DbToModelConverter.fromEntityToShoppingClub(clubEntity)
                 shoppingClub

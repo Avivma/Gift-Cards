@@ -63,7 +63,7 @@ class AddCardViewModel @Inject constructor(
 
     private fun attachToDb() {
         //attach viewModel's stores to db
-        shoppingClubLiveData = Transformations.map(shoppingClubsRepo.getAllShoppingClubs()) { clubEntities ->
+        shoppingClubLiveData = shoppingClubsRepo.getAllShoppingClubs().map { clubEntities ->
             L.i("attachToDb - Transformations.map")
             clubEntities.map { clubEntity ->
                 val shoppingClub = DbToModelConverter.fromEntityToShoppingClub(clubEntity)
@@ -122,6 +122,11 @@ class AddCardViewModel @Inject constructor(
         when (val event = navigatedEvent) {
             is AddCardIntention.NavigatedType.EditCardFromCards -> editCard(event.card.id)
             is AddCardIntention.NavigatedType.EditCardFromCardDetails -> editCard(event.card.id)
+            AddCardIntention.NavigatedType.AddCard -> {
+                /*do nothing*/
+                L.i("AddCardViewModel - refresh - AddCardIntention.NavigatedType.AddCard")
+            }
+            else -> throw Exception("Unfamiliar navigated event (intention = ${event.javaClass.simpleName})")
         }
     }
 

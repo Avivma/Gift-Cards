@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.composefirsttry.L
 import com.example.composefirsttry.databinding.CardsFragmentBinding
@@ -25,6 +26,7 @@ class CardsFragment : Fragment() {
     private val viewModel: CardsViewModel by viewModels()
     private lateinit var binding: CardsFragmentBinding
     private lateinit var adapter: CardAdapter
+    private val args: CardsFragmentArgs by navArgs()
 
     @Inject
     lateinit var navigateOutsideHandler: NavigateOutsideHandler
@@ -44,26 +46,14 @@ class CardsFragment : Fragment() {
     }
 
     private fun sendArgsToViewModel() {
-        val args = arguments?.get("cardType")
-        if (args != null) {
-            viewModel.setArgCardClubId(args as String)
-            arguments?.clear()
-        }
+        val args = args.cardType
+        viewModel.setArgCardClubId(args)
+        arguments?.clear()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         adapter.intentionsListener.observe(viewLifecycleOwner, { intention -> viewModel.action(intention) })
-/*
-        //try1
-        viewModel.setObserver(true)
-        viewModel.stateLiveData.observe(viewLifecycleOwner, { state -> render(state) })
-        viewModel.setObserver(false)
-        viewModel.navigationLiveData.observe(viewLifecycleOwner, { state -> navigate(state) })
-        //try2
-        stateLiveDataObserver = viewModel.stateLiveData.observeFreshly(viewLifecycleOwner, { state -> render(state) })
-        navigationLiveDataObserver = viewModel.navigationLiveData.observeFreshly(viewLifecycleOwner, { state -> navigate(state) })
-*/
         viewModel.observeStateLiveData(viewLifecycleOwner, { state ->
             if (state is CardsState.Navigation) navigate(state)
             else render(state)

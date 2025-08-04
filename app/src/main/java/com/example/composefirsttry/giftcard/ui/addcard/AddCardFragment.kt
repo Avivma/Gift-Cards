@@ -106,6 +106,7 @@ class AddCardFragment : Fragment() {
             is AddCardState.CardImageChanged -> changedCardImage(state.clubDetails)
             is AddCardState.FieldStatusChanged -> changeFieldStatus(state.fieldType, state.statusOk)
             is AddCardState.DisplayDataEditCard -> displayDataEditCard(state.fieldsValueMap, state.clubDetails)
+            else -> throw Exception("Unfamiliar AddCardState (${state.javaClass.simpleName})")
         }
     }
 

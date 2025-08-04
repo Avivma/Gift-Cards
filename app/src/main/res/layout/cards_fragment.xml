@@ -12,7 +12,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".giftcard.ui.cards.CardsFragment">
-        <!--    android:background="@drawable/navigation_menu_background"-->
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler_view"

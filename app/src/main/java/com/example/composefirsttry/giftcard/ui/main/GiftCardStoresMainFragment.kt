@@ -138,6 +138,7 @@ class GiftCardStoresMainFragment : Fragment() {
                     setPositiveButton(R.string.main_select_cards_dialog_button_text) { }
                 }.show()
             }
+            else -> throw Exception("Unfamiliar StoreMainState (${state.javaClass.simpleName})")
         }
     }
 
